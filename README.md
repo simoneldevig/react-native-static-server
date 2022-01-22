@@ -1,5 +1,6 @@
+# React Native Static Server
 
-# react-native-static-server
+_This is a fork of [the original `react-native-static-server`](https://www.npmjs.com/package/react-native-static-server). The original does not seem to be actively maintained, so the current goal is just to have fork I can rapidly patch / update for personal projects._
 
 A cross platform component for serving static assets with React Native.
 

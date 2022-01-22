@@ -55,3 +55,4 @@ StaticServerExample/my-release-key.keystore
 .project
 .settings/
 android/.project
+/react-native-static-server-*.tgz
