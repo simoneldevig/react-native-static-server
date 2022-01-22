@@ -11,6 +11,8 @@ const ROOT = null;
 const LOCALHOST = 'http://127.0.0.1:';
 
 class StaticServer {
+  #appStateSub;
+
 	constructor(port, root, opts) {
 		switch (arguments.length) {
 			case 3:
@@ -66,7 +68,10 @@ class StaticServer {
 		this.running = true;
 
 		if (!this.keepAlive && (Platform.OS === 'android')) {
-			AppState.addEventListener('change', this._handleAppStateChangeFn);
+      this.#appStateSub = AppState.addEventListener(
+        'change',
+        this._handleAppStateChangeFn,
+      );
 		}
 
 		return FPStaticServer.start(this.port, this.root, this.localOnly, this.keepAlive)
@@ -86,7 +91,7 @@ class StaticServer {
 		this.stop();
 		this.started = false;
 		this._origin = undefined;
-		AppState.removeEventListener('change', this._handleAppStateChangeFn);
+    if (this.#appStateSub) this.#appStateSub.remove();
 	}
 
 	_handleAppStateChange(appState) {
