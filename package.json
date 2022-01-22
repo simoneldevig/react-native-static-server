@@ -3,10 +3,10 @@
   "version": "0.5.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/futurepress/react-native-static-server.git",
-    "baseUrl": "https://github.com/futurepress/react-native-static-server"
+    "url": "git+https://github.com/birdofpreyru/react-native-static-server.git",
+    "baseUrl": "https://github.com/birdofpreyru/react-native-static-server"
   },
-  "homepage": "https://github.com/futurepress/react-native-static-server",
+  "homepage": "https://github.com/birdofpreyru/react-native-static-server",
   "title": "React Native Static Server",
   "description": "HTTP static file server for React Native",
   "main": "index.js",
@@ -17,10 +17,7 @@
   "keywords": [
     "react-native"
   ],
-  "author": {
-    "name": "Fred Chasen",
-    "email": "fchasen@gmail.com"
-  },
+  "author": "Dr. Sergey Pogodin <doc@pogodin.studio> (https://dr.pogodin.studio)",
   "license": "MIT",
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
