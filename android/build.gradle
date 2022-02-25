@@ -17,14 +17,14 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet('RNStaticServer_compileSdkVersion', 31)
-    buildToolsVersion safeExtGet('RNStaticServer_buildToolsVersion', '30.0.2')
+    compileSdkVersion safeExtGet('compileSdkVersion', 31)
+    buildToolsVersion safeExtGet('buildToolsVersion', '30.0.2')
     defaultConfig {
-        minSdkVersion safeExtGet('RNStaticServer_minSdkVersion', 23)
-        ndkVersion safeExtGet('RNStaticServer_ndkVersion', '21.4.7075529')
-        targetSdkVersion safeExtGet('RNStaticServer_targetSdkVersion', 31)
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion safeExtGet('minSdkVersion', 23)
+        ndkVersion safeExtGet('ndkVersion', '21.4.7075529')
+        targetSdkVersion safeExtGet('targetSdkVersion', 31)
+        versionCode 2
+        versionName "0.5.4"
     }
     buildTypes {
         release {

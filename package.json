@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/birdofpreyru/react-native-static-server.git",
@@ -23,7 +23,7 @@
   "readmeFilename": "README.md",
   "peerDependencies": {
     "react": "*",
-    "react-native": "^0.67.1"
+    "react-native": "^0.67.3"
   },
   "files": [
     "android",
