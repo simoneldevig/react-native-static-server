@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
     if (project == rootProject) {
         repositories {
@@ -5,7 +7,7 @@ buildscript {
             mavenCentral()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:4.2.2'
+            classpath 'com.android.tools.build:gradle:7.0.4'
         }
     }
 }
@@ -18,13 +20,19 @@ def safeExtGet(prop, fallback) {
 
 android {
     compileSdkVersion safeExtGet('compileSdkVersion', 31)
-    buildToolsVersion safeExtGet('buildToolsVersion', '30.0.2')
+    buildToolsVersion safeExtGet('buildToolsVersion', '31.0.0')
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 23)
-        ndkVersion safeExtGet('ndkVersion', '21.4.7075529')
+        if (System.properties['os.arch'] == "aarch64") {
+            // For M1 Users we need to use the NDK 24 which added support for aarch64
+            ndkVersion safeExtGet('ndkVersion', '24.0.8215888')
+        } else {
+            // Otherwise we default to the side-by-side NDK version from AGP.
+            ndkVersion safeExtGet('ndkVersion', '21.4.7075529')
+        }
         targetSdkVersion safeExtGet('targetSdkVersion', 31)
-        versionCode 2
-        versionName "0.5.4"
+        versionCode 3
+        versionName "0.5.5"
     }
     buildTypes {
         release {
