@@ -6,10 +6,11 @@
 #import "GCDWebServerFileResponse.h"
 #import "GCDWebServerHTTPStatusCodes.h"
 
-@interface FPStaticServer : NSObject <RCTBridgeModule> {
+#ifdef RCT_NEW_ARCH_ENABLED
+  #import <NativeStaticServerSpec/NativeStaticServerSpec.h>
+  @interface NativeStaticServer() <NativeStaticServerSpec> {
     GCDWebServer* _webServer;
-}
-
+  }
     @property(nonatomic, retain) NSString *localPath;
     @property(nonatomic, retain) NSString *url;
 
@@ -17,6 +18,17 @@
     @property (nonatomic, retain) NSNumber* port;
     @property (assign) BOOL localhost_only;
     @property (assign) BOOL keep_alive;
+  @end
+#else
+  @interface FPStaticServer : NSObject <RCTBridgeModule> {
+    GCDWebServer* _webServer;
+  }
+    @property(nonatomic, retain) NSString *localPath;
+    @property(nonatomic, retain) NSString *url;
 
-@end
-  
+    @property (nonatomic, retain) NSString* www_root;
+    @property (nonatomic, retain) NSNumber* port;
+    @property (assign) BOOL localhost_only;
+    @property (assign) BOOL keep_alive;
+  @end
+#endif

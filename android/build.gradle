@@ -4,15 +4,25 @@ buildscript {
     if (project == rootProject) {
         repositories {
             google()
+            gradlePluginPortal()
             mavenCentral()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:7.0.4'
+            classpath 'com.android.tools.build:gradle:7.1.1'
+            classpath("com.facebook.react:react-native-gradle-plugin")
+            classpath("de.undercouch:gradle-download-task:5.0.1")
         }
     }
 }
 
+def isNewArchitectureEnabled() {
+  return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
 apply plugin: 'com.android.library'
+if (isNewArchitectureEnabled()) {
+  apply plugin: 'com.facebook.react'
+}
 
 def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
@@ -31,8 +41,18 @@ android {
             ndkVersion safeExtGet('ndkVersion', '21.4.7075529')
         }
         targetSdkVersion safeExtGet('targetSdkVersion', 31)
-        versionCode 3
-        versionName "0.5.5"
+        versionCode 4
+        versionName "0.6.0"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    }
+    sourceSets {
+      main {
+        if (isNewArchitectureEnabled()) {
+          java.srcDirs += ['src/newarch']
+        } else {
+          java.srcDirs += ['src/oldarch']
+        }
+      }
     }
     buildTypes {
         release {
@@ -62,4 +82,15 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.nanohttpd:nanohttpd-webserver:2.3.1'
+}
+
+if (isNewArchitectureEnabled()) {
+  react {
+    libraryName = "static-server"
+    codegenJavaPackageName = "com.futurepress.staticserver"
+    root = rootProject.file("..")
+    jsRootDir = rootProject.file("../src/")
+    reactNativeDir = rootProject.file("../node_modules/react-native/")
+    codegenDir = rootProject.file("../node_modules/react-native-codegen/")
+  }
 }

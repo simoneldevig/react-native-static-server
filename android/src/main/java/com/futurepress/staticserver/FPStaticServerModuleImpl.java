@@ -2,10 +2,7 @@
 package com.futurepress.staticserver;
 
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.LifecycleEventListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,14 +14,12 @@ import java.net.ServerSocket;
 
 import android.util.Log;
 
-
 import fi.iki.elonen.SimpleWebServer;
 
-public class FPStaticServerModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
-
+public class FPStaticServerModuleImpl {
   private final ReactApplicationContext reactContext;
 
-  private static final String LOGTAG = "FPStaticServerModule";
+  public static final String NAME = "RNStaticServer";
 
   private File www_root = null;
   private int port = 9999;
@@ -35,8 +30,7 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
   private SimpleWebServer server = null;
   private String	url = "";
 
-  public FPStaticServerModule(ReactApplicationContext reactContext) {
-    super(reactContext);
+  public FPStaticServerModuleImpl(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
   }
 
@@ -49,25 +43,19 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
           if (! inetAddress.isLoopbackAddress()) {
             String ip = inetAddress.getHostAddress();
             if(InetAddressUtils.isIPv4Address(ip)) {
-              Log.w(LOGTAG, "local IP: "+ ip);
+              Log.w(NAME, "local IP: "+ ip);
               return ip;
             }
           }
         }
       }
     } catch (SocketException ex) {
-      Log.e(LOGTAG, ex.toString());
+      Log.e(NAME, ex.toString());
     }
 
     return "127.0.0.1";
   }
 
-  @Override
-  public String getName() {
-    return "FPStaticServer";
-  }
-
-  @ReactMethod
   public void start(String _port, String root, Boolean localhost, Boolean keepAlive, Promise promise) {
 
     if (server != null){
@@ -112,13 +100,11 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
     }
 
     try {
-
       if(localhost_only) {
         server = new WebServer("localhost", port, www_root);
       } else {
         server = new WebServer(__getLocalIpAddress(), port, www_root);
       }
-
 
       if (localhost_only) {
         url = "http://localhost:" + port;
@@ -127,13 +113,9 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
       }
 
       server.start();
-
       promise.resolve(url);
-
     } catch (IOException e) {
       String msg = e.getMessage();
-
-
 
       // Server doesn't stop on refresh
       if (server != null && msg.equals("bind failed: EADDRINUSE (Address already in use)")){
@@ -141,17 +123,14 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
       } else {
         promise.reject(null, msg);
       }
-
     }
-
-
   }
 
   private Integer findRandomOpenPort() throws IOException {
     try {
       ServerSocket socket = new ServerSocket(0);
       int port = socket.getLocalPort();
-      Log.w(LOGTAG, "port:" + port);
+      Log.w(NAME, "port:" + port);
       socket.close();
       return port;
     } catch (IOException e) {
@@ -159,16 +138,29 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
     }
   }
 
-  @ReactMethod
+  public void stop(Promise promise) {
+    if (server != null) {
+      Log.w(NAME, "Stopped Server");
+      server.stop();
+      server = null;
+
+      // TODO: Not sure, whether it is fine to resolve the promise just like
+      // this, or should we do something to wait for the server to actually
+      // stop. Should be double-checked in the underlying server docs.
+      promise.resolve("");
+    }
+  }
+
+  // TODO: A version without Promise argument, it should be combined with the
+  // version above.
   public void stop() {
     if (server != null) {
-      Log.w(LOGTAG, "Stopped Server");
+      Log.w(NAME, "Stopped Server");
       server.stop();
       server = null;
     }
   }
 
-  @ReactMethod
   public void origin(Promise promise) {
     if (server != null) {
       promise.resolve(url);
@@ -177,24 +169,7 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
     }
   }
 
-  @ReactMethod
   public void isRunning(Promise promise) {
     promise.resolve(server != null && server.isAlive());
-  }
-
-  /* Shut down the server if app is destroyed or paused */
-  @Override
-  public void onHostResume() {
-    //start(null, null, null, null);
-  }
-
-  @Override
-  public void onHostPause() {
-    //stop();
-  }
-
-  @Override
-  public void onHostDestroy() {
-    stop();
   }
 }
