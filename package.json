@@ -6,7 +6,7 @@
     "url": "git+https://github.com/birdofpreyru/react-native-static-server.git",
     "baseUrl": "https://github.com/birdofpreyru/react-native-static-server"
   },
-  "homepage": "https://github.com/birdofpreyru/react-native-static-server",
+  "homepage": "https://dr.pogodin.studio/docs/react-native-static-server",
   "title": "React Native Static Server",
   "description": "HTTP static file server for React Native",
   "main": "index.js",
