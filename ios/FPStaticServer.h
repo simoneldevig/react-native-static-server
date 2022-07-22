@@ -20,7 +20,7 @@
     @property (assign) BOOL keep_alive;
   @end
 #else
-  @interface FPStaticServer : NSObject <RCTBridgeModule> {
+  @interface RNStaticServer : NSObject <RCTBridgeModule> {
     GCDWebServer* _webServer;
   }
     @property(nonatomic, retain) NSString *localPath;
