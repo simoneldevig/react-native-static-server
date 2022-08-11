@@ -1,18 +1,47 @@
 # React Native Static Server
 
-_This is a fork of [the original `react-native-static-server`](https://www.npmjs.com/package/react-native-static-server). The original does not seem to be actively maintained, so the current goal is just to have fork I can rapidly patch / update for personal projects._
+A cross-platform component for serving static assets with React Native.
 
-A cross platform component for serving static assets with React Native.
+_This is a well-maintained fork of the original [`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server), which was abandoned by its creators._
 
 ## Getting started
+- Install the package
+  ```shell
+  $ npm install --save react-native-static-server
+  ```
+- The current library implementation uses JavaScript's
+  [Private Class Features](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields),
+  which should be enabled in the React Native's [Babel] config, as of RN 0.69+.
+  To enable it, first install the required [Babel] plugin:
+  ```shell
+  $ npm install --save-dev @babel/plugin-proposal-private-methods
+  ```
+  Then add this plugin to the [Babel]'s [config file](https://babeljs.io/docs/en/config-files) in the root of your RN project:
+  ```js
+  // babel.config.js
 
-`$ npm install react-native-static-server --save`
+  module.exports = {
+    // This is the default Babel preset for RN, don't forget to include it,
+    // if you create the config file from scratch.
+    presets: ['module:metro-react-native-babel-preset'],
 
-### Installation
+    // This enables private methods support for JavaScript.
+    plugins: ['@babel/plugin-proposal-private-methods'],
 
-From react-native 0.60 autolinking will take care of the link step but don't forget to run pod install
-
-`$ react-native link react-native-static-server`
+    // These flags are optional. They allow more efficient code for private
+    // methods, at a cost irrelevant for most projects.
+    // See https://babeljs.io/docs/en/babel-plugin-proposal-private-methods#loose
+    // for details.
+    assumptions: {
+      privateFieldsAsProperties: true,
+      setPublicClassFields: true
+    }
+  };
+  ```
+- If you intend to use this library in an [Expo app](https://expo.dev),
+  it is possible, but requires additional setup efforts.
+  See [this discussion](https://github.com/birdofpreyru/react-native-static-server/issues/8#issuecomment-1211605867)
+  for details.
 
 ## Usage
 
@@ -108,3 +137,6 @@ let server = new StaticServer(0, {keepAlive : true });
 * Android server: [NanoHttpd Webserver](https://github.com/NanoHttpd/nanohttpd)
 
 Thanks to [CorHttpd](https://github.com/floatinghotpot/cordova-httpd) and [react-native-httpserver](https://gitlab.com/base.io/react-native-httpserver#README) for the basis of this library.
+
+<!-- links -->
+[Babel]: https://babeljs.io/
