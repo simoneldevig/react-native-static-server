@@ -121,9 +121,29 @@ RCT_EXPORT_METHOD(start: (NSString *)port
         return response;
       }];
 
-    NSError *error;
-    NSMutableDictionary* options = [NSMutableDictionary dictionary];
+    // Note: It must be __block variable to allow onStartFailure() block below
+    // to access its current, rather than its initial value.
+    __block NSError *error;
 
+    /**
+     * Rejects the start promise with details from "error" object, if that
+     * exists, otherwise rejects with the fallback "StaticServer could not start"
+     * message.
+     *
+     * BEWARE: Once this block is executed, you should ensure yourself
+     * the parent function returns, or at least does not attempt to resolve or
+     * reject the start promise again.
+     */
+    void (^onStartFailure)(void) = ^{
+        if (error) {
+            NSString *errorDescription = [NSString stringWithFormat:@"%@ / %@",
+                error.localizedDescription,
+                error.localizedFailureReason];
+            reject(error.domain, errorDescription, error);
+        } else reject(@"server_error", @"StaticServer could not start", nil);
+    };
+
+    NSMutableDictionary* options = [NSMutableDictionary dictionary];
 
     NSLog(@"Started StaticServer on port %@", self.port);
 
@@ -147,18 +167,15 @@ RCT_EXPORT_METHOD(start: (NSString *)port
         NSNumber *listenPort = [NSNumber numberWithUnsignedInteger:_webServer.port];
         self.port = listenPort;
 
-        if(_webServer.serverURL == NULL) {
-            reject(@"server_error", @"StaticServer could not start", error);
-        } else {
+        if(_webServer.serverURL == NULL) onStartFailure();
+        else {
             self.url = [NSString stringWithFormat: @"%@://%@:%@", [_webServer.serverURL scheme], [_webServer.serverURL host], [_webServer.serverURL port]];
             NSLog(@"Started StaticServer at URL %@", self.url);
             resolve(self.url);
         }
     } else {
         NSLog(@"Error starting StaticServer: %@", error);
-
-        reject(@"server_error", @"StaticServer could not start", error);
-
+        onStartFailure();
     }
 
 }
