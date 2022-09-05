@@ -21,7 +21,11 @@ type Options = {
 };
 
 class StaticServer {
-  #appStateSub?: NativeEventSubscription;
+  // Note: could be a private method, and we tried it, but it turns out that
+  // Babel's @babel/plugin-proposal-private-methods causes many troubles in RN.
+  // See: https://github.com/birdofpreyru/react-native-static-server/issues/6
+  // and: https://github.com/birdofpreyru/react-native-static-server/issues/9
+  _appStateSub?: NativeEventSubscription;
 
   _origin?: string;
 
@@ -112,9 +116,9 @@ class StaticServer {
     this.running = true;
 
     if (!this.keepAlive && Platform.OS === 'android') {
-      this.#appStateSub = AppState.addEventListener(
+      this._appStateSub = AppState.addEventListener(
         'change',
-        this.#handleAppStateChange.bind(this),
+        this._handleAppStateChange.bind(this),
       );
     }
 
@@ -139,10 +143,10 @@ class StaticServer {
     this.stop();
     this.started = false;
     this._origin = undefined;
-    if (this.#appStateSub) this.#appStateSub.remove();
+    if (this._appStateSub) this._appStateSub.remove();
   }
 
-  #handleAppStateChange(appState: AppStateStatus) {
+  _handleAppStateChange(appState: AppStateStatus) {
     if (!this.started) {
       return;
     }
