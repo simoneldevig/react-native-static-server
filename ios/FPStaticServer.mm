@@ -134,13 +134,13 @@ RCT_EXPORT_METHOD(start: (NSString *)port
      * the parent function returns, or at least does not attempt to resolve or
      * reject the start promise again.
      */
-    void (^onStartFailure)(void) = ^{
+    void (^onStartFailure)(NSString*) = ^(NSString *fallbackMessage){
         if (error) {
             NSString *errorDescription = [NSString stringWithFormat:@"%@ / %@",
                 error.localizedDescription,
                 error.localizedFailureReason];
             reject(error.domain, errorDescription, error);
-        } else reject(@"server_error", @"StaticServer could not start", nil);
+        } else reject(@"server_error", fallbackMessage, nil);
     };
 
     NSMutableDictionary* options = [NSMutableDictionary dictionary];
@@ -167,17 +167,17 @@ RCT_EXPORT_METHOD(start: (NSString *)port
         NSNumber *listenPort = [NSNumber numberWithUnsignedInteger:_webServer.port];
         self.port = listenPort;
 
-        if(_webServer.serverURL == NULL) onStartFailure();
-        else {
+        if(_webServer.serverURL == NULL) {
+            onStartFailure(@"StaticServer could not start (.serverURL is NULL)");
+        } else {
             self.url = [NSString stringWithFormat: @"%@://%@:%@", [_webServer.serverURL scheme], [_webServer.serverURL host], [_webServer.serverURL port]];
             NSLog(@"Started StaticServer at URL %@", self.url);
             resolve(self.url);
         }
     } else {
         NSLog(@"Error starting StaticServer: %@", error);
-        onStartFailure();
+        onStartFailure(@"StaticServer could not start (.start() returned NO)");
     }
-
 }
 
 RCT_EXPORT_METHOD(stop) {
