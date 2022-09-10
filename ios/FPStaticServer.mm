@@ -4,7 +4,7 @@
 
 @synthesize bridge = _bridge;
 
-RCT_EXPORT_MODULE();
+RCT_EXPORT_MODULE(StaticServer);
 
 - (instancetype)init {
     if((self = [super init])) {
