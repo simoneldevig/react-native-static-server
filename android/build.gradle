@@ -8,7 +8,7 @@ buildscript {
             mavenCentral()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:7.1.1'
+            classpath 'com.android.tools.build:gradle:7.2.1'
             classpath("com.facebook.react:react-native-gradle-plugin")
             classpath("de.undercouch:gradle-download-task:5.0.1")
         }
@@ -49,7 +49,7 @@ android {
         targetSdkVersion safeExtGet('targetSdkVersion', 31)
         versionCode 4
         versionName "0.6.0"
-        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+        buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
     }
     sourceSets {
       main {
@@ -88,15 +88,4 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.nanohttpd:nanohttpd-webserver:2.3.1'
-}
-
-if (isNewArchitectureEnabled()) {
-  react {
-    libraryName = "static-server"
-    codegenJavaPackageName = "com.futurepress.staticserver"
-    root = file("..")
-    jsRootDir = file("../src/")
-    reactNativeDir = rootProject.file("../node_modules/react-native/")
-    codegenDir = rootProject.file("../node_modules/react-native-codegen/")
-  }
 }
