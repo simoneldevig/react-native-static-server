@@ -4,9 +4,13 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
+A cross platform component for serving static assets with React Native.
+
+---
 _This is a fork of [the original `react-native-static-server`](https://www.npmjs.com/package/react-native-static-server). The original library is not actively maintained, thus my aim here is to maintain the library for use in personal projects._
 
-A cross platform component for serving static assets with React Native.
+---
+[![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 ## Getting started
 
