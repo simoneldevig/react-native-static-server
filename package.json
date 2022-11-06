@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.6.0-alpha.7",
+  "version": "0.6.0-alpha.8",
   "description": "HTTP static file server for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -29,40 +29,44 @@
   },
   "keywords": [
     "android",
+    "file",
     "ios",
-    "react-native"
+    "javascript",
+    "js",
+    "mobile",
+    "native",
+    "react",
+    "reactjs",
+    "server",
+    "static"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/birdofpreyru/react-native-static-server.git",
-    "baseUrl": "https://github.com/birdofpreyru/react-native-static-server"
-  },
+  "repository": "github:birdofpreyru/react-native-static-server",
   "author": "Dr. Sergey Pogodin <doc@pogodin.studio> (https://dr.pogodin.studio)",
   "license": "MIT",
-  "licenseFilename": "LICENSE",
+  "licenseFilename": "LICENSE.md",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/birdofpreyru/react-native-static-server/issues"
   },
-  "homepage": "https://github.com/birdofpreyru/react-native-static-server#readme",
+  "homepage": "https://dr.pogodin.studio/docs/react-native-static-server",
   "title": "React Native Static Server",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@react-native-community/eslint-config": "^3.1.0",
-    "@types/jest": "^29.0.2",
-    "@types/react": "^18.0.20",
-    "@types/react-native": "^0.70.0",
-    "eslint": "^8.23.1",
+    "@react-native-community/eslint-config": "^3.2.0",
+    "@types/jest": "^29.2.2",
+    "@types/react": "^18.0.25",
+    "@types/react-native": "^0.70.6",
+    "eslint": "^8.26.0",
     "eslint-plugin-flowtype": "^8.0.3",
     "eslint-plugin-react-native": "^4.0.0",
-    "jest": "^29.0.3",
+    "jest": "^29.2.2",
     "pod-install": "^0.1.38",
     "react": "^18.1.0",
-    "react-native": "^0.70.0",
-    "react-native-builder-bob": "^0.18.3",
-    "typescript": "^4.8.3"
+    "react-native": "^0.70.4",
+    "react-native-builder-bob": "^0.20.1",
+    "typescript": "^4.8.4"
   },
   "peerDependencies": {
     "react": "*",
