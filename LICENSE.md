@@ -1,6 +1,7 @@
 # MIT License
 
-Copyright &copy; 2022, Dr. Sergey Pogodin
+_Copyright &copy; 2022, Dr. Sergey Pogodin_ \
+_Copyright &copy; 2017, futurepress_
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
