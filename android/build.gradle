@@ -38,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion safeExtGet('minSdkVersion', 23)
+        minSdkVersion safeExtGet('minSdkVersion', 28)
         if (System.properties['os.arch'] == "aarch64") {
             // For M1 Users we need to use the NDK 24 which added support for aarch64
             ndkVersion safeExtGet('ndkVersion', '24.0.8215888')
@@ -50,6 +50,16 @@ android {
         versionCode 4
         versionName "0.6.0"
         buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
+        externalNativeBuild {
+          cmake {
+            targets "pcre2-8-static", "lighttpd"
+          }
+        }
+    }
+    externalNativeBuild {
+      cmake {
+        path "src/main/CMakeLists.txt"
+      }
     }
     sourceSets {
       main {

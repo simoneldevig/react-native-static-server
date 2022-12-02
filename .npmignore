@@ -1,4 +1,7 @@
-StaticServerExample
+.*
+android/build
+build
+dr.pogodin-react-native-static-server-*.tgz
+ios/build
+lighttpd1.4/doc
 node_modules
-
-my-release-key.keystore

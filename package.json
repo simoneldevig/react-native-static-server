@@ -7,17 +7,6 @@
   "types": "lib/typescript/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
-  "files": [
-    "src",
-    "lib",
-    "android",
-    "ios",
-    "cpp",
-    "react-native-static-server.podspec",
-    "!android/.gradle",
-    "!android/build",
-    "!ios/build"
-  ],
   "scripts": {
     "android:generate-specs": "cd android && ./gradlew generateCodegenArtifactsFromSchema -PnewArchEnabled=true",
     "ios:generate-schema": "rimraf ios/NativeStaticServerSpec && mkdir -p ios/NativeStaticServerSpec && node ./node_modules/react-native-codegen/lib/cli/combine/combine-js-to-schema-cli.js ./ios/NativeStaticServerSpec/schema.json src",
