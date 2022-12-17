@@ -1,6 +1,6 @@
-[submodule "lighttpd1.4"]
-	path = lighttpd1.4
-	url = https://github.com/lighttpd/lighttpd1.4.git
 [submodule "pcre2"]
 	path = pcre2
 	url = https://github.com/PCRE2Project/pcre2.git
+[submodule "lighttpd1.4"]
+	path = lighttpd1.4
+	url = https://github.com/birdofpreyru/lighttpd1.4
