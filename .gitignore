@@ -33,6 +33,7 @@ project.xcworkspace
 # Android/IntelliJ
 #
 build/
+.cxx
 .idea
 .gradle
 local.properties
@@ -61,3 +62,6 @@ android/.project
 lib/
 /dr.pogodin-react-native-static-server-*.tgz
 /.vscode
+
+# Java compiler outputs
+*.class

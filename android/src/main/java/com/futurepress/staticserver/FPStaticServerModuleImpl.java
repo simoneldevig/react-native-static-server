@@ -14,6 +14,8 @@ import java.net.ServerSocket;
 
 import android.util.Log;
 
+import com.lighttpd.Server;
+
 import fi.iki.elonen.SimpleWebServer;
 
 public class FPStaticServerModuleImpl {
@@ -57,6 +59,9 @@ public class FPStaticServerModuleImpl {
   }
 
   public void start(String _port, String root, Boolean localhost, Boolean keepAlive, Promise promise) {
+
+    String configPath = this.reactContext.getFilesDir() + "/rnss.cfg";
+    Server.launch(configPath, "");
 
     if (server != null){
       promise.resolve(url);
