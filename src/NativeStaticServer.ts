@@ -4,12 +4,10 @@ import {TurboModuleRegistry} from 'react-native';
 export interface Spec extends TurboModule {
   isRunning(): Promise<boolean>;
 
-  start(
-    port: string,
-    root: string,
-    localOnly: boolean,
-    keepAlive: boolean,
-  ): Promise<string>;
+  start(configPath: string): Promise<string>;
+
+  getLocalIpAddress(): Promise<string>;
+  getOpenPort(): Promise<number>;
 
   stop(): Promise<void>;
 }

@@ -8,13 +8,14 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.module.annotations.ReactModule;
 
+import android.util.Log;
+
 @ReactModule(name = FPStaticServerModuleImpl.NAME)
 public class FPStaticServerModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
-  private FPStaticServerModuleImpl impl;
+  private FPStaticServerModuleImpl impl = new FPStaticServerModuleImpl();
 
   public FPStaticServerModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.impl = new FPStaticServerModuleImpl(reactContext);
   }
 
   @Override
@@ -23,38 +24,53 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
   }
 
   @ReactMethod
-  public void start(String _port, String root, Boolean localhost, Boolean keepAlive, Promise promise) {
-    impl.start(_port, root, localhost, keepAlive, promise);
+  public void start(String configPath, Promise promise) {
+    try {
+      impl.start(configPath);
+      promise.resolve(null);
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  @ReactMethod
+  public Integer getOpenPort(Promise promise) {
+    try {
+      promise.resolve(impl.getOpenPort());
+    } catch (Exception e) {
+      promise.reject(e);
+    }
   }
 
   @ReactMethod
   public void stop(Promise promise) {
-    impl.stop(promise);
-  }
-
-  @ReactMethod
-  public void origin(Promise promise) {
-    impl.origin(promise);
+    try {
+      impl.stop();
+      promise.resolve(null);
+    } catch (Exception e) {
+      promise.reject(e);
+    }
   }
 
   @ReactMethod
   public void isRunning(Promise promise) {
-    impl.isRunning(promise);
+    promise.resolve(impl.isRunning());
   }
 
-  /* Shut down the server if app is destroyed or paused */
+  // Note: these operations are now managed from JS layer, thus no need for
+  // them here, and probably entire lifecycle listening here may be removed.
   @Override
-  public void onHostResume() {
-    //start(null, null, null, null);
-  }
+  public void onHostResume() {}
 
   @Override
-  public void onHostPause() {
-    //stop();
-  }
+  public void onHostPause() {}
 
   @Override
   public void onHostDestroy() {
-    impl.stop();
+    try {
+      impl.stop();
+    } catch (Exception e) {
+      Log.e(impl.NAME, "Failed to stop server in onHostDestroy()", e);
+    }
   }
 }

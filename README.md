@@ -4,16 +4,63 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
-A cross-platform component for serving static assets with React Native.
+Embed HTTP server for [React Native](https://reactnative.dev) applications.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
-> **NOTE:** _This is a well-maintained fork of the original [`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server), which was abandoned by its creators._
+## Project History and Roadmap
+
+[GCDWebServer]: https://github.com/swisspol/GCDWebServer
+[Lighttpd]: https://www.lighttpd.net
+[RN's New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
+[RN's Old Architecture]: https://reactnative.dev/docs/native-modules-intro
+
+This project started as a fork of the original
+[`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server)
+library, abandoned by its creators.
+It is published to NPM as
+[@dr.pogodin/react-native-static-server](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server),
+and it aims to provide a well-maintained embed HTTP server for React Native (RN)
+applications.
+
+**These are notable versions of the library:**
+
+- **v0.7.0-alpha.0** &mdash; The aim for upcoming **v0.7.0** release is to
+  migrate from currently used, and not actively maintained, native server
+  implementations ([GCDWebServer](https://github.com/swisspol/GCDWebServer) on iOS,
+  and [NanoHttpd](https://github.com/NanoHttpd/nanohttpd) on Android) to the same,
+  actively maintained [Lighttpd] sever on both platforms (and Windows in perspective).
+  See [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12) for details.
+
+  As of the latest alpha version, the status is:
+  - Migration to [Lighttpd] is presumably completed for **Android**,
+    both with [RN's New Architecture] and [RN's Old Architecture]. May need
+    more testing and some fixes.
+  - **iOS** version is broken (prefer to use **v0.6.0-alpha.8**, or **0.5.5**
+    versions described below).
+
+- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6.0** release is
+  to refactor the library to support [RN's New Architecture],
+  while keeping backward compatibility with [RN's Old Architecture],
+  and to have the codebase refactored to follow the standard RN library template.
+
+  As of the latest alpha version, the status is:
+  - The overall code refactoring is, completed.
+  - The outcome is tested and works with [RN's Old Architecture] both on
+    **Android** and **iOS** devices.
+  - The outcome is tested to work with [RN's New Architecture] on **Android**,
+    when using RN@0.70.
+  - **NOT YET TESTED** with [RN's New Architecture] on **iOS**. Likely to need
+    minor fixes there. 
+
+- **v0.5.5** &mdash; A close copy of the latest version of the original library,
+  patched to work with React Native v0.67+, and with all dependencies updated
+  (as of May 17, 2022).
 
 ## Getting started
 - Install the package
   ```shell
-  $ npm install --save react-native-static-server
+  $ npm install --save @dr.pogodin/react-native-static-server
   ```
 - If you intend to use this library in an [Expo app](https://expo.dev),
   it is possible, but requires additional setup efforts.
@@ -24,8 +71,8 @@ A cross-platform component for serving static assets with React Native.
 
 Declare the `StaticServer` with a port or use the default `0` to pick a random available port.
 
-```javascript
-import StaticServer from 'react-native-static-server';
+```jsx
+import StaticServer from '@dr.pogodin/react-native-static-server';
 
 let server = new StaticServer(8080);
 
@@ -49,7 +96,7 @@ For instance, using [react-native-fs](https://github.com/johanneslumpe/react-nat
 #### Default (document directory)
 
 ```javascript
-import StaticServer from 'react-native-static-server';
+import StaticServer from '@dr.pogodin/react-native-static-server';
 import RNFS from 'react-native-fs';
 
 // create a path you want to write to
@@ -73,7 +120,7 @@ In XCode, `Project Navigator` right click in the folder project → `Add files t
 When the app gets bundled, this folder will be next to the compiled app, so using `MainBundlePath` property from `react-native-fs` you can access to the directory.
 
 ```javascript
-import StaticServer from 'react-native-static-server';
+import StaticServer from '@dr.pogodin/react-native-static-server';
 import RNFS from 'react-native-fs';
 
 // path where files will be served from (index.html here)
@@ -85,7 +132,7 @@ let server = new StaticServer(8080, path);
 If the server should only be accessible from within the app, set `localOnly` to `true`
 
 ```javascript
-import StaticServer from 'react-native-static-server';
+import StaticServer from '@dr.pogodin/react-native-static-server';
 
 // Just set options with defaults
 let server = new StaticServer({localOnly : true });
@@ -107,13 +154,6 @@ It will reset to a new random port each time the server unpauses, so this should
 ```javascript
 let server = new StaticServer(0, {keepAlive : true });
 ```
-
-## Credits
-
-* iOS server: [GCDWebServer](https://github.com/swisspol/GCDWebServer)
-* Android server: [NanoHttpd Webserver](https://github.com/NanoHttpd/nanohttpd)
-
-Thanks to [CorHttpd](https://github.com/floatinghotpot/cordova-httpd) and [react-native-httpserver](https://gitlab.com/base.io/react-native-httpserver#README) for the basis of this library.
 
 <!-- links -->
 [Babel]: https://babeljs.io/

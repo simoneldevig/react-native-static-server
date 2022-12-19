@@ -12,6 +12,7 @@ link_directories(${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_subdirectory(../../../lighttpd1.4 lighttpd)
 
+add_dependencies(lighttpd-common pcre2-8-shared)
 add_dependencies(lighttpd pcre2-8-shared)
 
 set_target_properties(lighttpd PROPERTIES OUTPUT_NAME "liblighttpd")

@@ -1,6 +1,6 @@
 # MIT License
 
-_Copyright &copy; 2022, Dr. Sergey Pogodin_ \
+_Copyright &copy; 2022&ndash;2023, Dr. Sergey Pogodin_ <doc@pogodin.studio> (https://dr.pogodin.studio) \
 _Copyright &copy; 2017, futurepress_
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
