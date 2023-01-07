@@ -1,4 +1,4 @@
-import { Barrier } from './Barrier';
+import {Barrier} from './Barrier';
 
 /**
  * Implements a simple semaphore for async code logic.
@@ -16,7 +16,9 @@ export default class Semaphore {
     this._ready = !!ready;
   }
 
-  get ready() { return this._ready; }
+  get ready() {
+    return this._ready;
+  }
 
   setReady(ready: boolean) {
     const bool = !!ready;
@@ -39,7 +41,7 @@ export default class Semaphore {
     if (!this._ready || this._queue.length) {
       const barrier = new Barrier();
       this._queue.push(barrier);
-      await <Promise<any>>barrier;
+      await (<Promise<any>>barrier);
       this._queue.shift();
     }
   }

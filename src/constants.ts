@@ -12,22 +12,18 @@ const StaticServer = global.__turboModuleProxy
   ? require('./NativeStaticServer').default
   : NativeModules.StaticServer;
 
-const {CRASHED, LAUNCHED, TERMINATED} = StaticServer.getConstants();
+const CONSTANTS = StaticServer.getConstants();
 
 export const SIGNALS = {
-  CRASHED,
-  LAUNCHED,
-  TERMINATED,
+  CRASHED: CONSTANTS.CRASHED,
+  LAUNCHED: CONSTANTS.LAUNCHED,
+  TERMINATED: CONSTANTS.TERMINATED,
 };
 
 export enum STATES {
-  PAUSE_FAILURE,
-  START_FAILURE,
-  STOP_FAILURE,
+  ACTIVE,
+  CRASHED,
+  INACTIVE,
   STARTING,
-  STARTED,
-  PAUSING,
-  PAUSED,
   STOPPING,
-  STOPPED,
 }

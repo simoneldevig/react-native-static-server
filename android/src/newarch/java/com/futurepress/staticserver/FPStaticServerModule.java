@@ -26,7 +26,7 @@ public class FPStaticServerModule extends NativeStaticServerSpec implements Life
   }
 
   @Override
-  public void start(int id, String configPath, Promise promise) {
+  public void start(double id, String configPath, Promise promise) {
     DeviceEventManagerModule.RCTDeviceEventEmitter emitter =
       getReactApplicationContext()
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);

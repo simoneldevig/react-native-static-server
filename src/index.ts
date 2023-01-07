@@ -33,16 +33,14 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
   if (server) {
     switch (event) {
       case SIGNALS.CRASHED:
-        // NOTE: Other server states either do not suggest to receive a crash
-        // signals, as the server is not active, or their state update will be
-        // handled by the function which handles corresponding state change,
-        // e.g. start() or stop().
-        if (server.state === STATES.STARTED) {
-          server._setState(STATES.RUNTIME_FAILURE);
-        }
         if (server._signalBarrier) {
           server._signalBarrier.reject(Error('Native server crashed'));
           server._signalBarrier = undefined;
+        } else {
+          // NOTE: Beside this state change, when server crashes while in active
+          // state, other state changes are managed by .start() and ._stop()
+          // methods, thus no need to do ._setState() explicitly here.
+          server._setState(STATES.CRASHED);
         }
         break;
       case SIGNALS.LAUNCHED:
@@ -57,11 +55,6 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
     }
   }
 });
-
-type Options = {
-  keepAlive?: boolean;
-  localOnly?: boolean;
-};
 
 /**
  * Creates a temporary file with standard configuration for Lighttpd,
@@ -182,16 +175,18 @@ class StaticServer {
   // and: https://github.com/birdofpreyru/react-native-static-server/issues/9
   _appStateSub?: NativeEventSubscription;
   _configPath?: string;
+  _fileDir: string;
   _hostname = '';
-  _localOnly = false;
-  _origin?: string;
-  _port = '';
+  _localhost: boolean;
+  _origin: string = '';
+  _pauseInBackground: boolean;
+  _port: string;
 
   // This barrier is used during start-up and stopage of the server to wait for
   // a success/failure signal from the native side.
   _signalBarrier?: Barrier;
 
-  _state: STATES = STATES.STOPPED;
+  _state: STATES = STATES.INACTIVE;
   _stateChangeEmitter = new Emitter();
 
   // TODO: It will be better to use UUID, but I believe "uuid" library
@@ -205,20 +200,24 @@ class StaticServer {
   // requests to start / stop the server won't result in a corrupt state.
   _sem = new Semaphore(true);
 
-  keepAlive: boolean;
+  get fileDir() {
+    return this._fileDir;
+  }
 
-  _root: string;
+  get hostname() {
+    return this._hostname;
+  }
 
-  get localOnly() {
-    return this._localOnly;
+  get origin() {
+    return this._origin;
+  }
+
+  get pauseInBackground() {
+    return this._pauseInBackground;
   }
 
   get port() {
     return this._port;
-  }
-
-  get root() {
-    return this._root;
   }
 
   get state() {
@@ -243,54 +242,23 @@ class StaticServer {
    * new StaticServer(port);
    * new StaticServer();
    *
-   * @param portOrOpts
-   * @param rootOrOpts
-   * @param opts
+   * @param {object} options
    */
-  constructor(
-    portOrOpts?: number | Options,
-    rootOrOpts?: Options | string,
-    opts?: Options,
-  ) {
-    let root = '';
-    switch (arguments.length) {
-      case 3:
-        this._port = `${portOrOpts}`;
+  constructor({
+    fileDir = '',
+    localhost = true,
+    pauseInBackground = true,
+    port = 0,
+  }) {
+    this._localhost = localhost;
+    if (localhost) this._hostname = 'localhost';
+    this._pauseInBackground = pauseInBackground;
+    this._port = port ? port.toString() : '';
 
-        if (typeof rootOrOpts === 'string') root = rootOrOpts;
-        else if (rootOrOpts) throw Error('Invalid "root" type');
-
-        this._localOnly = (opts && opts.localOnly) || false;
-        this.keepAlive = (opts && opts.keepAlive) || false;
-        break;
-      case 2:
-        this._port = `${portOrOpts}`;
-
-        if (typeof rootOrOpts === 'string') {
-          root = rootOrOpts;
-          this.keepAlive = false;
-        } else {
-          this._localOnly = (rootOrOpts && rootOrOpts.localOnly) || false;
-          this.keepAlive = (rootOrOpts && rootOrOpts.keepAlive) || false;
-        }
-        break;
-      case 1:
-        if (typeof portOrOpts === 'number') {
-          this._port = `${portOrOpts}`;
-          this.keepAlive = false;
-        } else {
-          this._localOnly = (portOrOpts && portOrOpts.localOnly) || false;
-          this.keepAlive = (portOrOpts && portOrOpts.keepAlive) || false;
-        }
-        break;
-      default:
-        this.keepAlive = false;
+    if (!fileDir.startsWith('/') && !fileDir.startsWith('file:///')) {
+      fileDir = new URL(fileDir, RNFS.DocumentDirectoryPath).href;
     }
-
-    if (!root.startsWith('/') && !root.startsWith('file:///')) {
-      root = new URL(root, RNFS.DocumentDirectoryPath).href;
-    }
-    this._root = root;
+    this._fileDir = fileDir;
   }
 
   addStateListener(listener: (newState: STATES) => void) {
@@ -298,16 +266,16 @@ class StaticServer {
   }
 
   _configureAppStateHandling() {
-    if (this.keepAlive) {
-      if (this._appStateSub) {
-        this._appStateSub.remove();
-        this._appStateSub = undefined;
+    if (this._pauseInBackground) {
+      if (!this._appStateSub) {
+        this._appStateSub = AppState.addEventListener(
+          'change',
+          this._handleAppStateChange.bind(this),
+        );
       }
-    } else if (!this._appStateSub) {
-      this._appStateSub = AppState.addEventListener(
-        'change',
-        this._handleAppStateChange.bind(this),
-      );
+    } else if (this._appStateSub) {
+      this._appStateSub.remove();
+      this._appStateSub = undefined;
     }
   }
 
@@ -324,27 +292,24 @@ class StaticServer {
   async start(): Promise<string> {
     try {
       await this._sem.seize();
-      if (this.state === STATES.STARTED) return this._origin!;
+      if (this.state === STATES.ACTIVE) return this._origin!;
       servers[this._id] = this;
       this._setState(STATES.STARTING);
       this._configureAppStateHandling();
 
-      // NOTE: These are done on the first start only, to ensure that possible
-      // automatic restarts of the same server instance do not alter hostname
-      // and port values.
+      // NOTE: This is done at the first start only, to avoid hostname changes
+      // when server is paused for background and automatically reactivated
+      // later. Same for automatic port selection.
       if (!this._hostname) {
-        this._hostname = this._localOnly
-          ? 'localhost'
-          : await FPStaticServer.getLocalIpAddress();
+        this._hostname = await FPStaticServer.getLocalIpAddress();
       }
-
-      if (!this._port || this._port === '0') {
+      if (!this._port) {
         this._port = await FPStaticServer.getOpenPort();
       }
 
       await this._removeConfigFile();
       this._configPath = await generateConfig(
-        this._root,
+        this._fileDir,
         this._hostname,
         this._port,
       );
@@ -363,12 +328,43 @@ class StaticServer {
       this._origin = `http://${this._hostname}:${this._port}`;
       await this._removeConfigFile();
 
-      this._setState(STATES.STARTED);
+      this._setState(STATES.ACTIVE);
       return this._origin;
     } catch (e: any) {
-      this._setState(STATES.START_FAILURE);
+      this._setState(STATES.CRASHED);
       throw e;
     } finally {
+      this._sem.setReady(true);
+    }
+  }
+
+  /**
+   * Soft-stop the server: if automatic pause for background is enabled,
+   * it will be automatically reactivated when the app goes into foreground
+   * again. End users are expected to use public .stop() method below, which
+   * additionally cleans-up that automatic re-activation.
+   * @returns {Promise<>}
+   */
+  async _stop() {
+    try {
+      await this._sem.seize();
+      if (this._state !== STATES.ACTIVE) return;
+      this._setState(STATES.STOPPING);
+
+      // Our synchronization logic assumes when we arrive here any previously
+      // set barriers should be cleared up already.
+      if (this._signalBarrier) throw Error('Internal error');
+
+      this._signalBarrier = new Barrier();
+      await FPStaticServer.stop();
+      await (<Promise<void>>this._signalBarrier);
+
+      this._setState(STATES.INACTIVE);
+    } catch (e: any) {
+      this._setState(STATES.CRASHED);
+      throw e;
+    } finally {
+      delete servers[this._id];
       this._sem.setReady(true);
     }
   }
@@ -385,50 +381,17 @@ class StaticServer {
    * @param kill
    * @returns {Promise<>}
    */
-  async stop(kill = false) {
-    try {
-      await this._sem.seize();
-      if (this._state === STATES.STOPPED) return;
-      if (kill && this._appStateSub) {
-        this._appStateSub.remove();
-        this._appStateSub = undefined;
-      }
-
-      if (this._state === STATES.STARTED) {
-        this._setState(
-          this._appStateSub && !kill ? STATES.PAUSING : STATES.STOPPING,
-        );
-
-        // Our synchronization logic assumes when we arrive here any previously
-        // set barriers should be cleared up already.
-        if (this._signalBarrier) throw Error('Internal error');
-
-        this._signalBarrier = new Barrier();
-        await FPStaticServer.stop();
-        await (<Promise<void>>this._signalBarrier);
-      }
-
-      this._setState(
-        this._appStateSub && !kill ? STATES.PAUSED : STATES.STOPPED,
-      );
-    } catch (e: any) {
-      this._setState(
-        this._appStateSub && !kill ? STATES.PAUSE_FAILURE : STATES.STOP_FAILURE,
-      );
-      throw e;
-    } finally {
-      delete servers[this._id];
-      this._sem.setReady(true);
+  async stop() {
+    if (this._appStateSub) {
+      this._appStateSub.remove();
+      this._appStateSub = undefined;
     }
+    await this._stop();
   }
 
   _handleAppStateChange(appState: AppStateStatus) {
     if (appState === 'active') this.start();
-    else this.stop();
-  }
-
-  get origin() {
-    return this._origin;
+    else this._stop();
   }
 }
 

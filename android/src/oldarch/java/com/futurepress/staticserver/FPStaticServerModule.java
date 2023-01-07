@@ -30,7 +30,7 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
   }
 
   @ReactMethod
-  public void start(int id, String configPath, Promise promise) {
+  public void start(double id, String configPath, Promise promise) {
     DeviceEventManagerModule.RCTDeviceEventEmitter emitter =
       getReactApplicationContext()
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);

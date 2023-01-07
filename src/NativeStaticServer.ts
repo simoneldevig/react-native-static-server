@@ -2,9 +2,15 @@ import type {TurboModule} from 'react-native';
 import {TurboModuleRegistry} from 'react-native';
 
 export interface Spec extends TurboModule {
+  readonly getConstants: () => {
+    CRASHED: string;
+    LAUNCHED: string;
+    TERMINATED: string;
+  };
+
   isRunning(): Promise<boolean>;
 
-  start(configPath: string): Promise<string>;
+  start(id: number, configPath: string): Promise<string>;
 
   getLocalIpAddress(): Promise<string>;
   getOpenPort(): Promise<number>;

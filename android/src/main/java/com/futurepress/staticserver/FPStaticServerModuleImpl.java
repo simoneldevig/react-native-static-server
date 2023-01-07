@@ -64,7 +64,7 @@ public class FPStaticServerModuleImpl {
   }
 
   public void start(
-    int id, // Server ID for backward communication with JS layer.
+    double id, // Server ID for backward communication with JS layer.
     String configPath,
     DeviceEventManagerModule.RCTDeviceEventEmitter emitter,
     Promise promise
@@ -89,7 +89,7 @@ public class FPStaticServerModuleImpl {
             else promise.reject(new Exception("Launch failure"));
           }
           WritableMap event = Arguments.createMap();
-          event.putInt("serverId", id);
+          event.putDouble("serverId", id);
           event.putString("event", signal.value);
           emitter.emit("RNStaticServer", event);
         }
