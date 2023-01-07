@@ -4,8 +4,9 @@ package com.futurepress.staticserver;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import android.util.Log;
+import java.util.Map;
 
 public class FPStaticServerModule extends NativeStaticServerSpec implements LifecycleEventListener {
   private FPStaticServerModuleImpl impl = new FPStaticServerModuleImpl();
@@ -20,41 +21,39 @@ public class FPStaticServerModule extends NativeStaticServerSpec implements Life
   }
 
   @Override
-  public void start(String configPath, Promise promise) {
-    try {
-      impl.start(configPath);
-      promise.resolve(null);
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+  public Map<String,Object> getTypedExportedConstants() {
+    return FPStaticServerModuleImpl.getConstants();
   }
 
   @Override
-  public Integer getOpenPort(Promise promise) {
-    try {
-      promise.resolve(impl.getOpenPort());
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+  public void start(int id, String configPath, Promise promise) {
+    DeviceEventManagerModule.RCTDeviceEventEmitter emitter =
+      getReactApplicationContext()
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+    impl.start(id, configPath, emitter, promise);
+  }
+
+  @Override
+  public void getLocalIpAddress(Promise promise) {
+    impl.getLocalIpAddress(promise);
+  }
+
+  @Override
+  public void getOpenPort(Promise promise) {
+    impl.getOpenPort(promise);
   }
 
   @Override
   public void stop(Promise promise) {
-    try {
-      impl.stop();
-      promise.resolve(null);
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+    impl.stop(promise);
   }
 
   @Override
   public void isRunning(Promise promise) {
-    promise.resolve(impl.isRunning());
+    impl.isRunning(promise);
   }
 
-  // Note: these operations are now managed from JS layer, thus no need for
-  // them here, and probably entire lifecycle listening here may be removed.
+  // NOTE: Pause/resume operations, if opted, are managed in JS layer.
   @Override
   public void onHostResume() {}
 
@@ -63,10 +62,6 @@ public class FPStaticServerModule extends NativeStaticServerSpec implements Life
 
   @Override
   public void onHostDestroy() {
-    try {
-      impl.stop();
-    } catch (Exception e) {
-      Log.e(impl.NAME, "Failed to stop server in onHostDestroy()", e);
-    }
+    impl.stop(null);
   }
 }

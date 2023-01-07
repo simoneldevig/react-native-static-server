@@ -7,8 +7,9 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import android.util.Log;
+import java.util.Map;
 
 @ReactModule(name = FPStaticServerModuleImpl.NAME)
 public class FPStaticServerModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
@@ -23,42 +24,40 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
     return impl.NAME;
   }
 
-  @ReactMethod
-  public void start(String configPath, Promise promise) {
-    try {
-      impl.start(configPath);
-      promise.resolve(null);
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+  @Override
+  public Map<String,Object> getConstants() {
+    return FPStaticServerModuleImpl.getConstants();
   }
 
   @ReactMethod
-  public Integer getOpenPort(Promise promise) {
-    try {
-      promise.resolve(impl.getOpenPort());
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+  public void start(int id, String configPath, Promise promise) {
+    DeviceEventManagerModule.RCTDeviceEventEmitter emitter =
+      getReactApplicationContext()
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+    impl.start(id, configPath, emitter, promise);
+  }
+
+  @ReactMethod
+  public void getLocalIpAddress(Promise promise) {
+    impl.getLocalIpAddress(promise);
+  }
+
+  @ReactMethod
+  public void getOpenPort(Promise promise) {
+    impl.getOpenPort(promise);
   }
 
   @ReactMethod
   public void stop(Promise promise) {
-    try {
-      impl.stop();
-      promise.resolve(null);
-    } catch (Exception e) {
-      promise.reject(e);
-    }
+    impl.stop(promise);
   }
 
   @ReactMethod
   public void isRunning(Promise promise) {
-    promise.resolve(impl.isRunning());
+    impl.isRunning(promise);
   }
 
-  // Note: these operations are now managed from JS layer, thus no need for
-  // them here, and probably entire lifecycle listening here may be removed.
+  // NOTE: Pause/resume operations, if opted, are managed in JS layer.
   @Override
   public void onHostResume() {}
 
@@ -67,10 +66,6 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
 
   @Override
   public void onHostDestroy() {
-    try {
-      impl.stop();
-    } catch (Exception e) {
-      Log.e(impl.NAME, "Failed to stop server in onHostDestroy()", e);
-    }
+    impl.stop(null);
   }
 }

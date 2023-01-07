@@ -1,12 +1,17 @@
 import {
   AppState,
   AppStateStatus,
+  NativeEventEmitter,
   NativeEventSubscription,
   NativeModules,
-  Platform,
 } from 'react-native';
 
 import RNFS from 'react-native-fs';
+
+import {Barrier} from './Barrier';
+import {SIGNALS, STATES} from './constants';
+import Semaphore from './Semaphore';
+import Emitter from './Emitter';
 
 declare global {
   var __turboModuleProxy: object | undefined;
@@ -16,6 +21,42 @@ declare global {
 const FPStaticServer = global.__turboModuleProxy
   ? require('./NativeStaticServer').default
   : NativeModules.StaticServer;
+
+// ID-to-StaticServer map for all potentially active server instances,
+// used to route native events back to JS server objects.
+const servers: {[id: string]: StaticServer} = {};
+
+const nativeEventEmitter = new NativeEventEmitter(FPStaticServer);
+
+nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
+  const server = servers[serverId];
+  if (server) {
+    switch (event) {
+      case SIGNALS.CRASHED:
+        // NOTE: Other server states either do not suggest to receive a crash
+        // signals, as the server is not active, or their state update will be
+        // handled by the function which handles corresponding state change,
+        // e.g. start() or stop().
+        if (server.state === STATES.STARTED) {
+          server._setState(STATES.RUNTIME_FAILURE);
+        }
+        if (server._signalBarrier) {
+          server._signalBarrier.reject(Error('Native server crashed'));
+          server._signalBarrier = undefined;
+        }
+        break;
+      case SIGNALS.LAUNCHED:
+      case SIGNALS.TERMINATED:
+        if (server._signalBarrier) {
+          server._signalBarrier.resolve();
+          server._signalBarrier = undefined;
+        }
+        break;
+      default:
+        throw Error(`Unexpected signal ${event}`);
+    }
+  }
+});
 
 type Options = {
   keepAlive?: boolean;
@@ -36,6 +77,7 @@ async function generateConfig(
   port: string,
 ): Promise<string> {
   const workDir = `${RNFS.TemporaryDirectoryPath}/__rn-static-server__`;
+  await RNFS.mkdir(`${workDir}/uploads`);
   const configFile = `${workDir}/config-${Date.now()}.txt`;
   await RNFS.writeFile(
     configFile,
@@ -139,21 +181,54 @@ class StaticServer {
   // See: https://github.com/birdofpreyru/react-native-static-server/issues/6
   // and: https://github.com/birdofpreyru/react-native-static-server/issues/9
   _appStateSub?: NativeEventSubscription;
-
   _configPath?: string;
-
+  _hostname = '';
+  _localOnly = false;
   _origin?: string;
+  _port = '';
+
+  // This barrier is used during start-up and stopage of the server to wait for
+  // a success/failure signal from the native side.
+  _signalBarrier?: Barrier;
+
+  _state: STATES = STATES.STOPPED;
+  _stateChangeEmitter = new Emitter();
+
+  // TODO: It will be better to use UUID, but I believe "uuid" library
+  // I would use won't work in RN without additional workarounds applied
+  // to RN setup to get around some issues with randombytes support in
+  // RN JS engine. Anyway, it should be double-checked later, but using
+  // timestamps as ID will do for now.
+  _id = Date.now();
+
+  // It is used to serialize state change requests, thus ensuring that parallel
+  // requests to start / stop the server won't result in a corrupt state.
+  _sem = new Semaphore(true);
 
   keepAlive: boolean;
-  localOnly: boolean;
 
-  // NOTE: It was type-defed as "number" prior to v0.6.0, but it was wrong,
-  // the value was "string" all along.
-  port: string = '';
+  _root: string;
 
-  root: null | string;
-  running: boolean = false;
-  started: boolean = false;
+  get localOnly() {
+    return this._localOnly;
+  }
+
+  get port() {
+    return this._port;
+  }
+
+  get root() {
+    return this._root;
+  }
+
+  get state() {
+    return this._state;
+  }
+
+  _setState(neu: STATES) {
+    this._state = neu;
+    this._stateChangeEmitter.emit(neu);
+  }
 
   /**
    * Creates a new StaticServer instance.
@@ -177,146 +252,183 @@ class StaticServer {
     rootOrOpts?: Options | string,
     opts?: Options,
   ) {
+    let root = '';
     switch (arguments.length) {
       case 3:
-        this.port = `${portOrOpts}`;
+        this._port = `${portOrOpts}`;
 
-        if (typeof rootOrOpts === 'string') this.root = rootOrOpts || null;
-        else if (!rootOrOpts) this.root = null;
-        else throw Error('Invalid "root" type');
+        if (typeof rootOrOpts === 'string') root = rootOrOpts;
+        else if (rootOrOpts) throw Error('Invalid "root" type');
 
-        this.localOnly = (opts && opts.localOnly) || false;
+        this._localOnly = (opts && opts.localOnly) || false;
         this.keepAlive = (opts && opts.keepAlive) || false;
         break;
       case 2:
-        this.port = `${portOrOpts}`;
+        this._port = `${portOrOpts}`;
 
         if (typeof rootOrOpts === 'string') {
-          this.root = rootOrOpts;
-          this.localOnly = false;
+          root = rootOrOpts;
           this.keepAlive = false;
         } else {
-          this.root = null;
-          this.localOnly = (rootOrOpts && rootOrOpts.localOnly) || false;
+          this._localOnly = (rootOrOpts && rootOrOpts.localOnly) || false;
           this.keepAlive = (rootOrOpts && rootOrOpts.keepAlive) || false;
         }
         break;
       case 1:
         if (typeof portOrOpts === 'number') {
-          this.port = `${portOrOpts}`;
-          this.root = null;
-          this.localOnly = false;
+          this._port = `${portOrOpts}`;
           this.keepAlive = false;
         } else {
-          this.port = '';
-          this.root = null;
-          this.localOnly = (portOrOpts && portOrOpts.localOnly) || false;
+          this._localOnly = (portOrOpts && portOrOpts.localOnly) || false;
           this.keepAlive = (portOrOpts && portOrOpts.keepAlive) || false;
         }
         break;
       default:
-        this.port = '';
-        this.root = null;
-        this.localOnly = false;
         this.keepAlive = false;
     }
+
+    if (!root.startsWith('/') && !root.startsWith('file:///')) {
+      root = new URL(root, RNFS.DocumentDirectoryPath).href;
+    }
+    this._root = root;
   }
 
-  async start(): Promise<string> {
-    if (this.running) {
-      return Promise.resolve(this.origin!);
-    }
+  addStateListener(listener: (newState: STATES) => void) {
+    return this._stateChangeEmitter.addListener(listener);
+  }
 
-    this.started = true;
-    this.running = true;
-
-    // TODO: We probably should to this on iOS as well now.
-    if (!this.keepAlive && Platform.OS === 'android') {
+  _configureAppStateHandling() {
+    if (this.keepAlive) {
+      if (this._appStateSub) {
+        this._appStateSub.remove();
+        this._appStateSub = undefined;
+      }
+    } else if (!this._appStateSub) {
       this._appStateSub = AppState.addEventListener(
         'change',
         this._handleAppStateChange.bind(this),
       );
     }
+  }
 
-    if (this._configPath) {
-      try {
-        await RNFS.unlink(this._configPath);
-      } catch {
-        // Noop.
+  async _removeConfigFile() {
+    try {
+      if (this._configPath) await RNFS.unlink(this._configPath);
+    } catch {
+      // noop
+    } finally {
+      this._configPath = undefined;
+    }
+  }
+
+  async start(): Promise<string> {
+    try {
+      await this._sem.seize();
+      if (this.state === STATES.STARTED) return this._origin!;
+      servers[this._id] = this;
+      this._setState(STATES.STARTING);
+      this._configureAppStateHandling();
+
+      // NOTE: These are done on the first start only, to ensure that possible
+      // automatic restarts of the same server instance do not alter hostname
+      // and port values.
+      if (!this._hostname) {
+        this._hostname = this._localOnly
+          ? 'localhost'
+          : await FPStaticServer.getLocalIpAddress();
       }
-    }
 
-    let fileDir;
-    if (
-      this.root &&
-      (this.root.startsWith('/') || this.root.startsWith('file:///'))
-    ) {
-      fileDir = this.root;
-    } else {
-      fileDir = new URL(this.root!, RNFS.DocumentDirectoryPath).href;
-    }
+      if (!this._port || this._port === '0') {
+        this._port = await FPStaticServer.getOpenPort();
+      }
 
-    const hostname = this.localOnly
-      ? 'localhost'
-      : await FPStaticServer.getLocalIpAddress();
+      await this._removeConfigFile();
+      this._configPath = await generateConfig(
+        this._root,
+        this._hostname,
+        this._port,
+      );
 
-    let port = this.port;
-    if (!port || port === '0') {
-      port = await FPStaticServer.getOpenPort();
-    }
+      // Our synchronization logic assumes when we arrive here any previously
+      // set barriers should be cleared up already.
+      if (this._signalBarrier) throw Error('Internal error');
 
-    this._configPath = await generateConfig(fileDir, hostname, port);
+      this._signalBarrier = new Barrier();
 
-    return FPStaticServer.start(
-      this.port,
-      this.root,
-      this.localOnly,
-      this.keepAlive,
-    ).then(() => {
-      this._origin = `http://${hostname}:${port}`;
+      // This resolves once startup is initiated, but we need to wait for
+      // "LAUNCHED" signal from the native side to be sure the server is up.
+      await FPStaticServer.start(this._configPath);
+      await (<Promise<void>>this._signalBarrier);
+
+      this._origin = `http://${this._hostname}:${this._port}`;
+      await this._removeConfigFile();
+
+      this._setState(STATES.STARTED);
       return this._origin;
-    });
+    } catch (e: any) {
+      this._setState(STATES.START_FAILURE);
+      throw e;
+    } finally {
+      this._sem.setReady(true);
+    }
   }
 
-  stop(): Promise<void> {
-    this.running = false;
-    return FPStaticServer.stop();
-  }
+  /**
+   * Stops or pauses the server, if it is running, depending on whether it was
+   * started with keepAlive option or not (note, keepAlive means that server is
+   * not paused / restarted when the app goes into background). Pausing the
+   * server means it will
+   * automatically start again the next time the app transitions from background
+   * to foreground. To ensure the server is stopped for good, pass in `kill`
+   * flag. In that case only explicit call to .start() will start the server
+   * again.
+   * @param kill
+   * @returns {Promise<>}
+   */
+  async stop(kill = false) {
+    try {
+      await this._sem.seize();
+      if (this._state === STATES.STOPPED) return;
+      if (kill && this._appStateSub) {
+        this._appStateSub.remove();
+        this._appStateSub = undefined;
+      }
 
-  kill() {
-    this.stop();
-    this.started = false;
-    this._origin = undefined;
-    if (this._appStateSub) this._appStateSub.remove();
+      if (this._state === STATES.STARTED) {
+        this._setState(
+          this._appStateSub && !kill ? STATES.PAUSING : STATES.STOPPING,
+        );
+
+        // Our synchronization logic assumes when we arrive here any previously
+        // set barriers should be cleared up already.
+        if (this._signalBarrier) throw Error('Internal error');
+
+        this._signalBarrier = new Barrier();
+        await FPStaticServer.stop();
+        await (<Promise<void>>this._signalBarrier);
+      }
+
+      this._setState(
+        this._appStateSub && !kill ? STATES.PAUSED : STATES.STOPPED,
+      );
+    } catch (e: any) {
+      this._setState(
+        this._appStateSub && !kill ? STATES.PAUSE_FAILURE : STATES.STOP_FAILURE,
+      );
+      throw e;
+    } finally {
+      delete servers[this._id];
+      this._sem.setReady(true);
+    }
   }
 
   _handleAppStateChange(appState: AppStateStatus) {
-    if (!this.started) {
-      return;
-    }
-
-    if (appState === 'active' && !this.running) {
-      this.start();
-    }
-
-    if (appState === 'background' && this.running) {
-      this.stop();
-    }
-
-    if (appState === 'inactive' && this.running) {
-      this.stop();
-    }
+    if (appState === 'active') this.start();
+    else this.stop();
   }
 
   get origin() {
     return this._origin;
-  }
-
-  isRunning(): Promise<boolean> {
-    return FPStaticServer.isRunning().then((running: boolean) => {
-      this.running = running;
-      return this.running;
-    });
   }
 }
 

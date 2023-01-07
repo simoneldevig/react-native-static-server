@@ -26,26 +26,33 @@ applications.
 **These are notable versions of the library:**
 
 - **v0.7.0-alpha.0** &mdash; The aim for upcoming **v0.7.0** release is to
-  migrate from currently used, and not actively maintained, native server
-  implementations ([GCDWebServer](https://github.com/swisspol/GCDWebServer) on iOS,
-  and [NanoHttpd](https://github.com/NanoHttpd/nanohttpd) on Android) to the same,
-  actively maintained [Lighttpd] sever on both platforms (and Windows in perspective).
-  See [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12) for details.
+  migrate from the currently used, and not actively maintained, native server
+  implementations ([GCDWebServer](https://github.com/swisspol/GCDWebServer) on
+  iOS, and [NanoHttpd](https://github.com/NanoHttpd/nanohttpd) on Android) to
+  the same, actively maintained [Lighttpd] sever on both platforms (and Windows
+  in perspective). See
+  [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
+  for details.
+
+  Also, library interface will be reworked in this version, with a bunch of
+  breaking changes, and library documentation will be enhanced.
 
   As of the latest alpha version, the status is:
-  - Migration to [Lighttpd] is presumably completed for **Android**,
-    both with [RN's New Architecture] and [RN's Old Architecture]. May need
-    more testing and some fixes.
-  - **iOS** version is broken (prefer to use **v0.6.0-alpha.8**, or **0.5.5**
-    versions described below).
+  - **NOT READY FOR PRODUCTION USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
+    described below.
+  - PoC migration to [Lighttpd] is completed for **Android**,
+    both with [RN's New Architecture] and [RN's Old Architecture].
+    It needs further testing.
+  - **iOS** version is broken.
 
 - **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6.0** release is
   to refactor the library to support [RN's New Architecture],
   while keeping backward compatibility with [RN's Old Architecture],
-  and to have the codebase refactored to follow the standard RN library template.
+  and the original library API. Also, the codebase will be refactored to follow
+  the standard RN library template.
 
   As of the latest alpha version, the status is:
-  - The overall code refactoring is, completed.
+  - The code refactoring is completed.
   - The outcome is tested and works with [RN's Old Architecture] both on
     **Android** and **iOS** devices.
   - The outcome is tested to work with [RN's New Architecture] on **Android**,
@@ -53,9 +60,9 @@ applications.
   - **NOT YET TESTED** with [RN's New Architecture] on **iOS**. Likely to need
     minor fixes there. 
 
-- **v0.5.5** &mdash; A close copy of the latest version of the original library,
-  patched to work with React Native v0.67+, and with all dependencies updated
-  (as of May 17, 2022).
+- **v0.5.5** &mdash; Almost exact close copy of the latest version of
+  the original library, patched to work with React Native v0.67+,
+  and with all dependencies updated (as of May 17, 2022).
 
 ## Getting started
 - Install the package
