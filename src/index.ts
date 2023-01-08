@@ -13,6 +13,8 @@ import {SIGNALS, STATES} from './constants';
 import Semaphore from './Semaphore';
 import Emitter from './Emitter';
 
+export { STATES };
+
 declare global {
   var __turboModuleProxy: object | undefined;
 }
@@ -256,7 +258,7 @@ class StaticServer {
     this._port = port ? port.toString() : '';
 
     if (!fileDir.startsWith('/') && !fileDir.startsWith('file:///')) {
-      fileDir = new URL(fileDir, RNFS.DocumentDirectoryPath).href;
+      fileDir = `${RNFS.DocumentDirectoryPath}/${fileDir}`;
     }
     this._fileDir = fileDir;
   }
@@ -322,7 +324,7 @@ class StaticServer {
 
       // This resolves once startup is initiated, but we need to wait for
       // "LAUNCHED" signal from the native side to be sure the server is up.
-      await FPStaticServer.start(this._configPath);
+      await FPStaticServer.start(this._id, this._configPath);
       await (<Promise<void>>this._signalBarrier);
 
       this._origin = `http://${this._hostname}:${this._port}`;

@@ -30,28 +30,22 @@ public class Server extends Thread {
     System.loadLibrary("lighttpd");
   }
 
+  // NOTE: Tried to use enum, but was not able to make it work with JNI.
+  public final static String CRASHED = "CRASHED";
+  public final static String LAUNCHED = "LAUNCHED";
+  public final static String TERMINATED = "TERMINATED";
+
   private static Server activeServer;
   private static final String LOGTAG = "StaticServer";
-  public static enum Signals {
-    CRASHED("CRASHED"),
-    LAUNCHED("LAUNCHED"),
-    TERMINATED("TERMINATED");
-
-    public final String value;
-
-    Signals(String value) {
-      this.value = value;
-    }
-  }
 
   String configPath;
-  private Consumer<Signals> signalConsumer;
+  private Consumer<String> signalConsumer;
 
   static public void onLaunchedCallback() {
-    activeServer.signalConsumer.accept(Signals.LAUNCHED);
+    activeServer.signalConsumer.accept(LAUNCHED);
   }
 
-  public Server(String configPath, Consumer<Signals> signalConsumer) {
+  public Server(String configPath, Consumer<String> signalConsumer) {
     this.configPath = configPath;
     this.signalConsumer = signalConsumer;
   }
@@ -74,7 +68,7 @@ public class Server extends Thread {
 
     if (Server.activeServer != null) {
       Log.e(LOGTAG, "Another Server instance is active");
-      signalConsumer.accept(Signals.CRASHED);
+      signalConsumer.accept(CRASHED);
       return;
     }
 
@@ -82,10 +76,10 @@ public class Server extends Thread {
       activeServer = this;
       launch(this.configPath);
       Log.i(LOGTAG, "Server terminated gracefully");
-      signalConsumer.accept(Signals.TERMINATED);
+      signalConsumer.accept(TERMINATED);
     } catch (Exception error) {
       Log.e(LOGTAG, "Server crashed", error);
-      signalConsumer.accept(Signals.CRASHED);
+      signalConsumer.accept(CRASHED);
     } finally {
       activeServer = null;
     }

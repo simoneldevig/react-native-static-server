@@ -33,9 +33,9 @@ public class FPStaticServerModuleImpl {
   public static Map<String,Object> getConstants() {
     final Map<String,Object> constants = new HashMap<>();
 
-    constants.put("CRASHED", Server.Signals.CRASHED);
-    constants.put("LAUNCHED", Server.Signals.LAUNCHED);
-    constants.put("TERMINATED", Server.Signals.TERMINATED);
+    constants.put("CRASHED", Server.CRASHED);
+    constants.put("LAUNCHED", Server.LAUNCHED);
+    constants.put("TERMINATED", Server.TERMINATED);
 
     return constants;
   }
@@ -80,17 +80,17 @@ public class FPStaticServerModuleImpl {
 
     server = new Server(
       configPath,
-      new Consumer<Server.Signals>() {
+      new Consumer<String>() {
         private boolean settled = false;
-        public void accept(Server.Signals signal) {
+        public void accept(String signal) {
           if (!settled) {
             settled = true;
-            if (signal == Server.Signals.LAUNCHED) promise.resolve(null);
+            if (signal == Server.LAUNCHED) promise.resolve(null);
             else promise.reject(new Exception("Launch failure"));
           }
           WritableMap event = Arguments.createMap();
           event.putDouble("serverId", id);
-          event.putString("event", signal.value);
+          event.putString("event", signal);
           emitter.emit("RNStaticServer", event);
         }
       }
