@@ -13,7 +13,7 @@ import {SIGNALS, STATES} from './constants';
 import Semaphore from './Semaphore';
 import Emitter from './Emitter';
 
-export { STATES };
+export {STATES};
 
 declare global {
   var __turboModuleProxy: object | undefined;
@@ -35,6 +35,9 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
   if (server) {
     switch (event) {
       case SIGNALS.CRASHED:
+        // TODO: When server crashes,
+        // we should get and message the crash
+        // reason.
         if (server._signalBarrier) {
           server._signalBarrier.reject(Error('Native server crashed'));
           server._signalBarrier = undefined;
@@ -247,8 +250,15 @@ class StaticServer {
    * @param {object} options
    */
   constructor({
+    // TODO: Forbid empty `fileDir` value? If user really
+    // wants to expose entire documents folder of the app,
+    // he better opts in explicitly providing its abs URL.
     fileDir = '',
+    // TODO: Rename into something else, so that with
+    // the current behavior the default "false" of the new
+    // param will do.
     localhost = true,
+    // TODO: Replace by "dontStopInBackground"
     pauseInBackground = true,
     port = 0,
   }) {

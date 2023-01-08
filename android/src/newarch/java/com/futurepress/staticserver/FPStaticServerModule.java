@@ -44,6 +44,16 @@ public class FPStaticServerModule extends NativeStaticServerSpec implements Life
   }
 
   @Override
+  public void addListener(String eventName) {
+    // NOOP
+  }
+
+  @Override
+  public void removeListeners(double count) {
+    // NOOP
+  }
+
+  @Override
   public void stop(Promise promise) {
     impl.stop(promise);
   }

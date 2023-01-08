@@ -10,6 +10,10 @@ export interface Spec extends TurboModule {
 
   isRunning(): Promise<boolean>;
 
+  addListener(eventName: string): void;
+
+  removeListeners(count: number): void;
+
   start(id: number, configPath: string): Promise<string>;
 
   getLocalIpAddress(): Promise<string>;

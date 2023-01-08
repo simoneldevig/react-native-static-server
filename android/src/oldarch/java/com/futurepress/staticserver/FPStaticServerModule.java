@@ -48,6 +48,16 @@ public class FPStaticServerModule extends ReactContextBaseJavaModule implements 
   }
 
   @ReactMethod
+  public void addListener(String eventName) {
+    // NOOP
+  }
+
+  @ReactMethod
+  public void removeListeners(double count) {
+    // NOOP
+  }
+
+  @ReactMethod
   public void stop(Promise promise) {
     impl.stop(promise);
   }
