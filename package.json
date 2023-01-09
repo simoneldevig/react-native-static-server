@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.7.0-alpha.0",
+  "version": "0.7.0-alpha.1",
   "description": "HTTP static file server for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

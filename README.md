@@ -32,7 +32,7 @@ applications.
 
 **These are notable versions of the library:**
 
-- **v0.7.0-alpha.0** &mdash; The aim for upcoming **v0.7.0** release is to
+- **v0.7.0-alpha.1** &mdash; The aim for upcoming **v0.7.0** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([GCDWebServer](https://github.com/swisspol/GCDWebServer) on
   iOS, and [NanoHttpd](https://github.com/NanoHttpd/nanohttpd) on Android) to
@@ -45,7 +45,7 @@ applications.
   breaking changes, and library documentation will be enhanced.
 
   As of the latest alpha version, the status is:
-  - **NOT READY FOR PRODUCTION USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
+  - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
     described below.
   - PoC migration to [Lighttpd] is completed for **Android**,
     both with [RN's New Architecture] and [RN's Old Architecture].

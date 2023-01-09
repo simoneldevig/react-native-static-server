@@ -8,6 +8,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - run: git submodule update --init --recursive
       - restore_cache:
           key: node-modules-{{ checksum "package-lock.json" }}
       - run: npm install --force
@@ -19,7 +20,9 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
+            - lighttpd1.4
             - node_modules
+            - pcre2
   release:
     <<: *defaults
     steps:
