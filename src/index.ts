@@ -72,7 +72,7 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
 async function generateConfig(
   fileDir: string,
   hostname: string,
-  port: string,
+  port: number,
 ): Promise<string> {
   const workDir = `${RNFS.TemporaryDirectoryPath}/__rn-static-server__`;
   await RNFS.mkdir(`${workDir}/uploads`);
@@ -182,10 +182,10 @@ class StaticServer {
   _configPath?: string;
   _fileDir: string;
   _hostname = '';
-  _localhost: boolean;
+  _nonLocal: boolean;
   _origin: string = '';
-  _pauseInBackground: boolean;
-  _port: string;
+  _stopInBackground: boolean;
+  _port: number;
 
   // This barrier is used during start-up and stopage of the server to wait for
   // a success/failure signal from the native side.
@@ -213,12 +213,16 @@ class StaticServer {
     return this._hostname;
   }
 
+  get nonLocal() {
+    return this._nonLocal;
+  }
+
   get origin() {
     return this._origin;
   }
 
-  get pauseInBackground() {
-    return this._pauseInBackground;
+  get stopInBackground() {
+    return this._stopInBackground;
   }
 
   get port() {
@@ -250,24 +254,23 @@ class StaticServer {
    * @param {object} options
    */
   constructor({
-    // TODO: Forbid empty `fileDir` value? If user really
-    // wants to expose entire documents folder of the app,
-    // he better opts in explicitly providing its abs URL.
-    fileDir = '',
-    // TODO: Rename into something else, so that with
-    // the current behavior the default "false" of the new
-    // param will do.
-    localhost = true,
-    // TODO: Replace by "dontStopInBackground"
-    pauseInBackground = true,
+    fileDir,
+    nonLocal = false,
+    stopInBackground = false,
     port = 0,
+  }: {
+    fileDir: string;
+    nonLocal: boolean;
+    port: number;
+    stopInBackground: boolean;
   }) {
-    this._localhost = localhost;
-    if (localhost) this._hostname = 'localhost';
-    this._pauseInBackground = pauseInBackground;
-    this._port = port ? port.toString() : '';
+    this._nonLocal = nonLocal;
+    if (!nonLocal) this._hostname = 'localhost';
+    this._port = port;
+    this._stopInBackground = stopInBackground;
 
-    if (!fileDir.startsWith('/') && !fileDir.startsWith('file:///')) {
+    if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
+    else if (!fileDir.startsWith('/') && !fileDir.startsWith('file:///')) {
       fileDir = `${RNFS.DocumentDirectoryPath}/${fileDir}`;
     }
     this._fileDir = fileDir;
@@ -278,7 +281,7 @@ class StaticServer {
   }
 
   _configureAppStateHandling() {
-    if (this._pauseInBackground) {
+    if (this._stopInBackground) {
       if (!this._appStateSub) {
         this._appStateSub = AppState.addEventListener(
           'change',
