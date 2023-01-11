@@ -4,115 +4,349 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
-A cross platform component for serving static assets with React Native.
+Embed HTTP server for [React Native](https://reactnative.dev) applications.
 
----
-_This is a fork of [the original `react-native-static-server`](https://www.npmjs.com/package/react-native-static-server). The original library is not actively maintained, thus my aim here is to maintain the library for use in personal projects._
-
----
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
-## Getting started
+## Content
+- [Project History and Roadmap](#project-history-and-roadmap)
+- [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
+- [Getting Started](#getting-started)
+- [Reference](#reference)
+- [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
 
-`$ npm install @dr.pogodin/react-native-static-server --save`
+## Project History and Roadmap
 
-### Installation
+[GCDWebServer]: https://github.com/swisspol/GCDWebServer
+[Lighttpd]: https://www.lighttpd.net
+[RN's New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
+[RN's Old Architecture]: https://reactnative.dev/docs/native-modules-intro
 
-From react-native 0.60 autolinking will take care of the link step but don't forget to run pod install
+This project started as a fork of the original
+[`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server)
+library, abandoned by its creators.
+It is published to NPM as
+[@dr.pogodin/react-native-static-server](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server),
+and it aims to provide a well-maintained embed HTTP server for React Native (RN)
+applications.
 
-`$ react-native link @dr.pogodin/react-native-static-server`
+**These are notable versions of the library:**
 
-## Usage
+- **v0.7.0-alpha.1** &mdash; The aim for upcoming **v0.7.0** release is to
+  migrate from the currently used, and not actively maintained, native server
+  implementations ([GCDWebServer](https://github.com/swisspol/GCDWebServer) on
+  iOS, and [NanoHttpd](https://github.com/NanoHttpd/nanohttpd) on Android) to
+  the same, actively maintained [Lighttpd] sever on both platforms (and Windows
+  in perspective). See
+  [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
+  for details.
 
-Declare the `StaticServer` with a port or use the default `0` to pick a random available port.
+  Also, library interface will be reworked in this version, with a bunch of
+  breaking changes, and library documentation will be enhanced.
 
-```javascript
-import StaticServer from '@dr.pogodin/react-native-static-server';
+  As of the latest alpha version, the status is:
+  - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
+    described below.
+  - PoC migration to [Lighttpd] is completed for **Android**,
+    both with [RN's New Architecture] (tested) and, presumably,
+    [RN's Old Architecture] (not tested).
+  - **iOS** version is broken.
 
-let server = new StaticServer(8080);
+- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6.0** release is
+  to refactor the library to support [RN's New Architecture],
+  while keeping backward compatibility with [RN's Old Architecture],
+  and the original library API. Also, the codebase will be refactored to follow
+  the standard RN library template.
 
-// Start the server
-server.start().then((url) => {
-  console.log("Serving at URL", url);
-});
+  As of the latest alpha version, the status is:
+  - The code refactoring is completed.
+  - The outcome is tested and works with [RN's Old Architecture] both on
+    **Android** and **iOS** devices.
+  - The outcome is tested to work with [RN's New Architecture] on **Android**,
+    when using RN@0.70.
+  - **NOT YET TESTED** with [RN's New Architecture] on **iOS**. Likely to need
+    minor fixes there. 
 
-// Stop the server
-server.stop();
+- **v0.5.5** &mdash; Almost exact close copy of the latest version of
+  the original library, patched to work with React Native v0.67+,
+  and with all dependencies updated (as of May 17, 2022).
 
-// Check if native server running
-const isRunning = await server.isRunning()
-// isRunning - true/false
+## Documentation for Older Library Versions (v0.6, v0.5)
+See [OLD-README.md](./OLD-README.md)
+
+## Usage Instructions
+
+_This is a very raw draft, it will be elaborated later._
+
+- Install the package
+  ```shell
+  $ npm install --save @dr.pogodin/react-native-static-server
+  ```
+- On **Android** in `build.gradle` file set `minSdkVersion` to the value 28 or larger.
+
+- _TODO: To use with [Expo](https://expo.dev/) some extra setup is needed, probably we'll document it later. Contributions to this piece of documentation are welcome!_
+
+- Create and run server instance:
+  ```js
+  import Server from '@dr.pogodin/react-native-static-server';
+
+  // NOTE: In practice, you probably want to create and persitently keep
+  // server instance within a RN component, presumably using useRef() hook,
+  // so this example should be enhanced to demonstrate it.
+
+  const server = new Server({
+    // See further in the docs how to statically bundle assets into the App,
+    // alternatively assets to server might be created or downloaded during
+    // the app's runtime.
+    fileDir: '/path/to/static/assets/on/target/device',
+  });
+
+  // As BEWARE note below says, you may have multiple Server instances around,
+  // but you MUST NOT start more than one instance a time, i.e. before calling
+  // .start() on an instance you MUST .stop() a previously started instance,
+  // if any.
+  server.start().then((origin) => {
+    console.log(`Serving at URL ${url}`);
+  });
+  ```
+
+  **BEWARE**: With the current implementation of **v0.7** versions no more
+  than a single server instance can be active at time. Attempt to start a new
+  server instance while another one is still active will result in the crash of
+  that new instance.
+
+- Add files to serve into your app bundle (this is use-case and OS-dependable,
+  should be explained into details).
+  - _TODO: Bundling assets in Android_
+  - _TODO: Bundling assets in iOS_
+
+## Reference
+- [STATES] &mdash; Enumerates possible states of [Server] instance.
+- [Server] &mdash; Represents a server instance.
+  - [constructor()] &mdash; Creates a new [Server] instance.
+  - [.addStateListener()] &mdash; Adds state listener to the server instance.
+  - [.start()] &mdash; Launches the server.
+  - [.stop()] &mdash; Stops the server.
+  - [.fileDir] &mdash; Holds absolute path to static assets on target device.
+  - [.hostname] &mdash; Holds the hostname used by server.
+  - [.nonLocal] &mdash; Holds `nonLocal` value provided to [constructor()].
+  - [.origin] &mdash; Holds server origin.
+  - [.port] &mdash; Holds the port used by server.
+  - [.state] &mdash; Holds the current server state.
+  - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
+    [constructor()].
+
+### STATES
+[STATES]: #states
+```js
+import {STATES} from '@dr.pogodin/react-native-static-server';
 ```
+The [STATES] enumerator provides possible states of a server instance:
+- `STATES.ACTIVE` &mdash; The server instance is up and running;
+- `STATES.CRASHED` &mdash; The server instance has crashed and is inactive;
+- `STATES.INACTIVE` &mdash; The server instance is shut down;
+- `STATES.STARTING` &mdash; The server instance is starting up;
+- `STATES.STOPPING` &mdash; The server instance is shutting down.
 
-`StaticServer` serves from the document directory (default) or takes an optional absolute path to serve from.
+Upon creation, a new server instance is in `INACTIVE` state. Calling [.start()]
+will immediately move it to `STARTING` state, and then to `ACTIVE` state once
+the server is fully initiated in the native layer and is ready to handle
+requests.
 
-For instance, using [react-native-fs](https://github.com/johanneslumpe/react-native-fs) you can get the document directory and specify a directory from there.
+When [.stop()] is called on `ACTIVE` server, or app enters background when
+a server created with `stopInBackground` option is `ACTIVE`, the server moves
+to `STOPPING` state, and it becomes `INACTIVE` once it is confirmed to fully
+stop within the native layer. The server automatically stopped because of
+`stopInBackground` option will automatically restart once the app enters
+foreground, and state changes will be the same as for its regular [.start()]
+sequence described above.
 
-#### Default (document directory)
+It is legit to call [.stop()] on `INACTIVE` server &mdash; if server was stopped
+due to `stopInBackground` option and intends to automatically restart once
+the app is in foreground, calling [.stop()] will cancel such restart, and
+ensure that only explicit call to [.start()] will launch this server again.
 
-```javascript
-import StaticServer from '@dr.pogodin/react-native-static-server';
-import RNFS from 'react-native-fs';
+If any error at any time happens to server, either within native, or Java,
+or JavaScript layers, the server instance will terminate and move to `CRASHED`
+state. You may try to restart such instance calling [.start()] and if succeed,
+the state changes will follow the regular start sequence.
 
-// create a path you want to write to
-let path = RNFS.DocumentDirectoryPath + '/www';
-
-let server = new StaticServer(8080, path);
+### Server
+[Server]: #server
+```js
+import Server from '@dr.pogodin/react-native-static-server';
 ```
+The [Server] class instances represent individual server instances.
 
-#### Custom folder (iOS)
+**BEWARE:** As of the current (**v0.7+**) library implementations at most one
+server instance can be active at time. Attempts to start a new server instance
+will result in crash of that new instance. That means, although you may have
+multiple instance of [Server] class created, you should not call an instance
+[.start()] method unless all other server instances are stopped.
 
-##### Create the folder for static files
-
-Create a folder in your project's top-level directory (usually next to your node_modules and index.js file), and put the files you want to access over http in there.
-
-##### Add folder (static files) to XCode
-
-This folder **must be added to XCode** so it gets bundled with the app.
-
-In XCode, `Project Navigator` right click in the folder project → `Add files to "<project>"` → Select the static folder **and clic options (Uncheck copy items if needed, Create folder references)** so don't duplicate files → Clic Add.
-
-When the app gets bundled, this folder will be next to the compiled app, so using `MainBundlePath` property from `react-native-fs` you can access to the directory.
-
-```javascript
-import StaticServer from '@dr.pogodin/react-native-static-server';
-import RNFS from 'react-native-fs';
-
-// path where files will be served from (index.html here)
-let path = RNFS.MainBundlePath + '/www';
-
-let server = new StaticServer(8080, path);
+#### constructor()
+[constructor()]: #constructor
+```ts
+const server = new Server(options: object);
 ```
+Creates a new, inactive server instance. The following settings are supported
+within `options` argument:
 
-If the server should only be accessible from within the app, set `localOnly` to `true`
+- `fileDir` &mdash; **string** &mdash; The root path on target device from where
+  static assets should be served. Relative paths (those not starting with `/`,
+  neither `file:///`) will be automatically prepended by the _document directory_
+  path; however, empty `fileDir` value is forbidden: if you really want to serve
+  entire documents directory of the app, provide its absolute path explicitly.
 
-```javascript
-import StaticServer from '@dr.pogodin/react-native-static-server';
+- `nonLocal` &mdash; **boolean** &mdash; By default, the server is started on
+  `localhost` address, and it is only accessible within the app. With this flag
+  set **true** the server will be started on a local IP adress also accessible
+  from outside the app.
 
-// Just set options with defaults
-let server = new StaticServer({localOnly : true });
-// Or also valid are:
-let server = new StaticServer(8080, {localOnly : true });
-let server = new StaticServer(8080, path, {localOnly : true });
+- `port` &mdash; **number** &mdash; The port at which to start the server.
+  If 0 (default) an available port will be automatically selected.
 
+- `stopInBackground` &mdash; **boolean** &mdash; By default, server intents
+  to keep working as usual when app enters background / returns to foreground.
+  Setting this flag **true** will cause an active server to automatically stop
+  each time the app transitions to background, and then automatically restart
+  once the app re-enters foreground. Note that calling [.stop()] explicitly
+  will stop the server for good &mdash; no matter `stopInBackground` value,
+  once [.stop()] is called the server won't restart automatically unless you
+  explicitly [.start()] it again.
+
+#### .addStateListener()
+[.addStateListener()]: #addstatelistener
+```ts
+server.addStateListener(listener: callback): function;
 ```
+Adds given state listener to the server instance. The listener will be called
+each time the server state changes with a single argument passed in, the new
+state, which will be one of [STATES] values.
 
-If the server should not pause when the app is in the background, set `keepAlive` to `true`
+This method also returns "unsubscribe" function, call it to remove added
+listener from the server instance.
 
-```javascript
-let server = new StaticServer({keepAlive : true });
+#### .start()
+[.start()]: #start
+```ts
+server.start(): Promise<string>
 ```
+Launches [Server] instance. It returns a Promise, which resolves to the server
+origin once the server is ready to handle requests (the origin is the URL at
+which the server is bound, _e.g._ "http://localhost:3000").
+See [STATES] documentation for details of possible server states and transitions
+between them.
 
-Passing `0` as the port number will cause a random port to be assigned every time the server starts.
-It will reset to a new random port each time the server unpauses, so this should only be used with `keepAlive`.
-
-```javascript
-let server = new StaticServer(0, {keepAlive : true });
+#### .stop()
+[.stop()]: #stop
+```ts
+server.stop(): Promise<>
 ```
+Shuts down the [Server].
 
-## Credits
+**NOTE**: When server was created with `pauseInBackground` option (default),
+calling `.stop()` also ensures that the stopped server won't be restarted
+when the app re-enters foreground. Once stopped, the server only can be
+re-launched by explicity call to [.start()].
 
-* iOS server: [GCDWebServer](https://github.com/swisspol/GCDWebServer)
-* Android server: [NanoHttpd Webserver](https://github.com/NanoHttpd/nanohttpd)
+#### .fileDir
+[.fileDir]: #filedir
+```ts
+server.fileDir: string;
+```
+**Readonly** property, it holds `fileDir` value &mdash; the absolute path
+on target device from which static assets are served by the server.
 
-Thanks to [CorHttpd](https://github.com/floatinghotpot/cordova-httpd) and [react-native-httpserver](https://gitlab.com/base.io/react-native-httpserver#README) for the basis of this library.
+#### .hostname
+[.hostname]: #hostname
+```ts
+server.hostname: string;
+```
+**Readonly** property, it holds hostname used by the server. If server instance
+was constructed without `nonLocal` option (default), the `.hostname` property
+will equal "`localhost`" from the beginning. Otherwise, it will be empty string
+till the first launch of server instance, after which it will be equal to IP
+address automatically selected for the server. This IP address won't change
+upon subsequent re-starts of the server.
+
+#### .nonLocal
+[.nonLocal]: #nonlocal
+```ts
+server.nonLocal: boolean;
+```
+**Readonly** property, it holds `nonLocal` value provided to server
+[constructor()].
+
+#### .origin
+[.origin]: #origin
+```ts
+server.origin: string;
+```
+**Readonly** property, it holds server origin. Initially it equals empty string,
+and after the first launch of server instance it becomes equal to its origin,
+_i.e._ "`http://HOSTNAME:PORT`", where `HOSTNAME` and `PORT` are selected hostname
+and port, also accessible via [.hostname] and [.port] properties.
+
+#### .port
+[.port]: #port
+```ts
+server.port: number;
+```
+**Readonly** property, it holds the port used by the server. Initially it equals
+the `port` value provided to [constructor()], or 0 (default value), if it was
+not provided. If it is 0, it will change to the automatically selected port
+number once the server is started the first time. The selected port number
+does not change upon subsequent re-starts of the server.
+
+#### .state
+[.state]: #state
+```ts
+server.state: STATES;
+```
+**Readonly** property, it holds current server state, which is one of [STATES]
+values.
+
+#### .stopInBackground
+[.stopInBackground]: #stopinbackground
+```ts
+server.stopInBackground: boolean;
+```
+**Readonly** property, it holds `stopInBackground` value provided to
+[constructor()].
+
+## Migration from Older Versions (v0.6, v0.5)
+
+- On **Android** it now requires `minSdkVersion` to be set in equal 28 or larger
+  (in `build.gradle` file). Also, now it is not supported to start more than one
+  server instance a time (previously started server instance, if any, must be
+  stopped before starting another one).
+
+- [Server]'s [constructor()] signature was changed, as well as default behavior:
+  - [constructor()] now accepts a single required argument: an object holding
+    all available server options:
+  - `fileDir` option replaces old `root` argument, and now it MUST BE
+    a non-empty string (to prevent any mistakes due to wrong assumptions
+    what folder is served by default).
+  - `nonLocal` option replaces the old `localOnly`  option, with the opposite
+    meaning and default behavior. Now, by default the server is started on
+    "`localhost`" and is only accessible from within the app. Setting `nonLocal`
+    flag will start it on an automatically assigned IP, accessible from outside
+    the app as well. This is the opposite to behavior in previous versions, and
+    it feels more secure (prevents exposing server outside the app due to
+    overlooking the default behavior).
+  - `stopInBackground` option replaces the old `keepAlive` option, with
+    the opposite meaning and behavior. Now, by default the server does not
+    do anything special when the app goes into background / returns to foreground.
+    Setting `stopInBackground` **true** will cause automatic stop of the server
+    each time the app enters background, with subsequent automatic server restart
+    when the app returns to foreground. This is opposite to behavior in previous
+    versions, and the rationale is: it is easy to handle the server without
+    stopping in background (in this case there is no need to watch server state
+    and synchronize possible requests with current server state), thus new
+    default behavior allows for easier server usage, while the opt-in stopping
+    of server in background allows more advanced usage scenario.
+
+- The new server implementation relies on app's temporary data folder to store
+  some internal files (all within its `__rn-static-server__` subfolder), don't
+  mess with it if you do anything special with the temporary folder.
