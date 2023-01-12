@@ -69,7 +69,7 @@ android {
         buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
         externalNativeBuild {
           cmake {
-            arguments "-DBUILD_JNI_LIB=ON", "-DBUILD_SHARED_LIBS=ON", "-DBUILD_STATIC_LIBS=OFF"
+            arguments "-DBUILD_ANDROID_NDK_LOGGING=ON", "-DBUILD_JNI_LIB=ON", "-DBUILD_SHARED_LIBS=ON", "-DBUILD_STATIC_LIBS=OFF"
             targets "pcre2-8-shared", "lighttpd-common", "mod_indexfile", "mod_dirlisting", "mod_staticfile", "lighttpd"
           }
         }

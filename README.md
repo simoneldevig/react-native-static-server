@@ -148,6 +148,8 @@ The [STATES] enumerator provides possible states of a server instance:
 - `STATES.STARTING` &mdash; The server instance is starting up;
 - `STATES.STOPPING` &mdash; The server instance is shutting down.
 
+_TODO: Move these state behavior description to [.start()] and [.stop()] docs._
+
 Upon creation, a new server instance is in `INACTIVE` state. Calling [.start()]
 will immediately move it to `STARTING` state, and then to `ACTIVE` state once
 the server is fully initiated in the native layer and is ready to handle
@@ -238,6 +240,8 @@ which the server is bound, _e.g._ "http://localhost:3000").
 See [STATES] documentation for details of possible server states and transitions
 between them.
 
+_TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
+
 #### .stop()
 [.stop()]: #stop
 ```ts
@@ -249,6 +253,8 @@ Shuts down the [Server].
 calling `.stop()` also ensures that the stopped server won't be restarted
 when the app re-enters foreground. Once stopped, the server only can be
 re-launched by explicity call to [.start()].
+
+_TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
 
 #### .fileDir
 [.fileDir]: #filedir
