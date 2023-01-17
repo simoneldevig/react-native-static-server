@@ -45,8 +45,7 @@ Pod::Spec.new do |s|
         -DCMAKE_OSX_DEPLOYMENT_TARGET=${IPHONEOS_DEPLOYMENT_TARGET} \
         -DCMAKE_SYSTEM_NAME=iOS \
         -DBUILD_STATIC=1 \
-        -DBUILD_STATIC_LIB=1 \
-        -DBUILD_SHARED_LIB=1 \
+        -DBUILD_LIBRARY=1 \
         -GXcode
       cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} \
         --target pcre2-8-static mod_indexfile mod_dirlisting mod_staticfile \
