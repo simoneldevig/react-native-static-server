@@ -266,7 +266,7 @@ class StaticServer {
   }) {
     this._nonLocal = nonLocal;
     if (!nonLocal) this._hostname = '127.0.0.1'; // TODO: 'localhost' does not work on iOS?
-                                                 // This should be re-tested, or just stick to 127.0.0.1?
+    // This should be re-tested, or just stick to 127.0.0.1?
     this._port = port;
     this._stopInBackground = stopInBackground;
 
