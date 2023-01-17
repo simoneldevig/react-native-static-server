@@ -28,7 +28,34 @@ Pod::Spec.new do |s|
   s.source_files   = "ios/**/*.{h,m,mm,swift}"
 
   s.dependency 'React-Core'
-  s.dependency 'GCDWebServer', '~> 3.0'
+
+  # This requires CMake on the build host, which can be installed via Homebrew (https://brew.sh)
+  s.script_phase = {
+    :name => 'Build native dependencies',
+    :execution_position => :before_compile,
+    # TODO: This should be re-added, but maybe different sets of files.
+    #:output_files => [
+    #  '${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/libpcre2-8.a',
+    #  '${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/iblighttpd.a'
+      # It also depends on compiled module files!
+    #],
+    :script => <<-CMD
+      set -e
+      cmake ${PODS_TARGET_SRCROOT} -B ${TARGET_TEMP_DIR} \
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${IPHONEOS_DEPLOYMENT_TARGET} \
+        -DCMAKE_SYSTEM_NAME=iOS \
+        -DBUILD_STATIC=1 \
+        -DBUILD_STATIC_LIB=1 \
+        -DBUILD_SHARED_LIB=1 \
+        -GXcode
+      cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} \
+        --target pcre2-8-static mod_indexfile mod_dirlisting mod_staticfile \
+          lighttpd
+      cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build/${CONFIGURATION}-iphoneos/*.a \
+          ${TARGET_TEMP_DIR}/pcre2/${CONFIGURATION}-iphoneos/*.a \
+          ${TARGET_BUILD_DIR}
+    CMD
+  }
 
   # This guard prevent to install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
@@ -44,4 +71,8 @@ Pod::Spec.new do |s|
         s.dependency "RCTTypeSafety"
         s.dependency "ReactCommon/turbomodule/core"
     end
+
+    s.pod_target_xcconfig = {
+      'OTHER_LIBTOOLFLAGS' => '-llighttpd -lpcre2-8 -lmod_staticfile -lmod_indexfile -lmod_dirlisting'
+    }
 end

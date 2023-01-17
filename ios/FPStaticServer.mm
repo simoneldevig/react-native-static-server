@@ -1,212 +1,174 @@
 #import "FPStaticServer.h"
+#import "Server.h"
 
-@implementation RNStaticServer
+static NSString * const ERROR_DOMAIN = @"RNStaticServer";
+static NSString * const EVENT_NAME = @"RNStaticServer";
 
-@synthesize bridge = _bridge;
+@implementation RNStaticServer {
+    Server *server;
+}
 
 RCT_EXPORT_MODULE(StaticServer);
 
 - (instancetype)init {
-    if((self = [super init])) {
-
-        [GCDWebServer self];
-        _webServer = [[GCDWebServer alloc] init];
-    }
-    return self;
+  return [super init];
 }
 
 - (void)dealloc {
-
-    if(_webServer.isRunning == YES) {
-        [_webServer stop];
-    }
-    _webServer = nil;
-
+  if (self->server) {
+    [self->server cancel];
+  }
 }
 
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_queue_create("com.futurepress.staticserver", DISPATCH_QUEUE_SERIAL);
+- (NSDictionary*) constantsToExport {
+  return @{
+    @"CRASHED": CRASHED,
+    @"LAUNCHED": LAUNCHED,
+    @"TERMINATED": TERMINATED
+  };
 }
 
-
-RCT_EXPORT_METHOD(start: (NSString *)port
-                  root:(NSString *)optroot
-                  localOnly:(BOOL *)localhost_only
-                  keepAlive:(BOOL *)keep_alive
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-
-    NSString * root;
-
-    if( [optroot isEqualToString:@"DocumentDir"] ){
-        root = [NSString stringWithFormat:@"%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] ];
-    } else if( [optroot isEqualToString:@"BundleDir"] ){
-        root = [NSString stringWithFormat:@"%@", [[NSBundle mainBundle] bundlePath] ];
-    } else if([optroot hasPrefix:@"/"]) {
-        root = optroot;
-    } else {
-        root = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], optroot ];
-    }
-
-    if(root && [root length] > 0) {
-        self.www_root = root;
-    }
-
-    if(port && [port length] > 0) {
-        NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
-        f.numberStyle = NSNumberFormatterDecimalStyle;
-        self.port = [f numberFromString:port];
-    } else {
-        self.port = [NSNumber numberWithInt:-1];
-    }
-
-    self.keep_alive = keep_alive;
-
-    self.localhost_only = localhost_only;
-
-    if(_webServer.isRunning != NO) {
-        NSLog(@"StaticServer already running at %@", self.url);
-        resolve(self.url);
-        return;
-    }
-
-    //[_webServer addGETHandlerForBasePath:@"/" directoryPath:self.www_root indexFilename:@"index.html" cacheAge:3600 allowRangeRequests:YES];
-    NSString *basePath = @"/";
-    NSString *directoryPath = self.www_root;
-    NSString *indexFilename = @"index.html";
-    NSUInteger cacheAge = 0;
-    BOOL allowRangeRequests = YES;
-    [_webServer addHandlerWithMatchBlock:^GCDWebServerRequest*(NSString* requestMethod, NSURL* requestURL, NSDictionary<NSString*, NSString*>* requestHeaders, NSString* urlPath, NSDictionary<NSString*, NSString*>* urlQuery) {
-        if (![requestMethod isEqualToString:@"GET"]) {
-          return nil;
-        }
-        if (![urlPath hasPrefix:basePath]) {
-          return nil;
-        }
-        return [[GCDWebServerRequest alloc] initWithMethod:requestMethod url:requestURL headers:requestHeaders path:urlPath query:urlQuery];
-      }
-      processBlock:^GCDWebServerResponse*(GCDWebServerRequest* request) {
-        GCDWebServerResponse* response = nil;
-        NSString* filePath = [directoryPath stringByAppendingPathComponent:GCDWebServerNormalizePath([request.path substringFromIndex:basePath.length])];
-        NSString* fileType = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:NULL] fileType];
-        if (fileType) {
-          if ([fileType isEqualToString:NSFileTypeDirectory]) {
-            if (indexFilename) {
-              NSString* indexPath = [filePath stringByAppendingPathComponent:indexFilename];
-              NSString* indexType = [[[NSFileManager defaultManager] attributesOfItemAtPath:indexPath error:NULL] fileType];
-              if ([indexType isEqualToString:NSFileTypeRegular]) {
-                response = [GCDWebServerFileResponse responseWithFile:indexPath];
-              }
-            } else {
-              response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_NotFound];
-            }
-          } else if ([fileType isEqualToString:NSFileTypeRegular]) {
-            if (allowRangeRequests) {
-              response = [GCDWebServerFileResponse responseWithFile:filePath byteRange:request.byteRange];
-              [response setValue:@"bytes" forAdditionalHeader:@"Accept-Ranges"];
-            } else {
-              response = [GCDWebServerFileResponse responseWithFile:filePath];
+RCT_EXPORT_METHOD(
+  getLocalIpAddress:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+) {
+  // TODO: For now, let's just hardcode localhost IP, will do non-local support
+  // later.
+  resolve(@"127.0.0.1");
+  /** THIS IS ANDROID/JAVA VERSION OF THE METHOD. CAN WE PORT IT TO IOS?
+     try {
+      Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+      while(en.hasMoreElements()) {
+        NetworkInterface intf = en.nextElement();
+        Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
+        while(enumIpAddr.hasMoreElements()) {
+          InetAddress inetAddress = enumIpAddr.nextElement();
+          if (!inetAddress.isLoopbackAddress()) {
+            String ip = inetAddress.getHostAddress();
+            if(InetAddressUtils.isIPv4Address(ip)) {
+              promise.resolve(ip);
+              return;
             }
           }
         }
-        if (response) {
-          response.cacheControlMaxAge = cacheAge;
-          [response setValue:@"GET" forAdditionalHeader:@"Access-Control-Request-Method"];
-          [response setValue:@"OriginX-Requested-With, Content-Type, Accept, Cache-Control, Range,Access-Control-Allow-Origin"  forAdditionalHeader:@"Access-Control-Request-Headers"];
-          [response setValue: @"*" forAdditionalHeader:@"Access-Control-Allow-Origin"];
-        } else {
-          response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_NotFound];
+      }
+      promise.resolve("127.0.0.1");
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+  */
+}
+
+RCT_EXPORT_METHOD(
+  isRunning:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+) {
+  resolve(@(self->server && self->server.executing));
+}
+
+RCT_EXPORT_METHOD(
+  start:(NSNumber* _Nonnull)serverId
+  configPath:(NSString*)configPath
+  resolver:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+) {
+    NSLog(@"Starting the server...");
+
+    if (self->server) {
+      NSString *msg = @"Another server instance is active";
+      NSError *e = [NSError
+        errorWithDomain:ERROR_DOMAIN
+        code:1
+        userInfo:NULL
+      ];
+      NSLog(@"%@", msg);
+      reject(e.domain, msg, e);
+      return;
+    }
+
+    __block BOOL settled = false;
+    SignalConsumer signalConsumer = ^void(NSString * const signal) {
+      if (!settled) {
+        settled = true;
+        if (signal == LAUNCHED) {
+          NSLog(@"SERVER LAUNCHED!");
+          resolve(NULL);
         }
-        return response;
-      }];
-
-    // Note: It must be __block variable to allow onStartFailure() block below
-    // to access its current, rather than its initial value.
-    __block NSError *error;
-
-    /**
-     * Rejects the start promise with details from "error" object, if that
-     * exists, otherwise rejects with the fallback "StaticServer could not start"
-     * message.
-     *
-     * BEWARE: Once this block is executed, you should ensure yourself
-     * the parent function returns, or at least does not attempt to resolve or
-     * reject the start promise again.
-     */
-    void (^onStartFailure)(NSString*) = ^(NSString *fallbackMessage){
-        if (error) {
-            NSString *errorDescription = [NSString stringWithFormat:@"%@ / %@",
-                error.localizedDescription,
-                error.localizedFailureReason];
-            reject(error.domain, errorDescription, error);
-        } else reject(@"server_error", fallbackMessage, nil);
+        else reject(ERROR_DOMAIN, @"Launch failure", NULL);
+      }
+      [self sendEventWithName:EVENT_NAME
+        body: @{
+          @"serverId": serverId,
+          @"event": signal
+        }
+      ];
     };
 
-    NSMutableDictionary* options = [NSMutableDictionary dictionary];
+    self->server = [Server
+      serverWithConfig:configPath
+      signalConsumer:signalConsumer
+    ];
 
-    NSLog(@"Started StaticServer on port %@", self.port);
-
-    if (![self.port isEqualToNumber:[NSNumber numberWithInt:-1]]) {
-        [options setObject:self.port forKey:GCDWebServerOption_Port];
-    } else {
-        [options setObject:[NSNumber numberWithInteger:8080] forKey:GCDWebServerOption_Port];
-    }
-
-    if (self.localhost_only == YES) {
-        [options setObject:@(YES) forKey:GCDWebServerOption_BindToLocalhost];
-    }
-
-    if (self.keep_alive == YES) {
-        [options setObject:@(NO) forKey:GCDWebServerOption_AutomaticallySuspendInBackground];
-        [options setObject:@2.0 forKey:GCDWebServerOption_ConnectedStateCoalescingInterval];
-    }
-
-
-    if([_webServer startWithOptions:options error:&error]) {
-        NSNumber *listenPort = [NSNumber numberWithUnsignedInteger:_webServer.port];
-        self.port = listenPort;
-
-        if(_webServer.serverURL == NULL) {
-            onStartFailure(@"StaticServer could not start (.serverURL is NULL)");
-        } else {
-            self.url = [NSString stringWithFormat: @"%@://%@:%@", [_webServer.serverURL scheme], [_webServer.serverURL host], [_webServer.serverURL port]];
-            NSLog(@"Started StaticServer at URL %@", self.url);
-            resolve(self.url);
-        }
-    } else {
-        NSLog(@"Error starting StaticServer: %@", error);
-        onStartFailure(@"StaticServer could not start (.start() returned NO)");
-    }
+    [self->server start];
 }
 
-RCT_EXPORT_METHOD(stop) {
-    if(_webServer.isRunning == YES) {
-
-        [_webServer stop];
-
-        NSLog(@"StaticServer stopped");
-    }
+- (NSArray<NSString *> *)supportedEvents {
+  return @[EVENT_NAME];
 }
 
-RCT_EXPORT_METHOD(origin:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
-    if(_webServer.isRunning == YES) {
-        resolve(self.url);
-    } else {
-        resolve(@"");
+RCT_EXPORT_METHOD(
+  stop:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+) {
+  try {
+    if (self->server) {
+      NSLog(@"Stopping...");
+      [self->server cancel];
+      // TODO: In Java we do server.join() here to wait for server thread to exit,
+      // can't find counterpart of .join() for NSThread. Probably, there is
+      // another way to do it, and we should use it.
+      self->server = NULL;
+      NSLog(@"Stopped");
+      resolve(NULL);
     }
+  } catch (NSException *e) {
+    NSString *msg = @"Failed to stop";
+    NSLog(msg);
+    reject(e.name, msg, NULL);
+  }
 }
 
-RCT_EXPORT_METHOD(isRunning:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
-    bool isRunning = _webServer != nil &&_webServer.isRunning == YES;
-    resolve(@(isRunning));
+RCT_EXPORT_METHOD(
+  getOpenPort:(RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject
+) {
+  // TODO: For now, let's just hardcode this port, we'll implement the actual
+  // open port detection later.
+  resolve(@(3000));
+/**
+ANDROID/JAVA IMPLEMENTATION OF THE METHOD
+try {
+      ServerSocket socket = new ServerSocket(0);
+      int port = socket.getLocalPort();
+      socket.close();
+      promise.resolve(port);
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+*/
+}
+
+- (void) startObserving {
+  // NOOP: Triggered when the first listener from JS side is added.
+}
+
+- (void) stopObserving {
+  // NOOP: Triggered when the last listener from JS side is removed.
 }
 
 + (BOOL)requiresMainQueueSetup
 {
-    return YES;
+    return NO;
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
