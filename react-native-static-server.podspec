@@ -52,7 +52,7 @@ Pod::Spec.new do |s|
           lighttpd
       cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build/${CONFIGURATION}-iphoneos/*.a \
           ${TARGET_TEMP_DIR}/pcre2/${CONFIGURATION}-iphoneos/*.a \
-          ${TARGET_BUILD_DIR}
+          ${BUILT_PRODUCTS_DIR}
     CMD
   }
 
