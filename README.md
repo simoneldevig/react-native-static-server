@@ -18,6 +18,7 @@ Embed HTTP server for [React Native](https://reactnative.dev) applications.
 ## Project History and Roadmap
 
 [GCDWebServer]: https://github.com/swisspol/GCDWebServer
+[NanoHttpd]: https://github.com/NanoHttpd/nanohttpd
 [Lighttpd]: https://www.lighttpd.net
 [RN's New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
 [RN's Old Architecture]: https://reactnative.dev/docs/native-modules-intro
@@ -32,12 +33,11 @@ applications.
 
 **These are notable versions of the library:**
 
-- **v0.7.0-alpha.1** &mdash; The aim for upcoming **v0.7.0** release is to
+- **v0.7.0-alpha.3** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
-  implementations ([GCDWebServer](https://github.com/swisspol/GCDWebServer) on
-  iOS, and [NanoHttpd](https://github.com/NanoHttpd/nanohttpd) on Android) to
-  the same, actively maintained [Lighttpd] sever on both platforms (and Windows
-  in perspective). See
+  implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
+  the same, actively maintained [Lighttpd] sever on both platforms, and Windows,
+  in perspective. See
   [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
   for details.
 
@@ -47,12 +47,19 @@ applications.
   As of the latest alpha version, the status is:
   - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
     described below.
-  - PoC migration to [Lighttpd] is completed for **Android**,
-    both with [RN's New Architecture] (tested) and, presumably,
-    [RN's Old Architecture] (not tested).
-  - **iOS** version is broken.
+  - **Android**: PoC migration to [Lighttpd] was completed and tested with
+    RN@0.70, [RN's New Architecture], and library version **v0.7.0-alpha.2**.
+    It looked functional, but missed a few ProGuard rules necessary for production
+    builds (see [Commit#1f37ea](https://github.com/birdofpreyru/react-native-static-server/commit/1f37ea76c25a3c1a7dafdaea406923cdfbc79c93) for the fix). It is most probably
+    broken in the next alpha version, which was focusing on PoC iOS integration.
+    Support of [RN's Old Architecture] was also implemented, but not tested.
+  - **iOS**: PoC migration to [Lighttpd] is work in progress.
+    As of **v0.7.0-alpha.3** it is missing a few pieces, but it was tested
+    with RN@0.70 and [RN's Old Architecture], and it looked functional, but
+    also could be broken during further code preparation for the alpha release.
+    Support of [RN's New Architecture] was also implemented, but not tested.
 
-- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6.0** release is
+- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
   to refactor the library to support [RN's New Architecture],
   while keeping backward compatibility with [RN's Old Architecture],
   and the original library API. Also, the codebase will be refactored to follow
@@ -60,16 +67,17 @@ applications.
 
   As of the latest alpha version, the status is:
   - The code refactoring is completed.
-  - The outcome is tested and works with [RN's Old Architecture] both on
-    **Android** and **iOS** devices.
-  - The outcome is tested to work with [RN's New Architecture] on **Android**,
-    when using RN@0.70.
-  - **NOT YET TESTED** with [RN's New Architecture] on **iOS**. Likely to need
-    minor fixes there. 
+  - **Android**: relies on [NanoHttpd], tested with RN@0.70, and both
+  [RN's New Architecture], and [RN's Old Architecture].
+  - **iOS**: reliles on [GCDWebServer], tested with RN@0.70 and
+    [RN's Old Architecture]. \
+    **NOT TESTED** with [RN's New Architecture], it is likely to require minor
+    fixes to support it.
 
-- **v0.5.5** &mdash; Almost exact close copy of the latest version of
-  the original library, patched to work with React Native v0.67+,
-  and with all dependencies updated (as of May 17, 2022).
+- **v0.5.5** &mdash; The latest version of the original library, patched to work
+  with RN@0.67+, and with all dependencies updated (as of May 17, 2022). Relies
+  on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
+  [RN's Old Architecture], and have not been officially tested with RN@0.69+.
 
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
@@ -82,9 +90,27 @@ _This is a very raw draft, it will be elaborated later._
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
-- On **Android** in `build.gradle` file set `minSdkVersion` to the value 28 or larger.
+- For **Android**:
+  - In `build.gradle` file set `minSdkVersion` to the value 28 or larger. \
+    _Note: older SDK versions miss some functions / libraries we rely upon.
+    Technically, we can support them if we bundle-in those missing pieces into
+    this library; in practice, if nobody sponsors this task, the need to support
+    older SDKs looks low (mind that
+    [SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0)
+    is with us since August 2018)._
 
-- _TODO: To use with [Expo](https://expo.dev/) some extra setup is needed, probably we'll document it later. Contributions to this piece of documentation are welcome!_
+- For **iOS**:
+  - [CMake](https://cmake.org) is required on the build host. The easiest way
+    to get it is to install [Homebrew](https://brew.sh), then execute:
+    ```shell
+    $ brew install cmake
+    ```
+
+- For [Expo](https://expo.dev): \
+  _It probably works with some additional setup (see
+  [Issue#8](https://github.com/birdofpreyru/react-native-static-server/issues/8)),
+  however at the moment we don't support it officially. If anybody wants
+  to help with this, contributions to the documentation / codebase are welcome._
 
 - Create and run server instance:
   ```js
@@ -147,6 +173,8 @@ The [STATES] enumerator provides possible states of a server instance:
 - `STATES.INACTIVE` &mdash; The server instance is shut down;
 - `STATES.STARTING` &mdash; The server instance is starting up;
 - `STATES.STOPPING` &mdash; The server instance is shutting down.
+
+_TODO: Move these state behavior description to [.start()] and [.stop()] docs._
 
 Upon creation, a new server instance is in `INACTIVE` state. Calling [.start()]
 will immediately move it to `STARTING` state, and then to `ACTIVE` state once
@@ -238,6 +266,8 @@ which the server is bound, _e.g._ "http://localhost:3000").
 See [STATES] documentation for details of possible server states and transitions
 between them.
 
+_TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
+
 #### .stop()
 [.stop()]: #stop
 ```ts
@@ -249,6 +279,8 @@ Shuts down the [Server].
 calling `.stop()` also ensures that the stopped server won't be restarted
 when the app re-enters foreground. Once stopped, the server only can be
 re-launched by explicity call to [.start()].
+
+_TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
 
 #### .fileDir
 [.fileDir]: #filedir
