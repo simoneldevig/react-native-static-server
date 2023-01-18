@@ -34,7 +34,7 @@ RCT_EXPORT_METHOD(
 ) {
   // TODO: For now, let's just hardcode localhost IP, will do non-local support
   // later.
-  resolve(@"127.0.0.1");
+  resolve(@"localhost");
   /** THIS IS ANDROID/JAVA VERSION OF THE METHOD. CAN WE PORT IT TO IOS?
      try {
       Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
@@ -52,7 +52,7 @@ RCT_EXPORT_METHOD(
           }
         }
       }
-      promise.resolve("127.0.0.1");
+      promise.resolve("localhost");
     } catch (Exception e) {
       promise.reject(e);
     }

@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.7.0-alpha.3",
+  "version": "0.7.0-alpha.4",
   "description": "HTTP static file server for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -44,7 +44,7 @@
     "@types/jest": "^29.2.5",
     "@types/react": "^18.0.26",
     "@types/react-native": "^0.70.8",
-    "eslint": "^8.31.0",
+    "eslint": "^8.32.0",
     "eslint-plugin-flowtype": "^8.0.3",
     "eslint-plugin-react-native": "^4.0.0",
     "jest": "^29.3.1",

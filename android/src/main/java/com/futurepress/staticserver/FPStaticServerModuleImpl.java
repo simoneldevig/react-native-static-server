@@ -57,7 +57,7 @@ public class FPStaticServerModuleImpl {
           }
         }
       }
-      promise.resolve("127.0.0.1");
+      promise.resolve("localhost");
     } catch (Exception e) {
       promise.reject(e);
     }

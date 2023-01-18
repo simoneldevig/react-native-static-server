@@ -33,7 +33,7 @@ applications.
 
 **These are notable versions of the library:**
 
-- **v0.7.0-alpha.3** &mdash; The aim for upcoming **v0.7** release is to
+- **v0.7.0-alpha.4** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
   the same, actively maintained [Lighttpd] sever on both platforms, and Windows,
@@ -47,12 +47,9 @@ applications.
   As of the latest alpha version, the status is:
   - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
     described below.
-  - **Android**: PoC migration to [Lighttpd] was completed and tested with
-    RN@0.70, [RN's New Architecture], and library version **v0.7.0-alpha.2**.
-    It looked functional, but missed a few ProGuard rules necessary for production
-    builds (see [Commit#1f37ea](https://github.com/birdofpreyru/react-native-static-server/commit/1f37ea76c25a3c1a7dafdaea406923cdfbc79c93) for the fix). It is most probably
-    broken in the next alpha version, which was focusing on PoC iOS integration.
-    Support of [RN's Old Architecture] was also implemented, but not tested.
+  - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
+  - [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
+    [RN's Old Architecture] is also implemented, but is not tested.
   - **iOS**: PoC migration to [Lighttpd] is work in progress.
     As of **v0.7.0-alpha.3** it is missing a few pieces, but it was tested
     with RN@0.70 and [RN's Old Architecture], and it looked functional, but
