@@ -81,7 +81,7 @@ async function generateConfig(
     configFile,
     `server.document-root = "${fileDir}"
     server.bind = "${hostname}"
-    server.errorlog = "${workDir}/error.log"
+    server.errorlog-use-syslog = "enable"
     server.upload-dirs = ( "${workDir}/uploads" )
     server.port = ${port}
     # debug.log-file-not-found = "enable"

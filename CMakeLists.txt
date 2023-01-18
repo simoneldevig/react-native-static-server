@@ -5,9 +5,18 @@ macro(install)
 endmacro(install)
 
 add_subdirectory(pcre2)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Android")
+  set(BUILD_SHARED_LIBS 1)
+endif()
 add_subdirectory(lighttpd1.4)
 
+add_dependencies(lighttpd pcre2-8-static)
 target_include_directories(lighttpd
+  PRIVATE ${CMAKE_BINARY_DIR}/lighttpd1.4/build
+  PRIVATE ${CMAKE_BINARY_DIR}/pcre2
+)
+target_link_directories(lighttpd
   PRIVATE ${CMAKE_BINARY_DIR}/lighttpd1.4/build
   PRIVATE ${CMAKE_BINARY_DIR}/pcre2
 )

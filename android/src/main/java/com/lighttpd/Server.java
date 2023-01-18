@@ -53,13 +53,13 @@ public class Server extends Thread {
   @Override
   public void interrupt() {
     Log.i(LOGTAG, "Server.interrupt() triggered");
-    shutdown();
+    gracefulShutdown();
     // No need to call super.interrupt() here, the native this.shutdown()
     // method will set within the native layer necessary flags that will
     // cause graceful termination of the thread.
   }
 
-  private native void shutdown();
+  private native void gracefulShutdown();
   public native int launch(String configPath);
 
   @Override
