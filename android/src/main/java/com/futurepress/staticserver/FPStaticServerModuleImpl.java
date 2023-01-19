@@ -59,7 +59,11 @@ public class FPStaticServerModuleImpl {
       }
       promise.resolve("localhost");
     } catch (Exception e) {
-      promise.reject(e);
+      promise.reject(
+        "RNStaticServer.getLocalIpAddres()#1",
+        "Failed to get local IP address",
+        e
+      );
     }
   }
 
@@ -74,7 +78,7 @@ public class FPStaticServerModuleImpl {
     if (server != null) {
       Exception e = new Exception("Another server instance is active");
       Log.e(NAME, e.getMessage());
-      promise.reject(e);
+      promise.reject("RNStaticServer.start()#1", e.getMessage(), e);
       return;
     }
 
@@ -86,7 +90,14 @@ public class FPStaticServerModuleImpl {
           if (!settled) {
             settled = true;
             if (signal == Server.LAUNCHED) promise.resolve(null);
-            else promise.reject(new Exception("Launch failure"));
+            else {
+              String msg = "Launch failure";
+              promise.reject(
+                "RNStaticServer.start()#2",
+                msg,
+                new Exception(msg)
+              );
+            }
           }
           WritableMap event = Arguments.createMap();
           event.putDouble("serverId", id);
@@ -105,7 +116,11 @@ public class FPStaticServerModuleImpl {
       socket.close();
       promise.resolve(port);
     } catch (Exception e) {
-      promise.reject(e);
+      promise.reject(
+        "RNStaticServer.getOpenPort()#1",
+        e.getMessage(),
+        e
+      );
     }
   }
 
@@ -121,7 +136,9 @@ public class FPStaticServerModuleImpl {
       if (promise != null) promise.resolve(null);
     } catch (Exception e) {
       Log.e(NAME, "Failed to stop", e);
-      if (promise != null) promise.reject(e);
+      if (promise != null) {
+        promise.reject("RNStaticServer.stop()#1", e.getMessage(), e);
+      }
     }
   }
 

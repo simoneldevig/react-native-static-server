@@ -40,7 +40,6 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
         // reason.
         if (server._signalBarrier) {
           server._signalBarrier.reject(Error('Native server crashed'));
-          server._signalBarrier = undefined;
         } else {
           // NOTE: Beside this state change, when server crashes while in active
           // state, other state changes are managed by .start() and ._stop()
@@ -52,7 +51,6 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
       case SIGNALS.TERMINATED:
         if (server._signalBarrier) {
           server._signalBarrier.resolve();
-          server._signalBarrier = undefined;
         }
         break;
       default:
@@ -349,6 +347,7 @@ class StaticServer {
       this._setState(STATES.CRASHED);
       throw e;
     } finally {
+      this._signalBarrier = undefined;
       this._sem.setReady(true);
     }
   }
@@ -380,6 +379,7 @@ class StaticServer {
       throw e;
     } finally {
       delete servers[this._id];
+      this._signalBarrier = undefined;
       this._sem.setReady(true);
     }
   }

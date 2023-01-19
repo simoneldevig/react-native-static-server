@@ -74,10 +74,10 @@ public class Server extends Thread {
 
     try {
       activeServer = this;
-      // TODO: Here launch method actually returns a value which will be
-      // non-zero if server exited due to an error, and thus we should check it,
-      // and throw in that case.
-      launch(this.configPath);
+      int res = launch(this.configPath);
+      if (res != 0) {
+        throw new Exception("Native server exited with status " + res);
+      }
       Log.i(LOGTAG, "Server terminated gracefully");
       signalConsumer.accept(TERMINATED);
     } catch (Exception error) {
