@@ -12,10 +12,14 @@ public enum Errors {
   STOP_FAILURE("Failed to gracefully shutdown the server");
 
   private String message;
-  private static final String TAG = "RN_STATIC_SERVER";
+  public static final String LOGTAG = "RN_STATIC_SERVER";
 
   Errors(String message) {
     this.message = message;
+  }
+
+  public Error getError() {
+    return new Error(this.getMessage());
   }
 
   public Exception getException() {
@@ -27,23 +31,23 @@ public enum Errors {
   }
 
   public Errors log() {
-    Log.e(Errors.TAG, this.getMessage());
+    Log.e(Errors.LOGTAG, this.getMessage());
     return this;
   }
 
   public Errors log(Exception e) {
-    Log.e(Errors.TAG, e.toString());
+    Log.e(Errors.LOGTAG, e.toString());
     return this.log();
   }
 
   public void reject(Promise promise) {
     if (promise != null) {
-      promise.reject(this.toString(), this.getMessage(), this.getException());
+      promise.reject(this.toString(), this.getMessage(), this.getError());
     }
   }
 
   public String toString() {
-    return Errors.TAG + ":" + this.name();
+    return Errors.LOGTAG + ":" + this.name();
   }
 }
 

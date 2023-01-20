@@ -7,6 +7,7 @@ import java.lang.Thread;
 import java.util.function.Consumer;
 
 import android.util.Log;
+import com.futurepress.staticserver.Errors;
 
 /**
  * Java interface for native Lighttpd server running in a dedicated Thread.
@@ -36,7 +37,7 @@ public class Server extends Thread {
   public final static String TERMINATED = "TERMINATED";
 
   private static Server activeServer;
-  private static final String LOGTAG = "StaticServer";
+  private static final String LOGTAG = Errors.LOGTAG;
 
   String configPath;
   private Consumer<String> signalConsumer;

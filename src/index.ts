@@ -302,10 +302,26 @@ class StaticServer {
     }
   }
 
+  /**
+   * This method throws if server is not in a "stable" state, i.e. not in one
+   * of these: ACTIVE, CRASHED, INACTIVE.
+   */
+  _stableStateGuard() {
+    switch (this._state) {
+      case STATES.ACTIVE:
+      case STATES.CRASHED:
+      case STATES.INACTIVE:
+        return;
+      default:
+        throw Error(`Server is in unstable state ${this._state}`);
+    }
+  }
+
   async start(): Promise<string> {
     try {
       await this._sem.seize();
-      if (this.state === STATES.ACTIVE) return this._origin!;
+      this._stableStateGuard();
+      if (this._state === STATES.ACTIVE) return this._origin!;
       servers[this._id] = this;
       this._setState(STATES.STARTING);
       this._configureAppStateHandling();
@@ -362,6 +378,7 @@ class StaticServer {
   async _stop() {
     try {
       await this._sem.seize();
+      this._stableStateGuard();
       if (this._state !== STATES.ACTIVE) return;
       this._setState(STATES.STOPPING);
 

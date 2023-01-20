@@ -30,6 +30,8 @@ public class FPStaticServerModuleImpl {
   private Server server = null;
 
   public static final String NAME = "StaticServer";
+  public static final String LOGTAG = Errors.LOGTAG
+    + ": FPStaticServerModuleImpl";
 
   public static Map<String,Object> getConstants() {
     final Map<String,Object> constants = new HashMap<>();
@@ -70,7 +72,7 @@ public class FPStaticServerModuleImpl {
     DeviceEventManagerModule.RCTDeviceEventEmitter emitter,
     Promise promise
   ) {
-    Log.i(NAME, "Starting...");
+    Log.i(LOGTAG, "Starting...");
 
     if (server != null) {
       Errors.ANOTHER_INSTANCE_IS_ACTIVE.log().reject(promise);
@@ -110,13 +112,13 @@ public class FPStaticServerModuleImpl {
 
   public void stop(Promise promise) {
     try {
+      Log.i(LOGTAG, "stop() triggered.");
       if (server != null) {
-        Log.i(NAME, "Stopping...");
         server.interrupt();
         server.join();
         server = null;
-        Log.i(NAME, "Stopped");
-      }
+        Log.i(LOGTAG, "Active server stopped");
+      } else Log.i(LOGTAG, "No active server");
       if (promise != null) promise.resolve(null);
     } catch (Exception e) {
       Errors.STOP_FAILURE.log(e).reject(promise);

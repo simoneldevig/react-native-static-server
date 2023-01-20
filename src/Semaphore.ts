@@ -43,7 +43,7 @@ export default class Semaphore {
       await (<Promise<any>>barrier);
       if (seize) this._ready = false;
       this._drainLock!.resolve();
-    }
+    } else if (seize) this._ready = false;
   }
 
   // Private members below this point.
