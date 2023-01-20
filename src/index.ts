@@ -187,7 +187,7 @@ class StaticServer {
 
   // This barrier is used during start-up and stopage of the server to wait for
   // a success/failure signal from the native side.
-  _signalBarrier?: Barrier;
+  _signalBarrier?: Barrier<void>;
 
   _state: STATES = STATES.INACTIVE;
   _stateChangeEmitter = new Emitter();

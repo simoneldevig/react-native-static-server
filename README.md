@@ -55,6 +55,7 @@ applications.
     with RN@0.70 and [RN's Old Architecture], and it looked functional, but
     also could be broken during further code preparation for the alpha release.
     Support of [RN's New Architecture] was also implemented, but not tested.
+  - **v1.4.68** (latest) version of [Lighttpd] is used.
 
 - **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
   to refactor the library to support [RN's New Architecture],
@@ -74,7 +75,7 @@ applications.
 - **v0.5.5** &mdash; The latest version of the original library, patched to work
   with RN@0.67+, and with all dependencies updated (as of May 17, 2022). Relies
   on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
-  [RN's Old Architecture], and have not been officially tested with RN@0.69+.
+  [RN's Old Architecture], and was not tested with RN@0.69+.
 
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)

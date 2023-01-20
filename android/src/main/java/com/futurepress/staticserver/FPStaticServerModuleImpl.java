@@ -14,6 +14,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import com.futurepress.staticserver.Errors;
 import com.lighttpd.Server;
 
 import java.util.HashMap;
@@ -59,11 +60,7 @@ public class FPStaticServerModuleImpl {
       }
       promise.resolve("localhost");
     } catch (Exception e) {
-      promise.reject(
-        "RNStaticServer.getLocalIpAddres()#1",
-        "Failed to get local IP address",
-        e
-      );
+      Errors.FAIL_GET_LOCAL_IP_ADDRESS.reject(promise);
     }
   }
 
@@ -76,9 +73,7 @@ public class FPStaticServerModuleImpl {
     Log.i(NAME, "Starting...");
 
     if (server != null) {
-      Exception e = new Exception("Another server instance is active");
-      Log.e(NAME, e.getMessage());
-      promise.reject("RNStaticServer.start()#1", e.getMessage(), e);
+      Errors.ANOTHER_INSTANCE_IS_ACTIVE.log().reject(promise);
       return;
     }
 
@@ -90,14 +85,7 @@ public class FPStaticServerModuleImpl {
           if (!settled) {
             settled = true;
             if (signal == Server.LAUNCHED) promise.resolve(null);
-            else {
-              String msg = "Launch failure";
-              promise.reject(
-                "RNStaticServer.start()#2",
-                msg,
-                new Exception(msg)
-              );
-            }
+            else Errors.LAUNCH_FAILURE.reject(promise);
           }
           WritableMap event = Arguments.createMap();
           event.putDouble("serverId", id);
@@ -116,11 +104,7 @@ public class FPStaticServerModuleImpl {
       socket.close();
       promise.resolve(port);
     } catch (Exception e) {
-      promise.reject(
-        "RNStaticServer.getOpenPort()#1",
-        e.getMessage(),
-        e
-      );
+      Errors.FAIL_GET_OPEN_PORT.log(e).reject(promise);
     }
   }
 
@@ -135,10 +119,7 @@ public class FPStaticServerModuleImpl {
       }
       if (promise != null) promise.resolve(null);
     } catch (Exception e) {
-      Log.e(NAME, "Failed to stop", e);
-      if (promise != null) {
-        promise.reject("RNStaticServer.stop()#1", e.getMessage(), e);
-      }
+      Errors.STOP_FAILURE.log(e).reject(promise);
     }
   }
 

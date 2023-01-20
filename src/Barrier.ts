@@ -13,7 +13,7 @@ type Rejecter = (error: Error) => void;
  *
  * Docs: https://dr.pogodin.studio/docs/react-utils/docs/api/classes/Barrier
  */
-export class Barrier extends Promise<any> {
+export class Barrier<T> extends Promise<T> {
   _resolve: Resolver;
 
   _resolved = false;
@@ -56,8 +56,11 @@ export class Barrier extends Promise<any> {
     return this._rejected;
   }
 
-  then(onFulfilled: any, onRejected: any) {
-    const res = <Barrier>super.then(onFulfilled, onRejected);
+  then<TR1>(
+    onFulfilled: ((value: T) => TR1 | PromiseLike<TR1>) | null | undefined,
+    onRejected: any,
+  ) {
+    const res = <Barrier<TR1>>super.then(onFulfilled, onRejected);
     res._resolve = this._resolve;
     res._reject = this._reject;
     return res;
