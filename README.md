@@ -36,8 +36,8 @@ applications.
 - **v0.7.0-alpha.4** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
-  the same, actively maintained [Lighttpd] sever on both platforms, and Windows,
-  in perspective. See
+  the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
+  platforms, and Windows, in perspective. See
   [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
   for details.
 
@@ -48,14 +48,14 @@ applications.
   - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
     described below.
   - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
-  - [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
+    [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
     [RN's Old Architecture] is also implemented, but is not tested.
-  - **iOS**: PoC migration to [Lighttpd] is work in progress.
-    As of **v0.7.0-alpha.3** it is missing a few pieces, but it was tested
-    with RN@0.70 and [RN's Old Architecture], and it looked functional, but
-    also could be broken during further code preparation for the alpha release.
-    Support of [RN's New Architecture] was also implemented, but not tested.
-  - **v1.4.68** (latest) version of [Lighttpd] is used.
+  - **iOS**: PoC migration to [Lighttpd] is completed and tested with RN@0.70,
+    [RN's Old Architecture], and library version **v0.7.0-alpha.4**. Not yet
+    implemented `nonLocal` option (running server on IP accessible from outside
+    an app), and automatic port selection (non-zero `port` should be specified
+    to the [constructor()]). Support of [RN's New Architecture] is implemented,
+    but not tested.
 
 - **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
   to refactor the library to support [RN's New Architecture],
@@ -84,6 +84,15 @@ See [OLD-README.md](./OLD-README.md)
 
 _This is a very raw draft, it will be elaborated later._
 
+[CMake]: https://cmake.org
+
+- [CMake] is required on the build host.
+  - On **MacOS** you may get it by installing [Homebrew](https://brew.sh),
+    then executing
+    ```shell
+    $ brew install cmake
+    ```
+
 - Install the package
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
@@ -98,10 +107,10 @@ _This is a very raw draft, it will be elaborated later._
     is with us since August 2018)._
 
 - For **iOS**:
-  - [CMake](https://cmake.org) is required on the build host. The easiest way
-    to get it is to install [Homebrew](https://brew.sh), then execute:
+  - After installing the package, enter `ios` folder of the app codebase
+    and execute
     ```shell
-    $ brew install cmake
+    $ pod install
     ```
 
 - For [Expo](https://expo.dev): \
@@ -258,11 +267,11 @@ listener from the server instance.
 ```ts
 server.start(): Promise<string>
 ```
-Launches [Server] instance. It returns a Promise, which resolves to the server
-origin once the server is ready to handle requests (the origin is the URL at
-which the server is bound, _e.g._ "http://localhost:3000").
-See [STATES] documentation for details of possible server states and transitions
-between them.
+Launches [Server] instance. It returns a [Promise], which resolves
+to the server's [origin][.origin] once the server reaches [ACTIVE][STATES]
+state, thus ready to handle requests. The promise rejects in case of launch
+failure, _i.e._ if server ends in the [CRASHED][STATES] state before becoming
+[ACTIVE][STATES].
 
 _TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
 
@@ -313,10 +322,10 @@ server.nonLocal: boolean;
 ```ts
 server.origin: string;
 ```
-**Readonly** property, it holds server origin. Initially it equals empty string,
+**Readonly** property. It holds server origin. Initially it equals empty string,
 and after the first launch of server instance it becomes equal to its origin,
-_i.e._ "`http://HOSTNAME:PORT`", where `HOSTNAME` and `PORT` are selected hostname
-and port, also accessible via [.hostname] and [.port] properties.
+_i.e._ "`http://HOSTNAME:PORT`", where `HOSTNAME` and `PORT` are selected
+hostname and port, also accessible via [.hostname] and [.port] properties.
 
 #### .port
 [.port]: #port
@@ -380,3 +389,5 @@ server.stopInBackground: boolean;
 - The new server implementation relies on app's temporary data folder to store
   some internal files (all within its `__rn-static-server__` subfolder), don't
   mess with it if you do anything special with the temporary folder.
+
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
