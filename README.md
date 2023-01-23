@@ -49,14 +49,11 @@ applications.
     described below.
   - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
     [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
-    [RN's Old Architecture] is also implemented, but is not tested. Current
-    limitation: at most one server instance can be active at a time (inside
-    a single app).
+    [RN's Old Architecture] is also implemented, but is not tested.
   - **iOS**: PoC migration to [Lighttpd] is completed and tested with RN@0.70,
     [RN's Old Architecture], and library version **v0.7.0-alpha.4**. Support of
     [RN's New Architecture] is implemented, but is not tested.
     Current limitations:
-    - At most one server instance can be active at a time (inside a single app).
     - Only runs on `localhost` (the server is only accessible within an app;
       the `nonLocal` option is not implemented yet, and ignored).
     - Automatic port selection is not implemented yet. A non-zero `port` value
@@ -144,11 +141,6 @@ _This is a very raw draft, it will be elaborated later._
   });
   ```
 
-  **BEWARE**: With the current implementation of **v0.7** versions no more
-  than a single server instance can be active at time. Attempt to start a new
-  server instance while another one is still active will result in the crash of
-  that new instance.
-
 - Add files to serve into your app bundle (this is use-case and OS-dependable,
   should be explained into details).
   - _TODO: Bundling assets in Android_
@@ -157,6 +149,8 @@ _This is a very raw draft, it will be elaborated later._
 ## Reference
 - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
   (Android-specific).
+- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+  server instance, if any.
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
@@ -195,6 +189,19 @@ This is an Android-specific function; it does nothing on other platforms.
 
 **Returns** [Promise] which resolves once the extraction is completed.
 
+### getActiveServer()
+[getActiveServer()]: #getactiveserver
+```js
+import {getActiveServer} from '@dr.pogodin/react-native-static-server';
+
+getActiveServer(): Server;
+```
+Returns currently active, starting, or stopping [Server] instance, if any exist
+in the app. It does not return, however, any inactive server instance which has
+been stopped automatically because of `stopInBackground` option, when the app
+entered background, and might be automatically started in future if the app
+enters foreground again prior to an explicit [.stop()] call for that instance.
+
 ### Server
 [Server]: #server
 ```js
@@ -202,11 +209,13 @@ import Server from '@dr.pogodin/react-native-static-server';
 ```
 The [Server] class represents individual server instances.
 
-**BEWARE:** As of the current (**v0.7+**) library implementations at most one
-server instance can be active at time. Attempts to start a new server instance
-will result in crash of that new instance. That means, although you may have
-multiple instance of [Server] class created, you should not call an instance
-[.start()] method unless all other server instances are stopped.
+**BEWARE:** On **Android** and **iOS** at most one server instance can be active
+within an app at the same time. Attempts to start a new server instance will
+result in the crash of that new instance. That means, although you may have
+multiple instances of [Server] class created, you should not call [.start()]
+method of an instance unless all other server instances are stopped. You may
+use [getActiveServer()] function to check if there is any active server instance
+in the app, including a starting or stopping instance.
 
 #### constructor()
 [constructor()]: #constructor
@@ -270,7 +279,8 @@ if `CRASHED`, it attempts a new start of the server; otherwise (`STARTING` or
 
 **BEWARE:** With the current library version, at most one server instance can be
 active within an app at any time. Calling [.start()] when another server instance
-is running will result in the start failure and `CRASHED` state.
+is running will result in the start failure and `CRASHED` state. See also
+[getActiveServer()].
 
 #### .stop()
 [.stop()]: #stop

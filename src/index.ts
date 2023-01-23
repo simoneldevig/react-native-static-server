@@ -463,3 +463,15 @@ export async function extractBundledAssets(
     }
   }
 }
+
+/**
+ * Returns a server instance currently being in ACTIVE, STARTING,
+ * or STOPPING state, if such server instance exists.
+ * @return {StaticServer|undefined}
+ */
+export function getActiveServer() {
+  return Object.values(servers).find(
+    server =>
+      server.state !== STATES.INACTIVE && server.state !== STATES.CRASHED,
+  );
+}
