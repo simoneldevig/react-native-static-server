@@ -155,7 +155,8 @@ _This is a very raw draft, it will be elaborated later._
   - _TODO: Bundling assets in iOS_
 
 ## Reference
-- [STATES] &mdash; Enumerates possible states of [Server] instance.
+- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
+  (Android-specific).
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
@@ -169,18 +170,30 @@ _This is a very raw draft, it will be elaborated later._
   - [.state] &mdash; Holds the current server state.
   - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
     [constructor()].
+- [STATES] &mdash; Enumerates possible states of [Server] instance.
 
-### STATES
-[STATES]: #states
-```js
-import {STATES} from '@dr.pogodin/react-native-static-server';
+### extractBundledAssets()
+[extractBundledAssets()]: #extractbundledassets
+```jsx
+import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
+
+extractBundledAssets(into, from): Promise<>;
 ```
-The [STATES] enumerator provides possible states of a server instance:
-- `STATES.ACTIVE` &mdash; Up and running.
-- `STATES.CRASHED` &mdash; Crashed and inactive.
-- `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
-- `STATES.STARTING` &mdash; Starting up.
-- `STATES.STOPPING` &mdash; Shutting down.
+Extracts bundled assets into the specified regular folder, preserving asset
+folder structure, and overwriting any conflicting files in the destination.
+
+This is an Android-specific function; it does nothing on other platforms.
+
+**Arguments**
+- `into` &mdash; **string** &mdash; Optional. The destination folder for
+  extracted assets. By default assets are extracted into the app's document
+  folder.
+- `from` &mdash; **string** &mdash; Optional. Relative path to the root asset
+  folder, starting from which all assets contained in that folder and its
+  sub-folders will be extracted into the destination folder, preserving asset
+  folder structure. By default all bundled assets are extracted.
+
+**Returns** [Promise] which resolves once the extraction is completed.
 
 ### Server
 [Server]: #server
@@ -343,6 +356,18 @@ values. Use [.addStateListener()] method to watch for server state changes.
 server.stopInBackground: boolean;
 ```
 Readonly property. It holds `stopInBackground` value provided to [constructor()].
+
+### STATES
+[STATES]: #states
+```js
+import {STATES} from '@dr.pogodin/react-native-static-server';
+```
+The [STATES] enumerator provides possible states of a server instance:
+- `STATES.ACTIVE` &mdash; Up and running.
+- `STATES.CRASHED` &mdash; Crashed and inactive.
+- `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
+- `STATES.STARTING` &mdash; Starting up.
+- `STATES.STOPPING` &mdash; Shutting down.
 
 ## Migration from Older Versions (v0.6, v0.5)
 
