@@ -35,8 +35,8 @@ Pod::Spec.new do |s|
     :execution_position => :before_compile,
     # TODO: This should be re-added, but maybe different sets of files.
     #:output_files => [
-    #  '${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/libpcre2-8.a',
-    #  '${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/iblighttpd.a'
+    #  '${BUILT_PRODUCTS_DIR}/libpcre2-8.a',
+    #  '${BUILT_PRODUCTS_DIR}/iblighttpd.a'
       # It also depends on compiled module files!
     #],
     :script => <<-CMD

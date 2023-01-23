@@ -40,7 +40,6 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
         // reason.
         if (server._signalBarrier) {
           server._signalBarrier.reject(Error('Native server crashed'));
-          server._signalBarrier = undefined;
         } else {
           // NOTE: Beside this state change, when server crashes while in active
           // state, other state changes are managed by .start() and ._stop()
@@ -52,7 +51,6 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
       case SIGNALS.TERMINATED:
         if (server._signalBarrier) {
           server._signalBarrier.resolve();
-          server._signalBarrier = undefined;
         }
         break;
       default:
@@ -81,7 +79,7 @@ async function generateConfig(
     configFile,
     `server.document-root = "${fileDir}"
     server.bind = "${hostname}"
-    server.errorlog = "${workDir}/error.log"
+    server.errorlog-use-syslog = "enable"
     server.upload-dirs = ( "${workDir}/uploads" )
     server.port = ${port}
     # debug.log-file-not-found = "enable"
@@ -189,7 +187,7 @@ class StaticServer {
 
   // This barrier is used during start-up and stopage of the server to wait for
   // a success/failure signal from the native side.
-  _signalBarrier?: Barrier;
+  _signalBarrier?: Barrier<void>;
 
   _state: STATES = STATES.INACTIVE;
   _stateChangeEmitter = new Emitter();
@@ -265,8 +263,7 @@ class StaticServer {
     stopInBackground: boolean;
   }) {
     this._nonLocal = nonLocal;
-    if (!nonLocal) this._hostname = '127.0.0.1'; // TODO: 'localhost' does not work on iOS?
-    // This should be re-tested, or just stick to 127.0.0.1?
+    if (!nonLocal) this._hostname = 'localhost';
     this._port = port;
     this._stopInBackground = stopInBackground;
 
@@ -305,10 +302,26 @@ class StaticServer {
     }
   }
 
+  /**
+   * This method throws if server is not in a "stable" state, i.e. not in one
+   * of these: ACTIVE, CRASHED, INACTIVE.
+   */
+  _stableStateGuard() {
+    switch (this._state) {
+      case STATES.ACTIVE:
+      case STATES.CRASHED:
+      case STATES.INACTIVE:
+        return;
+      default:
+        throw Error(`Server is in unstable state ${this._state}`);
+    }
+  }
+
   async start(): Promise<string> {
     try {
       await this._sem.seize();
-      if (this.state === STATES.ACTIVE) return this._origin!;
+      this._stableStateGuard();
+      if (this._state === STATES.ACTIVE) return this._origin!;
       servers[this._id] = this;
       this._setState(STATES.STARTING);
       this._configureAppStateHandling();
@@ -350,6 +363,7 @@ class StaticServer {
       this._setState(STATES.CRASHED);
       throw e;
     } finally {
+      this._signalBarrier = undefined;
       this._sem.setReady(true);
     }
   }
@@ -364,6 +378,7 @@ class StaticServer {
   async _stop() {
     try {
       await this._sem.seize();
+      this._stableStateGuard();
       if (this._state !== STATES.ACTIVE) return;
       this._setState(STATES.STOPPING);
 
@@ -381,6 +396,7 @@ class StaticServer {
       throw e;
     } finally {
       delete servers[this._id];
+      this._signalBarrier = undefined;
       this._sem.setReady(true);
     }
   }

@@ -7,6 +7,7 @@ import java.lang.Thread;
 import java.util.function.Consumer;
 
 import android.util.Log;
+import com.futurepress.staticserver.Errors;
 
 /**
  * Java interface for native Lighttpd server running in a dedicated Thread.
@@ -36,7 +37,7 @@ public class Server extends Thread {
   public final static String TERMINATED = "TERMINATED";
 
   private static Server activeServer;
-  private static final String LOGTAG = "StaticServer";
+  private static final String LOGTAG = Errors.LOGTAG;
 
   String configPath;
   private Consumer<String> signalConsumer;
@@ -53,13 +54,13 @@ public class Server extends Thread {
   @Override
   public void interrupt() {
     Log.i(LOGTAG, "Server.interrupt() triggered");
-    shutdown();
+    gracefulShutdown();
     // No need to call super.interrupt() here, the native this.shutdown()
     // method will set within the native layer necessary flags that will
     // cause graceful termination of the thread.
   }
 
-  private native void shutdown();
+  private native void gracefulShutdown();
   public native int launch(String configPath);
 
   @Override
@@ -74,10 +75,10 @@ public class Server extends Thread {
 
     try {
       activeServer = this;
-      // TODO: Here launch method actually returns a value which will be
-      // non-zero if server exited due to an error, and thus we should check it,
-      // and throw in that case.
-      launch(this.configPath);
+      int res = launch(this.configPath);
+      if (res != 0) {
+        throw new Exception("Native server exited with status " + res);
+      }
       Log.i(LOGTAG, "Server terminated gracefully");
       signalConsumer.accept(TERMINATED);
     } catch (Exception error) {

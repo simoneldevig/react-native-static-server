@@ -14,6 +14,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import com.futurepress.staticserver.Errors;
 import com.lighttpd.Server;
 
 import java.util.HashMap;
@@ -29,6 +30,8 @@ public class FPStaticServerModuleImpl {
   private Server server = null;
 
   public static final String NAME = "StaticServer";
+  public static final String LOGTAG = Errors.LOGTAG
+    + ": FPStaticServerModuleImpl";
 
   public static Map<String,Object> getConstants() {
     final Map<String,Object> constants = new HashMap<>();
@@ -57,9 +60,9 @@ public class FPStaticServerModuleImpl {
           }
         }
       }
-      promise.resolve("127.0.0.1");
+      promise.resolve("localhost");
     } catch (Exception e) {
-      promise.reject(e);
+      Errors.FAIL_GET_LOCAL_IP_ADDRESS.reject(promise);
     }
   }
 
@@ -69,12 +72,10 @@ public class FPStaticServerModuleImpl {
     DeviceEventManagerModule.RCTDeviceEventEmitter emitter,
     Promise promise
   ) {
-    Log.i(NAME, "Starting...");
+    Log.i(LOGTAG, "Starting...");
 
     if (server != null) {
-      Exception e = new Exception("Another server instance is active");
-      Log.e(NAME, e.getMessage());
-      promise.reject(e);
+      Errors.ANOTHER_INSTANCE_IS_ACTIVE.log().reject(promise);
       return;
     }
 
@@ -86,7 +87,7 @@ public class FPStaticServerModuleImpl {
           if (!settled) {
             settled = true;
             if (signal == Server.LAUNCHED) promise.resolve(null);
-            else promise.reject(new Exception("Launch failure"));
+            else Errors.LAUNCH_FAILURE.reject(promise);
           }
           WritableMap event = Arguments.createMap();
           event.putDouble("serverId", id);
@@ -105,23 +106,22 @@ public class FPStaticServerModuleImpl {
       socket.close();
       promise.resolve(port);
     } catch (Exception e) {
-      promise.reject(e);
+      Errors.FAIL_GET_OPEN_PORT.log(e).reject(promise);
     }
   }
 
   public void stop(Promise promise) {
     try {
+      Log.i(LOGTAG, "stop() triggered.");
       if (server != null) {
-        Log.i(NAME, "Stopping...");
         server.interrupt();
         server.join();
         server = null;
-        Log.i(NAME, "Stopped");
-      }
+        Log.i(LOGTAG, "Active server stopped");
+      } else Log.i(LOGTAG, "No active server");
       if (promise != null) promise.resolve(null);
     } catch (Exception e) {
-      Log.e(NAME, "Failed to stop", e);
-      if (promise != null) promise.reject(e);
+      Errors.STOP_FAILURE.log(e).reject(promise);
     }
   }
 

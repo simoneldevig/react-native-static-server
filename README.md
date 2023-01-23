@@ -33,11 +33,11 @@ applications.
 
 **These are notable versions of the library:**
 
-- **v0.7.0-alpha.3** &mdash; The aim for upcoming **v0.7** release is to
+- **v0.7.0-alpha.4** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
-  the same, actively maintained [Lighttpd] sever on both platforms, and Windows,
-  in perspective. See
+  the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
+  platforms, and Windows, in perspective. See
   [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
   for details.
 
@@ -47,17 +47,20 @@ applications.
   As of the latest alpha version, the status is:
   - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
     described below.
-  - **Android**: PoC migration to [Lighttpd] was completed and tested with
-    RN@0.70, [RN's New Architecture], and library version **v0.7.0-alpha.2**.
-    It looked functional, but missed a few ProGuard rules necessary for production
-    builds (see [Commit#1f37ea](https://github.com/birdofpreyru/react-native-static-server/commit/1f37ea76c25a3c1a7dafdaea406923cdfbc79c93) for the fix). It is most probably
-    broken in the next alpha version, which was focusing on PoC iOS integration.
-    Support of [RN's Old Architecture] was also implemented, but not tested.
-  - **iOS**: PoC migration to [Lighttpd] is work in progress.
-    As of **v0.7.0-alpha.3** it is missing a few pieces, but it was tested
-    with RN@0.70 and [RN's Old Architecture], and it looked functional, but
-    also could be broken during further code preparation for the alpha release.
-    Support of [RN's New Architecture] was also implemented, but not tested.
+  - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
+    [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
+    [RN's Old Architecture] is also implemented, but is not tested. Current
+    limitation: at most one server instance can be active at a time (inside
+    a single app).
+  - **iOS**: PoC migration to [Lighttpd] is completed and tested with RN@0.70,
+    [RN's Old Architecture], and library version **v0.7.0-alpha.4**. Support of
+    [RN's New Architecture] is implemented, but is not tested.
+    Current limitations:
+    - At most one server instance can be active at a time (inside a single app).
+    - Only runs on `localhost` (the server is only accessible within an app;
+      the `nonLocal` option is not implemented yet, and ignored).
+    - Automatic port selection is not implemented yet. A non-zero `port` value
+      must be specified to the [constructor()].
 
 - **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
   to refactor the library to support [RN's New Architecture],
@@ -77,7 +80,7 @@ applications.
 - **v0.5.5** &mdash; The latest version of the original library, patched to work
   with RN@0.67+, and with all dependencies updated (as of May 17, 2022). Relies
   on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
-  [RN's Old Architecture], and have not been officially tested with RN@0.69+.
+  [RN's Old Architecture], and was not tested with RN@0.69+.
 
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
@@ -86,24 +89,29 @@ See [OLD-README.md](./OLD-README.md)
 
 _This is a very raw draft, it will be elaborated later._
 
+[CMake]: https://cmake.org
+
+- [CMake] is required on the build host.
+  - On **MacOS** you may get it by installing [Homebrew](https://brew.sh),
+    then executing
+    ```shell
+    $ brew install cmake
+    ```
+
 - Install the package
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
 - For **Android**:
-  - In `build.gradle` file set `minSdkVersion` to the value 28 or larger. \
-    _Note: older SDK versions miss some functions / libraries we rely upon.
-    Technically, we can support them if we bundle-in those missing pieces into
-    this library; in practice, if nobody sponsors this task, the need to support
-    older SDKs looks low (mind that
-    [SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0)
-    is with us since August 2018)._
+  - In the `build.gradle` file set `minSdkVersion` equal 28
+    ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
+    released in August 2018), or larger.
 
 - For **iOS**:
-  - [CMake](https://cmake.org) is required on the build host. The easiest way
-    to get it is to install [Homebrew](https://brew.sh), then execute:
+  - After installing the package, enter `ios` folder of the app's codebase
+    and execute
     ```shell
-    $ brew install cmake
+    $ pod install
     ```
 
 - For [Expo](https://expo.dev): \
@@ -168,43 +176,18 @@ _This is a very raw draft, it will be elaborated later._
 import {STATES} from '@dr.pogodin/react-native-static-server';
 ```
 The [STATES] enumerator provides possible states of a server instance:
-- `STATES.ACTIVE` &mdash; The server instance is up and running;
-- `STATES.CRASHED` &mdash; The server instance has crashed and is inactive;
-- `STATES.INACTIVE` &mdash; The server instance is shut down;
-- `STATES.STARTING` &mdash; The server instance is starting up;
-- `STATES.STOPPING` &mdash; The server instance is shutting down.
-
-_TODO: Move these state behavior description to [.start()] and [.stop()] docs._
-
-Upon creation, a new server instance is in `INACTIVE` state. Calling [.start()]
-will immediately move it to `STARTING` state, and then to `ACTIVE` state once
-the server is fully initiated in the native layer and is ready to handle
-requests.
-
-When [.stop()] is called on `ACTIVE` server, or app enters background when
-a server created with `stopInBackground` option is `ACTIVE`, the server moves
-to `STOPPING` state, and it becomes `INACTIVE` once it is confirmed to fully
-stop within the native layer. The server automatically stopped because of
-`stopInBackground` option will automatically restart once the app enters
-foreground, and state changes will be the same as for its regular [.start()]
-sequence described above.
-
-It is legit to call [.stop()] on `INACTIVE` server &mdash; if server was stopped
-due to `stopInBackground` option and intends to automatically restart once
-the app is in foreground, calling [.stop()] will cancel such restart, and
-ensure that only explicit call to [.start()] will launch this server again.
-
-If any error at any time happens to server, either within native, or Java,
-or JavaScript layers, the server instance will terminate and move to `CRASHED`
-state. You may try to restart such instance calling [.start()] and if succeed,
-the state changes will follow the regular start sequence.
+- `STATES.ACTIVE` &mdash; Up and running.
+- `STATES.CRASHED` &mdash; Crashed and inactive.
+- `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
+- `STATES.STARTING` &mdash; Starting up.
+- `STATES.STOPPING` &mdash; Shutting down.
 
 ### Server
 [Server]: #server
 ```js
 import Server from '@dr.pogodin/react-native-static-server';
 ```
-The [Server] class instances represent individual server instances.
+The [Server] class represents individual server instances.
 
 **BEWARE:** As of the current (**v0.7+**) library implementations at most one
 server instance can be active at time. Attempts to start a new server instance
@@ -239,7 +222,7 @@ within `options` argument:
   Setting this flag **true** will cause an active server to automatically stop
   each time the app transitions to background, and then automatically restart
   once the app re-enters foreground. Note that calling [.stop()] explicitly
-  will stop the server for good &mdash; no matter `stopInBackground` value,
+  will stop the server for good&nbsp;&mdash; no matter `stopInBackground` value;
   once [.stop()] is called the server won't restart automatically unless you
   explicitly [.start()] it again.
 
@@ -260,34 +243,50 @@ listener from the server instance.
 ```ts
 server.start(): Promise<string>
 ```
-Launches [Server] instance. It returns a Promise, which resolves to the server
-origin once the server is ready to handle requests (the origin is the URL at
-which the server is bound, _e.g._ "http://localhost:3000").
-See [STATES] documentation for details of possible server states and transitions
-between them.
+Starts [Server] instance. It returns a [Promise], which resolves
+to the server's [origin][.origin] once the server reaches `ACTIVE`
+[state][.state], thus becomes ready to handle requests. The promise rejects
+in case of start failure, _i.e._ if server ends up in the `CRASHED` state before
+becoming `ACTIVE`.
 
-_TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
+This method is safe to call no matter the current state of this server instance.
+If it is `ACTIVE`, the method just resolves to [origin][.origin] right away;
+if `CRASHED`, it attempts a new start of the server; otherwise (`STARTING` or
+`STOPPING`), it will wait until the server reaches one of resulting states
+(`ACTIVE`, `CRASHED`, or `INACTIVE`), then acts accordingly.
+
+**BEWARE:** With the current library version, at most one server instance can be
+active within an app at any time. Calling [.start()] when another server instance
+is running will result in the start failure and `CRASHED` state.
 
 #### .stop()
 [.stop()]: #stop
 ```ts
 server.stop(): Promise<>
 ```
-Shuts down the [Server].
+Gracefully shuts down the server. It returns a [Promise] which resolve once
+the server is shut down, _i.e._ reached `INACTIVE` [state](.state). The promise
+rejects if an error happens during shutdown, and server ends up in the `CRASHED`
+state.
 
-**NOTE**: When server was created with `pauseInBackground` option (default),
-calling `.stop()` also ensures that the stopped server won't be restarted
-when the app re-enters foreground. Once stopped, the server only can be
-re-launched by explicity call to [.start()].
+If server was created with `pauseInBackground` option, calling
+`.stop()` will also ensure that the stopped server won't be restarted when
+the app re-enters foreground. Once stopped, the server only can be re-launched
+by an explicit call of [.start()].
 
-_TODO_: The state changes, as well as function behavior in different states should be documented here, rather than in [STATES].
+It is safe to call this method no matter the current state of this server.
+If it is `INACTIVE` or `CRASHED`, the call will just cancel automatic restart
+of the server, if one is scheduled by `pauseInBackground` option, as mentioned
+above. If it is `STARTING` or `STOPPING`, this method will wait till server
+reaching another state (`ACTIVE`, `INACTIVE` or `CRASHED`), then it will act
+accordingly.
 
 #### .fileDir
 [.fileDir]: #filedir
 ```ts
 server.fileDir: string;
 ```
-**Readonly** property, it holds `fileDir` value &mdash; the absolute path
+Readonly property. It holds `fileDir` value &mdash; the absolute path
 on target device from which static assets are served by the server.
 
 #### .hostname
@@ -295,7 +294,7 @@ on target device from which static assets are served by the server.
 ```ts
 server.hostname: string;
 ```
-**Readonly** property, it holds hostname used by the server. If server instance
+Readonly property. It holds hostname used by the server. If server instance
 was constructed without `nonLocal` option (default), the `.hostname` property
 will equal "`localhost`" from the beginning. Otherwise, it will be empty string
 till the first launch of server instance, after which it will be equal to IP
@@ -307,25 +306,24 @@ upon subsequent re-starts of the server.
 ```ts
 server.nonLocal: boolean;
 ```
-**Readonly** property, it holds `nonLocal` value provided to server
-[constructor()].
+Readonly property. It holds `nonLocal` value provided to server [constructor()].
 
 #### .origin
 [.origin]: #origin
 ```ts
 server.origin: string;
 ```
-**Readonly** property, it holds server origin. Initially it equals empty string,
+Readonly property. It holds server origin. Initially it equals empty string,
 and after the first launch of server instance it becomes equal to its origin,
-_i.e._ "`http://HOSTNAME:PORT`", where `HOSTNAME` and `PORT` are selected hostname
-and port, also accessible via [.hostname] and [.port] properties.
+_i.e._ "`http://HOSTNAME:PORT`", where `HOSTNAME` and `PORT` are selected
+hostname and port, also accessible via [.hostname] and [.port] properties.
 
 #### .port
 [.port]: #port
 ```ts
 server.port: number;
 ```
-**Readonly** property, it holds the port used by the server. Initially it equals
+Readonly property. It holds the port used by the server. Initially it equals
 the `port` value provided to [constructor()], or 0 (default value), if it was
 not provided. If it is 0, it will change to the automatically selected port
 number once the server is started the first time. The selected port number
@@ -336,16 +334,15 @@ does not change upon subsequent re-starts of the server.
 ```ts
 server.state: STATES;
 ```
-**Readonly** property, it holds current server state, which is one of [STATES]
-values.
+Readonly property. It holds current server state, which is one of [STATES]
+values. Use [.addStateListener()] method to watch for server state changes.
 
 #### .stopInBackground
 [.stopInBackground]: #stopinbackground
 ```ts
 server.stopInBackground: boolean;
 ```
-**Readonly** property, it holds `stopInBackground` value provided to
-[constructor()].
+Readonly property. It holds `stopInBackground` value provided to [constructor()].
 
 ## Migration from Older Versions (v0.6, v0.5)
 
@@ -382,3 +379,5 @@ server.stopInBackground: boolean;
 - The new server implementation relies on app's temporary data folder to store
   some internal files (all within its `__rn-static-server__` subfolder), don't
   mess with it if you do anything special with the temporary folder.
+
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise

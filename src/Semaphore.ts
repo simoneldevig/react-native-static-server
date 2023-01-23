@@ -24,7 +24,7 @@ export default class Semaphore {
     const bool = !!ready;
     if (this._ready !== bool) {
       this._ready = bool;
-      if (bool && !this._draining) this._drainQueue();
+      if (bool && !this._draining && this._queue.length) this._drainQueue();
     }
   }
 
@@ -33,17 +33,17 @@ export default class Semaphore {
    * @return {Promise}
    */
   async seize() {
-    await this.waitReady();
-    this.setReady(false);
+    return this.waitReady(true);
   }
 
-  async waitReady() {
+  async waitReady(seize = false) {
     if (!this._ready || this._queue.length) {
-      const barrier = new Barrier();
+      const barrier: Barrier<void> = new Barrier();
       this._queue.push(barrier);
       await (<Promise<any>>barrier);
-      this._queue.shift();
-    }
+      if (seize) this._ready = false;
+      this._drainLock!.resolve();
+    } else if (seize) this._ready = false;
   }
 
   // Private members below this point.
@@ -54,29 +54,33 @@ export default class Semaphore {
    * Otherwise, it breaks the queue draining loop, which will be restarted
    * the next time the semaphore is set ready.
    */
-  _drainQueue() {
-    if (this._ready && this._queue.length) {
+  async _drainQueue() {
+    this._draining = true;
+    while (this._ready && this._queue.length) {
+      this._drainLock = new Barrier();
       this._queue[0].resolve();
-
-      // Re-schedules itself for the next event loop iteration.
-      if (this._queue.length) {
-        setTimeout(this._drainQueue.bind(this));
-        this._draining = true;
-        return; // Exit here to avoid the drain loop termination below.
-      }
+      await this._drainLock; // eslint-disable-line no-await-in-loop
+      this._queue.shift();
     }
-
-    // Cleans up for the drain loop termination.
     this._draining = false;
+    this._drainLock = null;
   }
 
   // "true" when the drain queue process is running (and thus no need to start
   // a new one).
   _draining = false;
 
+  // Each time a Promise from drain queue is resolved this drainLock is set
+  // to block further queue draining until the promise resolution handler
+  // (.seize() or .waitReady()) unlocks it, thus confirming it is fine
+  // to continue the draining. This is specifically important for .seize(),
+  // which should have a chance to switch semaphore state to non-ready prior
+  // to next Promise in the queue being unlocked.
+  _drainLock: Barrier<void> | null = null;
+
   // The array of barriers set for each async code flow awaiting for
   // the Semaphore to become ready.
-  _queue: Barrier[] = [];
+  _queue: Barrier<void>[] = [];
 
   _ready;
 }

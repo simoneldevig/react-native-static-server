@@ -7,8 +7,8 @@ void onLaunchedCallback() {
 }
 
 extern "C" {
-  int lighttpd_server_launch(const char * config_path, void (*cb)());
-  void lighttpd_server_graceful_shutdown();
+  int lighttpd_launch(const char * config_path, void (*cb)());
+  void lighttpd_graceful_shutdown();
 }
 
 @implementation Server {
@@ -26,7 +26,7 @@ extern "C" {
 
 - (void) cancel {
   NSLog(@"Server.cancel() triggered");
-  lighttpd_server_graceful_shutdown();
+  lighttpd_graceful_shutdown();
   [super cancel];
 }
 
@@ -41,7 +41,7 @@ extern "C" {
 
   @try {
     activeServer = self;
-    int res = lighttpd_server_launch(
+    int res = lighttpd_launch(
       [self->configPath cStringUsingEncoding:NSASCIIStringEncoding],
       onLaunchedCallback
     );
