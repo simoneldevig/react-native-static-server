@@ -78,7 +78,7 @@ applications.
     fixes to support it.
 
 - **v0.5.5** &mdash; The latest version of the original library, patched to work
-  with RN@0.67+, and with all dependencies updated (as of May 17, 2022). Relies
+  with RN@0.67&ndash;0.68, and with all dependencies updated (as of May 17, 2022). Relies
   on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
   [RN's Old Architecture], and was not tested with RN@0.69+.
 
