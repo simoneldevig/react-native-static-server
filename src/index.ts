@@ -451,16 +451,13 @@ export async function extractBundledAssets(
 ) {
   if (Platform.OS !== 'android') return;
 
+  await RNFS.mkdir(into);
   const assets = await RNFS.readDirAssets(from);
   for (let i = 0; i < assets.length; ++i) {
     const asset = assets[i];
-    const destination = `${into}/${asset.name}`;
-    if (asset.isDirectory()) {
-      await RNFS.mkdir(destination);
-      await extractBundledAssets(destination, asset.path);
-    } else {
-      await RNFS.copyFileAssets(asset.path, destination);
-    }
+    const target = `${into}/${asset.name}`;
+    if (asset.isDirectory()) await extractBundledAssets(target, asset.path);
+    else await RNFS.copyFileAssets(asset.path, target);
   }
 }
 
