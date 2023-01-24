@@ -50,8 +50,8 @@ Pod::Spec.new do |s|
       cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} \
         --target pcre2-8-static mod_indexfile mod_dirlisting mod_staticfile \
           lighttpd
-      cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build/${CONFIGURATION}-iphoneos/*.a \
-          ${TARGET_TEMP_DIR}/pcre2/${CONFIGURATION}-iphoneos/*.a \
+      cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build/${CONFIGURATION}${EFFECTIVE_PLATFORM_NAME}/*.a \
+          ${TARGET_TEMP_DIR}/pcre2/${CONFIGURATION}${EFFECTIVE_PLATFORM_NAME}/*.a \
           ${BUILT_PRODUCTS_DIR}
     CMD
   }
