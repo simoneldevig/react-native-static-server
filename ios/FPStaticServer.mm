@@ -1,5 +1,8 @@
 #import "FPStaticServer.h"
 #import "Server.h"
+#import <ifaddrs.h>
+#import <arpa/inet.h>
+#include <net/if.h>
 
 static NSString * const ERROR_DOMAIN = @"RNStaticServer";
 static NSString * const EVENT_NAME = @"RNStaticServer";
@@ -32,31 +35,41 @@ RCT_EXPORT_METHOD(
   getLocalIpAddress:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
-  // TODO: For now, let's just hardcode localhost IP, will do non-local support
-  // later.
-  resolve(@"localhost");
-  /** THIS IS ANDROID/JAVA VERSION OF THE METHOD. CAN WE PORT IT TO IOS?
-     try {
-      Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-      while(en.hasMoreElements()) {
-        NetworkInterface intf = en.nextElement();
-        Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
-        while(enumIpAddr.hasMoreElements()) {
-          InetAddress inetAddress = enumIpAddr.nextElement();
-          if (!inetAddress.isLoopbackAddress()) {
-            String ip = inetAddress.getHostAddress();
-            if(InetAddressUtils.isIPv4Address(ip)) {
-              promise.resolve(ip);
-              return;
-            }
+  struct ifaddrs *interfaces = NULL; // a linked list of network interfaces
+  @try {
+    struct ifaddrs *temp_addr = NULL;
+    int success = getifaddrs(&interfaces); // get the list of network interfaces
+    if (success == 0) {
+      NSLog(@"Found network interfaces, iterating.");
+      temp_addr = interfaces;
+      while(temp_addr != NULL) {
+        // Check if the current interface is of type AF_INET (IPv4)
+        // and not the loopback interface (lo0)
+        if(temp_addr->ifa_addr->sa_family == AF_INET) {
+          if(!(temp_addr->ifa_flags & IFF_LOOPBACK)) {
+            NSLog(@"Found IPv4 & non-loopback interface. Retrieving IP address.");
+            NSString *ip = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
+            resolve(ip);
+            return;
           }
         }
+        temp_addr = temp_addr->ifa_next;
       }
-      promise.resolve("localhost");
-    } catch (Exception e) {
-      promise.reject(e);
     }
-  */
+    NSLog(@"Could not find IP address, falling back to localhost.");
+    resolve(@"localhost");
+  }
+  @catch (NSException *e) {
+    // TODO: First, it is probably not the best way to map NSException fields
+    // into NSError object; second, we should adopt approach from Android code,
+    // where there is a dedicated error handling and reporting singletone, which
+    // simplifies such error handling with promise rejection and optional logging.
+    NSError *error = [NSError errorWithDomain:ERROR_DOMAIN code:12345 userInfo:e.userInfo];
+    reject(e.name, e.reason, error);
+  }
+  @finally {
+    freeifaddrs(interfaces);
+  }
 }
 
 RCT_EXPORT_METHOD(
@@ -78,7 +91,7 @@ RCT_EXPORT_METHOD(
       NSString *msg = @"Another server instance is active";
       NSError *e = [NSError
         errorWithDomain:ERROR_DOMAIN
-        code:1
+        code:12345
         userInfo:NULL
       ];
       NSLog(@"%@", msg);
@@ -133,7 +146,7 @@ RCT_EXPORT_METHOD(
     }
   } catch (NSException *e) {
     NSString *msg = @"Failed to stop";
-    NSLog(msg);
+    NSLog(@"%@", msg);
     reject(e.name, msg, NULL);
   }
 }
@@ -142,20 +155,40 @@ RCT_EXPORT_METHOD(
   getOpenPort:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
-  // TODO: For now, let's just hardcode this port, we'll implement the actual
-  // open port detection later.
-  resolve(@(3000));
-/**
-ANDROID/JAVA IMPLEMENTATION OF THE METHOD
-try {
-      ServerSocket socket = new ServerSocket(0);
-      int port = socket.getLocalPort();
-      socket.close();
-      promise.resolve(port);
-    } catch (Exception e) {
-      promise.reject(e);
+  @try {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+      reject(ERROR_DOMAIN, @"Error creating socket", NULL);
+      return;
     }
-*/
+
+    struct sockaddr_in serv_addr;
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    // INADDR_ANY is used to specify that the socket should be bound
+    // to any available network interface.
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_port = 0;
+
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+      reject(ERROR_DOMAIN, @"Error binding socket", NULL);
+      return;
+    }
+
+    socklen_t len = sizeof(serv_addr);
+    if (getsockname(sockfd, (struct sockaddr *) &serv_addr, &len) < 0) {
+      reject(ERROR_DOMAIN, @"Error getting socket name", NULL);
+      return;
+    }
+    int port = ntohs(serv_addr.sin_port);
+
+    close(sockfd);
+    resolve(@(port));
+  }
+  @catch (NSException *e) {
+    NSError *error = [NSError errorWithDomain:ERROR_DOMAIN code:12345 userInfo:e.userInfo];
+    reject(e.name, e.reason, error);
+  }
 }
 
 - (void) startObserving {

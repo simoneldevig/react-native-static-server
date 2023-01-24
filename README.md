@@ -12,6 +12,7 @@ Embed HTTP server for [React Native](https://reactnative.dev) applications.
 - [Project History and Roadmap](#project-history-and-roadmap)
 - [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
 - [Getting Started](#getting-started)
+  - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
 - [Reference](#reference)
 - [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
 
@@ -33,7 +34,7 @@ applications.
 
 **These are notable versions of the library:**
 
-- **v0.7.0-alpha.4** &mdash; The aim for upcoming **v0.7** release is to
+- **v0.7.0-alpha.5** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
   the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
@@ -45,22 +46,12 @@ applications.
   breaking changes, and library documentation will be enhanced.
 
   As of the latest alpha version, the status is:
-  - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
-    described below.
   - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
-    [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
-    [RN's Old Architecture] is also implemented, but is not tested. Current
-    limitation: at most one server instance can be active at a time (inside
-    a single app).
-  - **iOS**: PoC migration to [Lighttpd] is completed and tested with RN@0.70,
-    [RN's Old Architecture], and library version **v0.7.0-alpha.4**. Support of
+    [RN's New Architecture], and library version **v0.7.0-alpha.5**. Support of
+    [RN's Old Architecture] is also implemented, but is not tested.
+  - **iOS**: Migration to [Lighttpd] is completed and tested with RN@0.70,
+    [RN's Old Architecture], and library version **v0.7.0-alpha.5**. Support of
     [RN's New Architecture] is implemented, but is not tested.
-    Current limitations:
-    - At most one server instance can be active at a time (inside a single app).
-    - Only runs on `localhost` (the server is only accessible within an app;
-      the `nonLocal` option is not implemented yet, and ignored).
-    - Automatic port selection is not implemented yet. A non-zero `port` value
-      must be specified to the [constructor()].
 
 - **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
   to refactor the library to support [RN's New Architecture],
@@ -78,16 +69,14 @@ applications.
     fixes to support it.
 
 - **v0.5.5** &mdash; The latest version of the original library, patched to work
-  with RN@0.67+, and with all dependencies updated (as of May 17, 2022). Relies
+  with RN@0.67&ndash;0.68, and with all dependencies updated (as of May 17, 2022). Relies
   on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
   [RN's Old Architecture], and was not tested with RN@0.69+.
 
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
 
-## Usage Instructions
-
-_This is a very raw draft, it will be elaborated later._
+## Getting Started
 
 [CMake]: https://cmake.org
 
@@ -97,15 +86,20 @@ _This is a very raw draft, it will be elaborated later._
     ```shell
     $ brew install cmake
     ```
+  - On **Ubuntu** you may get it by executing
+    ```shell
+    $ sudo apt-get update && sudo apt-get install cmake
+    ```
 
 - Install the package
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
 - For **Android**:
-  - In the `build.gradle` file set `minSdkVersion` equal 28
+  - In the `build.gradle` file set `minSdkVersion` equal `28`
     ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
-    released in August 2018), or larger.
+    released in August 2018), or larger. _Support of older SDKs is technically
+    possible, but it is not a priority now._
 
 - For **iOS**:
   - After installing the package, enter `ios` folder of the app's codebase
@@ -144,18 +138,82 @@ _This is a very raw draft, it will be elaborated later._
   });
   ```
 
-  **BEWARE**: With the current implementation of **v0.7** versions no more
-  than a single server instance can be active at time. Attempt to start a new
-  server instance while another one is still active will result in the crash of
-  that new instance.
+### Bundling-in Server Assets Into an App Statically
 
-- Add files to serve into your app bundle (this is use-case and OS-dependable,
-  should be explained into details).
-  - _TODO: Bundling assets in Android_
-  - _TODO: Bundling assets in iOS_
+The assets to be served by the server may come to the target device in different
+ways, for example, they may be generated during the app's runtime, or downloaded
+to the device by the app from a remote location. They also may be statically
+bundled-in into the app's bundle at the build time, and it is this option
+covered in this section.
+
+Let's assume the assets to be served by the server are located in the app's
+codebase inside the folder `assets/webroot` (the path relative to the codebase
+root), outside `android` and `ios` project folders, as we presumably want
+to reuse the same assets in both projects, thus it makes sense to keep them
+outside platform-specific sub-folders.
+
+- **Android**
+  - Inside `android/app/build.gradle` file look for `android.sourceSets`
+    section, or create one if it does no exist. To bundle-in our assets for
+    server, it should look like this (note, this way we'll also bundle-in all
+    other content of our `assets` folder, if there is anything beside `webroot`
+    subfolder).
+    ```gradle
+    android {
+      sourceSets {
+        main: {
+          assets.srcDirs = [
+            '../../assets'
+            // This array may contain additional asset folders to bundle-in.
+            // Paths in this array are relative to "build.gradle" file, and
+            // should be comma-separated.
+          ]
+        }
+      }
+      // ... Other stuff.
+    }
+    ```
+  - On Android the server cannot access bundled assets as regular files, thus
+    before starting the server to serve them, these assets should be extracted
+    into a folder accessible to the server (_e.g._ app's document folder).
+    To facilitate it, this library provides [extractBundledAssets()] function.
+    You want to use it in this manner:
+    ```jsx
+    import RNFS from 'react-native-fs';
+    import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
+
+    async function prepareAssets() {
+      const targetWebrootPathOnDevice = `${RNFS.DocumentDirectoryPath}/webroot`;
+
+      // It is use-case specific, but in general if target webroot path exists
+      // on the device, probably these assets have been extracted in a previous
+      // app launch, and there is no need to extract them again. However, in most
+      // locations these extracted files won't be delected automatically on
+      // the apps's update, thus you'll need to check it and act accordingly,
+      // which is abstracted as needsOverwrite() function in the condition.
+      const alreadyExtracted = await RNFS.exists(targetWebrootPathOnDevice);
+      if (!alreadyExtracted || needsOverwrite()) {
+        if (alreadyExtracted) await RNFS.unlink(targetWebrootPathOnDevice);
+
+        // This function is a noop on other platforms than Android, thus no need
+        // to guard against the platform.
+        await extractBundledAssets(targetWebrootPathOnDevice, 'webroot');
+      }
+
+      // "webroot" assets have been extracted into the target folder, which now
+      // can be served by the server.
+    }
+    ```
+
+- **iOS**
+
+  _TODO: To be written..._
 
 ## Reference
-- [STATES] &mdash; Enumerates possible states of [Server] instance.
+- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
+  (Android-specific).
+- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+  server instance, if any.
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
@@ -169,18 +227,43 @@ _This is a very raw draft, it will be elaborated later._
   - [.state] &mdash; Holds the current server state.
   - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
     [constructor()].
+- [STATES] &mdash; Enumerates possible states of [Server] instance.
 
-### STATES
-[STATES]: #states
-```js
-import {STATES} from '@dr.pogodin/react-native-static-server';
+### extractBundledAssets()
+[extractBundledAssets()]: #extractbundledassets
+```jsx
+import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
+
+extractBundledAssets(into, from): Promise<>;
 ```
-The [STATES] enumerator provides possible states of a server instance:
-- `STATES.ACTIVE` &mdash; Up and running.
-- `STATES.CRASHED` &mdash; Crashed and inactive.
-- `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
-- `STATES.STARTING` &mdash; Starting up.
-- `STATES.STOPPING` &mdash; Shutting down.
+Extracts bundled assets into the specified regular folder, preserving asset
+folder structure, and overwriting any conflicting files in the destination.
+
+This is an Android-specific function; it does nothing on other platforms.
+
+**Arguments**
+- `into` &mdash; **string** &mdash; Optional. The destination folder for
+  extracted assets. By default assets are extracted into the app's document
+  folder.
+- `from` &mdash; **string** &mdash; Optional. Relative path to the root asset
+  folder, starting from which all assets contained in that folder and its
+  sub-folders will be extracted into the destination folder, preserving asset
+  folder structure. By default all bundled assets are extracted.
+
+**Returns** [Promise] which resolves once the extraction is completed.
+
+### getActiveServer()
+[getActiveServer()]: #getactiveserver
+```js
+import {getActiveServer} from '@dr.pogodin/react-native-static-server';
+
+getActiveServer(): Server;
+```
+Returns currently active, starting, or stopping [Server] instance, if any exist
+in the app. It does not return, however, any inactive server instance which has
+been stopped automatically because of `stopInBackground` option, when the app
+entered background, and might be automatically started in future if the app
+enters foreground again prior to an explicit [.stop()] call for that instance.
 
 ### Server
 [Server]: #server
@@ -189,11 +272,13 @@ import Server from '@dr.pogodin/react-native-static-server';
 ```
 The [Server] class represents individual server instances.
 
-**BEWARE:** As of the current (**v0.7+**) library implementations at most one
-server instance can be active at time. Attempts to start a new server instance
-will result in crash of that new instance. That means, although you may have
-multiple instance of [Server] class created, you should not call an instance
-[.start()] method unless all other server instances are stopped.
+**BEWARE:** On **Android** and **iOS** at most one server instance can be active
+within an app at the same time. Attempts to start a new server instance will
+result in the crash of that new instance. That means, although you may have
+multiple instances of [Server] class created, you should not call [.start()]
+method of an instance unless all other server instances are stopped. You may
+use [getActiveServer()] function to check if there is any active server instance
+in the app, including a starting or stopping instance.
 
 #### constructor()
 [constructor()]: #constructor
@@ -257,7 +342,8 @@ if `CRASHED`, it attempts a new start of the server; otherwise (`STARTING` or
 
 **BEWARE:** With the current library version, at most one server instance can be
 active within an app at any time. Calling [.start()] when another server instance
-is running will result in the start failure and `CRASHED` state.
+is running will result in the start failure and `CRASHED` state. See also
+[getActiveServer()].
 
 #### .stop()
 [.stop()]: #stop
@@ -343,6 +429,18 @@ values. Use [.addStateListener()] method to watch for server state changes.
 server.stopInBackground: boolean;
 ```
 Readonly property. It holds `stopInBackground` value provided to [constructor()].
+
+### STATES
+[STATES]: #states
+```js
+import {STATES} from '@dr.pogodin/react-native-static-server';
+```
+The [STATES] enumerator provides possible states of a server instance:
+- `STATES.ACTIVE` &mdash; Up and running.
+- `STATES.CRASHED` &mdash; Crashed and inactive.
+- `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
+- `STATES.STARTING` &mdash; Starting up.
+- `STATES.STOPPING` &mdash; Shutting down.
 
 ## Migration from Older Versions (v0.6, v0.5)
 

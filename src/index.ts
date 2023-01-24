@@ -4,6 +4,7 @@ import {
   NativeEventEmitter,
   NativeEventSubscription,
   NativeModules,
+  Platform,
 } from 'react-native';
 
 import RNFS from 'react-native-fs';
@@ -428,3 +429,46 @@ class StaticServer {
 }
 
 export default StaticServer;
+
+/**
+ * Extracts bundled assets into the specified regular directory,
+ * preserving asset folder structure, and overwriting any conflicting files
+ * in the destination.
+ *
+ * This is an Android-specific function; it does nothing if called on iOS.
+ *
+ * @param {string} [into=''] Optional. The destination folder for extracted
+ *  assets. By default assets are extracted into the app's document folder.
+ * @param {string} [from=''] Optional. Relative path of the root asset folder,
+ *  starting from which all assets contained in that folder and its subfolders
+ *  will be extracted into the destination folder, preserving asset folder
+ *  structure. By default all bundled assets will be extracted.
+ * @return {Promise} Resolves once unpacking is completed.
+ */
+export async function extractBundledAssets(
+  into = RNFS.DocumentDirectoryPath,
+  from = '',
+) {
+  if (Platform.OS !== 'android') return;
+
+  await RNFS.mkdir(into);
+  const assets = await RNFS.readDirAssets(from);
+  for (let i = 0; i < assets.length; ++i) {
+    const asset = assets[i];
+    const target = `${into}/${asset.name}`;
+    if (asset.isDirectory()) await extractBundledAssets(target, asset.path);
+    else await RNFS.copyFileAssets(asset.path, target);
+  }
+}
+
+/**
+ * Returns a server instance currently being in ACTIVE, STARTING,
+ * or STOPPING state, if such server instance exists.
+ * @return {StaticServer|undefined}
+ */
+export function getActiveServer() {
+  return Object.values(servers).find(
+    server =>
+      server.state !== STATES.INACTIVE && server.state !== STATES.CRASHED,
+  );
+}
