@@ -12,6 +12,7 @@ Embed HTTP server for [React Native](https://reactnative.dev) applications.
 - [Project History and Roadmap](#project-history-and-roadmap)
 - [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
 - [Getting Started](#getting-started)
+  - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
 - [Reference](#reference)
 - [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
 
@@ -33,7 +34,7 @@ applications.
 
 **These are notable versions of the library:**
 
-- **v0.7.0-alpha.4** &mdash; The aim for upcoming **v0.7** release is to
+- **v0.7.0-alpha.5** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
   the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
@@ -45,19 +46,12 @@ applications.
   breaking changes, and library documentation will be enhanced.
 
   As of the latest alpha version, the status is:
-  - **NOT READY FOR PUBLIC USE**, prefer **v0.6.0-alpha.8** or **v0.5.5**,
-    described below.
   - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
-    [RN's New Architecture], and library version **v0.7.0-alpha.4**. Support of
+    [RN's New Architecture], and library version **v0.7.0-alpha.5**. Support of
     [RN's Old Architecture] is also implemented, but is not tested.
-  - **iOS**: PoC migration to [Lighttpd] is completed and tested with RN@0.70,
-    [RN's Old Architecture], and library version **v0.7.0-alpha.4**. Support of
+  - **iOS**: Migration to [Lighttpd] is completed and tested with RN@0.70,
+    [RN's Old Architecture], and library version **v0.7.0-alpha.5**. Support of
     [RN's New Architecture] is implemented, but is not tested.
-    Current limitations:
-    - Only runs on `localhost` (the server is only accessible within an app;
-      the `nonLocal` option is not implemented yet, and ignored).
-    - Automatic port selection is not implemented yet. A non-zero `port` value
-      must be specified to the [constructor()].
 
 - **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
   to refactor the library to support [RN's New Architecture],
@@ -82,9 +76,7 @@ applications.
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
 
-## Usage Instructions
-
-_This is a very raw draft, it will be elaborated later._
+## Getting Started
 
 [CMake]: https://cmake.org
 
@@ -94,15 +86,20 @@ _This is a very raw draft, it will be elaborated later._
     ```shell
     $ brew install cmake
     ```
+  - On **Ubuntu** you may get it by executing
+    ```shell
+    $ sudo apt-get update && sudo apt-get install cmake
+    ```
 
 - Install the package
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
 - For **Android**:
-  - In the `build.gradle` file set `minSdkVersion` equal 28
+  - In the `build.gradle` file set `minSdkVersion` equal `28`
     ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
-    released in August 2018), or larger.
+    released in August 2018), or larger. _Support of older SDKs is technically
+    possible, but it is not a priority now._
 
 - For **iOS**:
   - After installing the package, enter `ios` folder of the app's codebase
@@ -141,10 +138,76 @@ _This is a very raw draft, it will be elaborated later._
   });
   ```
 
-- Add files to serve into your app bundle (this is use-case and OS-dependable,
-  should be explained into details).
-  - _TODO: Bundling assets in Android_
-  - _TODO: Bundling assets in iOS_
+### Bundling-in Server Assets Into an App Statically
+
+The assets to be served by the server may come to the target device in different
+ways, for example, they may be generated during the app's runtime, or downloaded
+to the device by the app from a remote location. They also may be statically
+bundled-in into the app's bundle at the build time, and it is this option
+covered in this section.
+
+Let's assume the assets to be served by the server are located in the app's
+codebase inside the folder `assets/webroot` (the path relative to the codebase
+root), outside `android` and `ios` project folders, as we presumably want
+to reuse the same assets in both projects, thus it makes sense to keep them
+outside platform-specific sub-folders.
+
+- **Android**
+  - Inside `android/app/build.gradle` file look for `android.sourceSets`
+    section, or create one if it does no exist. To bundle-in our assets for
+    server, it should look like this (note, this way we'll also bundle-in all
+    other content of our `assets` folder, if there is anything beside `webroot`
+    subfolder).
+    ```gradle
+    android {
+      sourceSets {
+        main: {
+          assets.srcDirs = [
+            '../../assets'
+            // This array may contain additional asset folders to bundle-in.
+            // Paths in this array are relative to "build.gradle" file, and
+            // should be comma-separated.
+          ]
+        }
+      }
+      // ... Other stuff.
+    }
+    ```
+  - On Android the server cannot access bundled assets as regular files, thus
+    before starting the server to serve them, these assets should be extracted
+    into a folder accessible to the server (_e.g._ app's document folder).
+    To facilitate it, this library provides [extractBundledAssets()] function.
+    You want to use it in this manner:
+    ```jsx
+    import RNFS from 'react-native-fs';
+    import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
+
+    async function prepareAssets() {
+      const targetWebrootPathOnDevice = `${RNFS.DocumentDirectoryPath}/webroot`;
+
+      // It is use-case specific, but in general if target webroot path exists
+      // on the device, probably these assets have been extracted in a previous
+      // app launch, and there is no need to extract them again. However, in most
+      // locations these extracted files won't be delected automatically on
+      // the apps's update, thus you'll need to check it and act accordingly,
+      // which is abstracted as needsOverwrite() function in the condition.
+      const alreadyExtracted = await RNFS.exists(targetWebrootPathOnDevice);
+      if (!alreadyExtracted || needsOverwrite()) {
+        if (alreadyExtracted) await RNFS.unlink(targetWebrootPathOnDevice);
+
+        // This function is a noop on other platforms than Android, thus no need
+        // to guard against the platform.
+        await extractBundledAssets(targetWebrootPathOnDevice, 'webroot');
+      }
+
+      // "webroot" assets have been extracted into the target folder, which now
+      // can be served by the server.
+    }
+    ```
+
+- **iOS**
+
+  _TODO: To be written..._
 
 ## Reference
 - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
