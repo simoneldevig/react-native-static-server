@@ -91,10 +91,12 @@ See [OLD-README.md](./OLD-README.md)
     $ sudo apt-get update && sudo apt-get install cmake
     ```
 
-- Install the package
+- Install the package:
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
+  _**Note:** In case you prefer to install this library from its source code (i.e. directly from its GitHub repo, or a local folder), mind that it depends on several Git sub-modules, which should be clonned and checked out by this command in the library's codebase root: `$ git submodule update --init --recursive`. Released NPM packages of the library have correct versions of the code from these sub-modules bundled into the package, thus no need to clone and check them out after installation from NPM._
+
 - For **Android**:
   - In the `build.gradle` file set `minSdkVersion` equal `28`
     ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
