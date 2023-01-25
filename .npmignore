@@ -2,5 +2,6 @@
 android/build
 build
 dr.pogodin-react-native-static-server-*.tgz
+/example/
 ios/build
 node_modules
