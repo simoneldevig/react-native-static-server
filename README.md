@@ -192,7 +192,15 @@ outside platform-specific sub-folders.
       // the apps's update, thus you'll need to check it and act accordingly,
       // which is abstracted as needsOverwrite() function in the condition.
       const alreadyExtracted = await RNFS.exists(targetWebrootPathOnDevice);
+
+      // TODO: Give an example of needsOverwrite(), relying on app version
+      // stored in local files. Maybe we should provide with the library
+      // an utility function which writes to disk a version fingerprint of
+      // the app, thus allowing to detect app updates.
       if (!alreadyExtracted || needsOverwrite()) {
+        // TODO: Careful here, as on platforms different from Android we do not
+        // need to extract assets, we also should not remove them, thus we need
+        // a guard when entering this clean-up / re-extract block.
         if (alreadyExtracted) await RNFS.unlink(targetWebrootPathOnDevice);
 
         // This function is a noop on other platforms than Android, thus no need

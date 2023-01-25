@@ -60,6 +60,9 @@ nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
   }
 });
 
+// TODO: This should go into a dedicated .ts file, to make it easy to refer
+// to the default config we use from documentation, and also to not pollute
+// with lighttpd configuration other .ts files with actual business logic.
 /**
  * Creates a temporary file with standard configuration for Lighttpd,
  * with just a few most important config values taken from the caller.
@@ -172,6 +175,16 @@ async function generateConfig(
   return configFile;
 }
 
+// TODO: The idea for later implementation is to allow users to provide their
+// own lighttpd config files with completely custom configuration. To do so,
+// we'll probably split StaticServer class in two: the BaseServer will run
+// server with given config path, and it will contain the logic like server
+// state watching, stopInBackground, etc. The StaticServer class will extend it,
+// allowing the current interface (starting the server with default config,
+// and providing the most important config options via arguments), it will
+// hold the props for accesing those options, selected hostname and port, etc.
+// (as BaseServer will run the server on whatever port is given in provided
+// config, but it won't be able to tell user what address / port it was, etc.).
 class StaticServer {
   // NOTE: could be a private method, and we tried it, but it turns out that
   // Babel's @babel/plugin-proposal-private-methods causes many troubles in RN.
