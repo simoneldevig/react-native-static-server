@@ -163,7 +163,7 @@ outside platform-specific sub-folders.
     ```gradle
     android {
       sourceSets {
-        main: {
+        main {
           assets.srcDirs = [
             '../../assets'
             // This array may contain additional asset folders to bundle-in.

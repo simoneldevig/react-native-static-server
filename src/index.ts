@@ -271,6 +271,8 @@ class StaticServer {
     stopInBackground = false,
     port = 0,
   }: {
+    // TODO: The typing is wrong here, as TypeScript gets it as all fields are
+    // obligatory. Fix it.
     fileDir: string;
     nonLocal: boolean;
     port: number;
