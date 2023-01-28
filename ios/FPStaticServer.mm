@@ -46,8 +46,8 @@ RCT_EXPORT_METHOD(
         // Check if the current interface is of type AF_INET (IPv4)
         // and not the loopback interface (lo0)
         if(temp_addr->ifa_addr->sa_family == AF_INET) {
-          if(!(temp_addr->ifa_flags & IFF_LOOPBACK)) {
-            NSLog(@"Found IPv4 & non-loopback interface. Retrieving IP address.");
+          if([[NSString stringWithUTF8String:temp_addr->ifa_name] isEqualToString:@"en0"]) {
+            NSLog(@"Found IPv4 address of the local wifi connection. Returning address.");
             NSString *ip = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
             resolve(ip);
             return;
