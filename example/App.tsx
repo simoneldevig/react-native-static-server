@@ -27,6 +27,7 @@ import RNFS from 'react-native-fs';
 import {WebView} from 'react-native-webview';
 
 import Server, {
+  STATES,
   extractBundledAssets,
 } from '@dr.pogodin/react-native-static-server';
 
@@ -50,32 +51,39 @@ const App = () => {
       default: '',
     });
     fileDir += '/webroot';
-    const server = new Server({
-      fileDir,
-      // TODO: There is wrong typing in the current version of library,
-      // which enforces that all options are required. This will be fixed later.
-      nonLocal: false,
-      port: 3000,
-      stopInBackground: true,
-    });
+
+    // In our example, `server` is reset to null when the component is unmount,
+    // thus signalling that server init sequence below should be aborted, if it
+    // is still underway.
+    let server: null | Server = new Server({fileDir, stopInBackground: true});
+
     (async () => {
       // TODO: Later update it to extract assets only on the first launch after
       // app installation or restart.
       await extractBundledAssets(fileDir, 'webroot');
-      const res = await server.start();
-      // TODO: Demo the server state listener, mention that with
-      // "stopInBackground" option, it might be necessary to send signals
-      // to the web app running inside WebView that it should temporarily
-      // pause any requests to the local server.
-      setOrigin(res);
+      server?.addStateListener(newState => {
+        // Depending on your use case, you may want to use such callback
+        // to implement a logic which prevents other pieces of your app from
+        // sending any requests to the server when it is inactive.
+
+        // Here `newState` equals to a numeric state constant,
+        // and `STATES[newState]` equals to its human-readable name,
+        // because `STATES` contains both forward and backward mapping
+        // between state names and corresponding numeric values.
+        console.log(`New server state is "${STATES[newState]}"`);
+      });
+      const res = await server?.start();
+      if (res && server) {
+        setOrigin(res);
+      }
     })();
     return () => {
       (async () => {
-        // TODO: This is not completely correct, as the server initialzation
-        // above is not atomic (there are several async operations), thus we
-        // might end up calling this .stop() prior to server .start() above.
-        // Some additional synchronization is needed here, will add it later.
-        await server.stop();
+        // In our example, here is no need to wait until the shutdown completes.
+        server?.stop();
+
+        server = null;
+        setOrigin('');
       })();
     };
   }, []);
@@ -94,9 +102,8 @@ const App = () => {
       </Text>
       <View style={styles.webview}>
         <WebView
-          // This demonstrates how we can open selected links, displayed inside
-          // this WebView, inside the system browser, rather than inside this
-          // WebView itself.
+          // This way selected links displayed inside this WebView can be opened
+          // in a separate system browser, instead of the WebView itself.
           onShouldStartLoadWithRequest={request => {
             const load = request.url.startsWith(origin);
             if (!load) {

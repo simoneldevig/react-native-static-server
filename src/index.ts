@@ -268,15 +268,13 @@ class StaticServer {
   constructor({
     fileDir,
     nonLocal = false,
-    stopInBackground = false,
     port = 0,
+    stopInBackground = false,
   }: {
-    // TODO: The typing is wrong here, as TypeScript gets it as all fields are
-    // obligatory. Fix it.
     fileDir: string;
-    nonLocal: boolean;
-    port: number;
-    stopInBackground: boolean;
+    nonLocal?: boolean;
+    port?: number;
+    stopInBackground?: boolean;
   }) {
     this._nonLocal = nonLocal;
     if (!nonLocal) this._hostname = 'localhost';

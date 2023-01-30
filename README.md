@@ -304,15 +304,15 @@ within `options` argument:
   path; however, empty `fileDir` value is forbidden: if you really want to serve
   entire documents directory of the app, provide its absolute path explicitly.
 
-- `nonLocal` &mdash; **boolean** &mdash; By default, the server is started on
+- `nonLocal` &mdash; **boolean** &mdash; Optional. By default, the server is started on
   `localhost` address, and it is only accessible within the app. With this flag
   set **true** the server will be started on a local IP adress also accessible
   from outside the app.
 
-- `port` &mdash; **number** &mdash; The port at which to start the server.
+- `port` &mdash; **number** &mdash; Optional. The port at which to start the server.
   If 0 (default) an available port will be automatically selected.
 
-- `stopInBackground` &mdash; **boolean** &mdash; By default, server intents
+- `stopInBackground` &mdash; **boolean** &mdash; Optional. By default, server intents
   to keep working as usual when app enters background / returns to foreground.
   Setting this flag **true** will cause an active server to automatically stop
   each time the app transitions to background, and then automatically restart
@@ -451,6 +451,9 @@ The [STATES] enumerator provides possible states of a server instance:
 - `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
 - `STATES.STARTING` &mdash; Starting up.
 - `STATES.STOPPING` &mdash; Shutting down.
+
+It also contains the backward mapping between state numeric values and their
+human-readable names used above.
 
 ## Migration from Older Versions (v0.6, v0.5)
 
