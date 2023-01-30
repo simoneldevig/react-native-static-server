@@ -8,9 +8,11 @@
  * @format
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {
+  Alert,
+  Button,
   Linking,
   Platform,
   SafeAreaView,
@@ -110,6 +112,8 @@ const App = () => {
     };
   }, []);
 
+  const webView = useRef<WebView>(null);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -122,8 +126,26 @@ const App = () => {
         web page, served by HTTP server powered by the React Native Static
         Server library.
       </Text>
+      <Button
+        onPress={() => {
+          if (webView.current) {
+            // This way a text message can be sent to the WebView content,
+            // assuming that content document has prepared to receive it by
+            // attaching .onNativeMessage() handler to its `window` object.
+            const message = 'Hello from the React Native layer!';
+            const envelope = `window.onNativeMessage('${message}')`;
+            webView.current.injectJavaScript(envelope);
+          }
+        }}
+        title="Send a message to the WebView content"
+      />
       <View style={styles.webview}>
         <WebView
+          // This way we can receive messages sent by the WebView content.
+          onMessage={event => {
+            const message = event.nativeEvent.data;
+            Alert.alert('Got a message from the WebView content', message);
+          }}
           // This way selected links displayed inside this WebView can be opened
           // in a separate system browser, instead of the WebView itself.
           onShouldStartLoadWithRequest={request => {
@@ -133,9 +155,8 @@ const App = () => {
             }
             return load;
           }}
+          ref={webView}
           source={{uri: origin}}
-          // TODO: Demo the communication back and forth between RN layer of
-          // the app, and the code running inside the webview?
         />
       </View>
     </SafeAreaView>
