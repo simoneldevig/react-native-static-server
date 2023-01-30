@@ -58,9 +58,31 @@ const App = () => {
     let server: null | Server = new Server({fileDir, stopInBackground: true});
 
     (async () => {
-      // TODO: Later update it to extract assets only on the first launch after
-      // app installation or restart.
-      await extractBundledAssets(fileDir, 'webroot');
+      // On Android we should extract web server assets from the application
+      // package, and in many cases it is enough to do it only on the first app
+      // installation and subsequent updates. In our example we'll compare
+      // the content of "version" asset file with its extracted version,
+      // if it exist, to deside whether we need to re-extract these assets.
+      if (Platform.OS === 'android') {
+        let extract = true;
+        try {
+          const versionD = await RNFS.readFile(`${fileDir}/version`, 'utf8');
+          const versionA = await RNFS.readFileAssets('webroot/version', 'utf8');
+          if (versionA === versionD) {
+            extract = false;
+          } else {
+            await RNFS.unlink(fileDir);
+          }
+        } catch {
+          // A legit error happens here if assets have not been extracted
+          // before, no need to react on such error, just extract assets.
+        }
+        if (extract) {
+          console.log('Extracting web server assets...');
+          await extractBundledAssets(fileDir, 'webroot');
+        }
+      }
+
       server?.addStateListener(newState => {
         // Depending on your use case, you may want to use such callback
         // to implement a logic which prevents other pieces of your app from
