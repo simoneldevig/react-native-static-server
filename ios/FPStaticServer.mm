@@ -31,7 +31,7 @@ RCT_EXPORT_MODULE(StaticServer);
   };
 }
 
-RCT_EXPORT_METHOD(
+RCT_REMAP_METHOD(getLocalIpAddress,
   getLocalIpAddress:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
@@ -72,14 +72,14 @@ RCT_EXPORT_METHOD(
   }
 }
 
-RCT_EXPORT_METHOD(
+RCT_REMAP_METHOD(isRunning,
   isRunning:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
   resolve(@(self->server && self->server.executing));
 }
 
-RCT_EXPORT_METHOD(
+RCT_REMAP_METHOD(start,
   start:(NSNumber* _Nonnull)serverId
   configPath:(NSString*)configPath
   resolver:(RCTPromiseResolveBlock)resolve
@@ -129,7 +129,7 @@ RCT_EXPORT_METHOD(
   return @[EVENT_NAME];
 }
 
-RCT_EXPORT_METHOD(
+RCT_REMAP_METHOD(stop,
   stop:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
@@ -151,7 +151,7 @@ RCT_EXPORT_METHOD(
   }
 }
 
-RCT_EXPORT_METHOD(
+RCT_REMAP_METHOD(getOpenPort,
   getOpenPort:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
@@ -204,6 +204,7 @@ RCT_EXPORT_METHOD(
     return NO;
 }
 
+// Don't compile this code when we build for the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params

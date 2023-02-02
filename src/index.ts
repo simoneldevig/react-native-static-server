@@ -9,29 +9,47 @@ import {
 
 import RNFS from 'react-native-fs';
 
-import {Barrier} from './Barrier';
-import {SIGNALS, STATES} from './constants';
+import { Barrier } from './Barrier';
+import { SIGNALS, STATES } from './constants';
 import Semaphore from './Semaphore';
 import Emitter from './Emitter';
 
-export {STATES};
+export { STATES };
+
+const LINKING_ERROR =
+  `The package 'react-native-static-server' doesn't seem to be linked. Make sure: \n\n` +
+  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
+  '- You rebuilt the app after installing the package\n' +
+  '- You are not using Expo Go\n';
 
 declare global {
   var __turboModuleProxy: object | undefined;
 }
 
-// This selects between TurboModule and legacy RN library implementation.
-const FPStaticServer = global.__turboModuleProxy
+const isTurboModuleEnabled = global.__turboModuleProxy != null;
+
+const StaticServerModule = isTurboModuleEnabled
   ? require('./NativeStaticServer').default
   : NativeModules.StaticServer;
 
+const FPStaticServer = StaticServerModule
+  ? StaticServerModule
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      },
+    );
+
 // ID-to-StaticServer map for all potentially active server instances,
 // used to route native events back to JS server objects.
-const servers: {[id: string]: StaticServer} = {};
+const servers: { [id: string]: StaticServer } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(FPStaticServer);
 
-nativeEventEmitter.addListener('RNStaticServer', ({event, serverId}) => {
+nativeEventEmitter.addListener('RNStaticServer', ({ event, serverId }) => {
   const server = servers[serverId];
   if (server) {
     switch (event) {
@@ -467,7 +485,7 @@ export async function extractBundledAssets(
   await RNFS.mkdir(into);
   const assets = await RNFS.readDirAssets(from);
   for (let i = 0; i < assets.length; ++i) {
-    const asset = assets[i];
+    const asset = assets[i]!;
     const target = `${into}/${asset.name}`;
     if (asset.isDirectory()) await extractBundledAssets(target, asset.path);
     else await RNFS.copyFileAssets(asset.path, target);
@@ -481,7 +499,7 @@ export async function extractBundledAssets(
  */
 export function getActiveServer() {
   return Object.values(servers).find(
-    server =>
+    (server) =>
       server.state !== STATES.INACTIVE && server.state !== STATES.CRASHED,
   );
 }

@@ -1,5 +1,6 @@
 
 package com.futurepress.staticserver;
+import androidx.annotation.NonNull;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -10,17 +11,20 @@ import java.util.function.Consumer;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import com.futurepress.staticserver.Errors;
 import com.lighttpd.Server;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactMethod;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class FPStaticServerModuleImpl {
+public class StaticServerModule extends StaticServerSpec implements LifecycleEventListener {
   // The currently active server instance. We assume only single server instance
   // can be active at any time, thus a simple field should be enought for now.
   // If we arrive to having possibility of multiple servers running in
@@ -33,7 +37,17 @@ public class FPStaticServerModuleImpl {
   public static final String LOGTAG = Errors.LOGTAG
     + ": FPStaticServerModuleImpl";
 
-  public static Map<String,Object> getConstants() {
+  StaticServerModule(ReactApplicationContext context) {
+    super(context);
+  }
+
+  @Override
+  @NonNull
+  public String getName() {
+    return NAME;
+  }
+
+  public Map<String,Object> getTypedExportedConstants() {
     final Map<String,Object> constants = new HashMap<>();
 
     constants.put("CRASHED", Server.CRASHED);
@@ -43,6 +57,7 @@ public class FPStaticServerModuleImpl {
     return constants;
   }
 
+  @ReactMethod
   public void getLocalIpAddress(Promise promise) {
     try {
       Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
@@ -66,10 +81,10 @@ public class FPStaticServerModuleImpl {
     }
   }
 
+  @ReactMethod
   public void start(
     double id, // Server ID for backward communication with JS layer.
     String configPath,
-    DeviceEventManagerModule.RCTDeviceEventEmitter emitter,
     Promise promise
   ) {
     Log.i(LOGTAG, "Starting...");
@@ -78,6 +93,10 @@ public class FPStaticServerModuleImpl {
       Errors.ANOTHER_INSTANCE_IS_ACTIVE.log().reject(promise);
       return;
     }
+
+    DeviceEventManagerModule.RCTDeviceEventEmitter emitter =
+      getReactApplicationContext()
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 
     server = new Server(
       configPath,
@@ -99,6 +118,7 @@ public class FPStaticServerModuleImpl {
     server.start();
   }
 
+  @ReactMethod
   public void getOpenPort(Promise promise) {
     try {
       ServerSocket socket = new ServerSocket(0);
@@ -110,6 +130,7 @@ public class FPStaticServerModuleImpl {
     }
   }
 
+  @ReactMethod
   public void stop(Promise promise) {
     try {
       Log.i(LOGTAG, "stop() triggered.");
@@ -125,7 +146,30 @@ public class FPStaticServerModuleImpl {
     }
   }
 
+  @ReactMethod
+  public void addListener(String eventName) {
+    // NOOP
+  }
+
+  @ReactMethod
+  public void removeListeners(double count) {
+    // NOOP
+  }
+
+  @ReactMethod
   public void isRunning(Promise promise) {
     promise.resolve(server != null && server.isAlive());
+  }
+
+  // NOTE: Pause/resume operations, if opted, are managed in JS layer.
+  @Override
+  public void onHostResume() {}
+
+  @Override
+  public void onHostPause() {}
+
+  @Override
+  public void onHostDestroy() {
+    stop(null);
   }
 }

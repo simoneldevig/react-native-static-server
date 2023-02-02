@@ -1,7 +1,9 @@
 // Imports internal constants defined within the native layer,
 // and exports user-facing constants for server states.
 
-import {NativeModules} from 'react-native';
+// TODO: This repeats the native module import used in index.ts
+// it should be split into a separate file.
+import { NativeModules } from 'react-native';
 
 declare global {
   var __turboModuleProxy: object | undefined;

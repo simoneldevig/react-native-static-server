@@ -1,14 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
   Alert,
@@ -23,17 +13,17 @@ import {
   View,
 } from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 import RNFS from 'react-native-fs';
-import {WebView} from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 
 import Server, {
   STATES,
   extractBundledAssets,
 } from '@dr.pogodin/react-native-static-server';
 
-const App = () => {
+export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -57,7 +47,7 @@ const App = () => {
     // In our example, `server` is reset to null when the component is unmount,
     // thus signalling that server init sequence below should be aborted, if it
     // is still underway.
-    let server: null | Server = new Server({fileDir, stopInBackground: true});
+    let server: null | Server = new Server({ fileDir, stopInBackground: true });
 
     (async () => {
       // On Android we should extract web server assets from the application
@@ -85,7 +75,7 @@ const App = () => {
         }
       }
 
-      server?.addStateListener(newState => {
+      server?.addStateListener((newState) => {
         // Depending on your use case, you may want to use such callback
         // to implement a logic which prevents other pieces of your app from
         // sending any requests to the server when it is inactive.
@@ -142,13 +132,13 @@ const App = () => {
       <View style={styles.webview}>
         <WebView
           // This way we can receive messages sent by the WebView content.
-          onMessage={event => {
+          onMessage={(event) => {
             const message = event.nativeEvent.data;
             Alert.alert('Got a message from the WebView content', message);
           }}
           // This way selected links displayed inside this WebView can be opened
           // in a separate system browser, instead of the WebView itself.
-          onShouldStartLoadWithRequest={request => {
+          onShouldStartLoadWithRequest={(request) => {
             const load = request.url.startsWith(origin);
             if (!load) {
               Linking.openURL(request.url);
@@ -156,12 +146,12 @@ const App = () => {
             return load;
           }}
           ref={webView}
-          source={{uri: origin}}
+          source={{ uri: origin }}
         />
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   text: {
@@ -180,5 +170,3 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
 });
-
-export default App;

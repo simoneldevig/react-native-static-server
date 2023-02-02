@@ -2,6 +2,7 @@
 // the actual .onNativeMessage name can be any name we decide to use
 // in our message envelope on the native side.
 window.onNativeMessage = function (message) {
+  // eslint-disable-next-line no-alert
   alert(`Got message from React Native layer: ${message}`);
 };
 

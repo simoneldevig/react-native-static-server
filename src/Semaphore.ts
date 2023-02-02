@@ -1,4 +1,4 @@
-import {Barrier} from './Barrier';
+import { Barrier } from './Barrier';
 
 /**
  * Implements a simple semaphore for async code logic.
@@ -58,8 +58,8 @@ export default class Semaphore {
     this._draining = true;
     while (this._ready && this._queue.length) {
       this._drainLock = new Barrier();
-      this._queue[0].resolve();
-      await this._drainLock; // eslint-disable-line no-await-in-loop
+      this._queue[0]!.resolve();
+      await this._drainLock;
       this._queue.shift();
     }
     this._draining = false;

@@ -1,5 +1,5 @@
-import type {TurboModule} from 'react-native';
-import {TurboModuleRegistry} from 'react-native';
+import type { TurboModule } from 'react-native';
+import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   readonly getConstants: () => {
@@ -26,4 +26,4 @@ export interface Spec extends TurboModule {
   stop(): Promise<void>;
 }
 
-export default TurboModuleRegistry.get<Spec>('StaticServer');
+export default TurboModuleRegistry.getEnforcing<Spec>('StaticServer');

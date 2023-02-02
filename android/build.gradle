@@ -1,116 +1,100 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 buildscript {
-    if (project == rootProject) {
-        repositories {
-            google()
-            gradlePluginPortal()
-            mavenCentral()
-        }
-        dependencies {
-            classpath 'com.android.tools.build:gradle:7.2.1'
-            classpath("com.facebook.react:react-native-gradle-plugin")
-            classpath("de.undercouch:gradle-download-task:5.0.1")
-        }
+  repositories {
+    google()
+    mavenCentral()
+  }
 
-        // TODO: This entire block should be removed once we upgrade
-        // to RN v0.71+
-        //
-        // Patch needed for https://github.com/facebook/react-native/issues/35210
-        // This is a patch to short-circuit the "+" dependencies inside the
-        // users' app/build.gradle file and the various .gradle files of libraries.
-        // As using plain "+" dependencies causes Gradle to always download the latest,
-        // this logic forces Gradle to use latest release in the minor series.
-        project.rootProject.allprojects {
-            configurations.all {
-                resolutionStrategy {
-                    force "com.facebook.react:react-native:0.70.+"
-                    force "com.facebook.react:hermes-engine:0.70.+"
-                }
-            }
-        }
-    }
+  dependencies {
+    classpath "com.android.tools.build:gradle:7.2.1"
+  }
 }
 
 def isNewArchitectureEnabled() {
-  return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
 }
 
-apply plugin: 'com.android.library'
+apply plugin: "com.android.library"
+
 if (isNewArchitectureEnabled()) {
-  apply plugin: 'com.facebook.react'
+  apply plugin: "com.facebook.react"
 }
 
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+def getExtOrDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["StaticServer_" + name]
+}
+
+def getExtOrIntegerDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["StaticServer_" + name]).toInteger()
 }
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 31)
-    buildToolsVersion safeExtGet('buildToolsVersion', '31.0.0')
+  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-
-    defaultConfig {
-        minSdkVersion safeExtGet('minSdkVersion', 28)
-        if (System.properties['os.arch'] == "aarch64") {
-            // For M1 Users we need to use the NDK 24 which added support for aarch64
-            ndkVersion safeExtGet('ndkVersion', '24.0.8215888')
-        } else {
-            // Otherwise we default to the side-by-side NDK version from AGP.
-            ndkVersion safeExtGet('ndkVersion', '21.4.7075529')
-        }
-        targetSdkVersion safeExtGet('targetSdkVersion', 31)
-        buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
-        externalNativeBuild {
-          cmake {
-            arguments "-DWITH_ANDROID_NDK_SYSLOG_INTERCEPT=ON", "-DWITH_JAVA_NATIVE_INTERFACE=ON", "-DBUILD_STATIC=ON"
-            targets "pcre2-8-static", "mod_indexfile", "mod_dirlisting", "mod_staticfile", "lighttpd"
-          }
-        }
-    }
+  defaultConfig {
+    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     externalNativeBuild {
       cmake {
-        path "../CMakeLists.txt"
+        arguments "-DWITH_ANDROID_NDK_SYSLOG_INTERCEPT=ON", "-DWITH_JAVA_NATIVE_INTERFACE=ON", "-DBUILD_STATIC=ON"
+        targets "pcre2-8-static", "mod_indexfile", "mod_dirlisting", "mod_staticfile", "lighttpd"
       }
     }
-    sourceSets {
-      main {
-        if (isNewArchitectureEnabled()) {
-          java.srcDirs += ['src/newarch']
-        } else {
-          java.srcDirs += ['src/oldarch']
-        }
+  }
+
+  externalNativeBuild {
+    cmake {
+      path "../CMakeLists.txt"
+    }
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      consumerProguardFiles "proguard-rules.pro"
+    }
+  }
+
+  lintOptions {
+    disable "GradleCompatible"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+
+  sourceSets {
+    main {
+      if (isNewArchitectureEnabled()) {
+        java.srcDirs += [
+          "src/newarch",
+          // This is needed to build Kotlin project with NewArch enabled
+          "${project.buildDir}/generated/source/codegen/java"
+        ]
+      } else {
+        java.srcDirs += ["src/oldarch"]
       }
     }
-    buildTypes {
-        release {
-            minifyEnabled true
-            consumerProguardFiles "proguard-rules.pro"
-        }
-    }
-    lintOptions {
-        disable 'GradleCompatible'
-    }
+  }
 }
 
 repositories {
-    mavenCentral()
-    mavenLocal()
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        url "$rootDir/../node_modules/react-native/android"
-    }
-    maven {
-        // Android JSC is installed from npm
-        url "$rootDir/../node_modules/jsc-android/dist"
-    }
-    google()
+  mavenCentral()
+  google()
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-native:+'  // From node_modules
+  // For < 0.71, this will be from the local maven repo
+  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
+  //noinspection GradleDynamicVersion
+  implementation "com.facebook.react:react-native"
+}
+
+if (isNewArchitectureEnabled()) {
+  react {
+    jsRootDir = file("../src/")
+    libraryName = "StaticServer"
+    codegenJavaPackageName = "com.futurepress.staticserver"
+  }
 }
