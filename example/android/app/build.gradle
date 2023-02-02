@@ -93,9 +93,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.rnstaticserver"
+    namespace "com.reactnativestaticserverexample"
     defaultConfig {
-        applicationId "com.rnstaticserver"
+        applicationId "com.reactnativestaticserverexample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

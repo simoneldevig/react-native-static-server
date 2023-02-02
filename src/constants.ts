@@ -10,11 +10,11 @@ declare global {
 }
 
 // This selects between TurboModule and legacy RN library implementation.
-const StaticServer = global.__turboModuleProxy
-  ? require('./NativeStaticServer').default
-  : NativeModules.StaticServer;
+const ReactNativeStaticServerModule = global.__turboModuleProxy
+  ? require('./NativeReactNativeStaticServer').default
+  : NativeModules.ReactNativeStaticServer;
 
-const CONSTANTS = StaticServer.getConstants();
+const CONSTANTS = ReactNativeStaticServerModule.getConstants();
 
 export const SIGNALS = {
   CRASHED: CONSTANTS.CRASHED,

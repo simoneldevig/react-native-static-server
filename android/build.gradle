@@ -20,11 +20,11 @@ if (isNewArchitectureEnabled()) {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["StaticServer_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["ReactNativeStaticServer_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["StaticServer_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["ReactNativeStaticServer_" + name]).toInteger()
 }
 
 android {
@@ -60,8 +60,8 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
   }
 
   sourceSets {
@@ -84,6 +84,7 @@ repositories {
   google()
 }
 
+
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
@@ -94,7 +95,7 @@ dependencies {
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
-    libraryName = "StaticServer"
-    codegenJavaPackageName = "com.futurepress.staticserver"
+    libraryName = "ReactNativeStaticServer"
+    codegenJavaPackageName = "com.drpogodin.reactnativestaticserver"
   }
 }

@@ -12,25 +12,20 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepack": "bob build",
+    "bootstrap": "cd example && npm install",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build"
   },
   "keywords": [
+    "react-native",
+    "ios",
     "android",
     "embed",
-    "file",
+    "server",
     "http",
     "https",
-    "ios",
-    "javascript",
-    "js",
-    "mobile",
-    "native",
-    "react",
-    "reactjs",
-    "server",
-    "static"
+    "react"
   ],
-  "repository": "github:birdofpreyru/react-native-static-server",
+  "repository": "https://github.com/birdofpreyru/react-native-static-server",
   "author": "Dr. Sergey Pogodin <doc@pogodin.studio> (https://dr.pogodin.studio)",
   "license": "MIT",
   "licenseFilename": "LICENSE.md",
@@ -45,14 +40,14 @@
     "@types/react": "^18.0.27",
     "eslint": "^8.32.0",
     "pod-install": "^0.1.38",
-    "react-native-builder-bob": "^0.20.3",
     "typescript": "^4.9.4",
     "del-cli": "^5.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.0.5",
     "react": "18.2.0",
-    "react-native": "0.71.1"
+    "react-native": "0.71.2",
+    "react-native-builder-bob": "^0.20.3"
   },
   "peerDependencies": {
     "react": "*",
@@ -76,12 +71,9 @@
     ]
   },
   "codegenConfig": {
-    "name": "NativeStaticServerSpec",
+    "name": "RNReactNativeStaticServerSpec",
     "type": "modules",
-    "jsSrcsDir": "src",
-    "android": {
-      "javaPackageName": "com.futurepress.staticserver"
-    }
+    "jsSrcsDir": "src"
   },
   "dependencies": {
     "react-native-fs": "^2.20.0"

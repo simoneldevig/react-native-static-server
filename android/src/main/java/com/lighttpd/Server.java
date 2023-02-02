@@ -7,7 +7,7 @@ import java.lang.Thread;
 import java.util.function.Consumer;
 
 import android.util.Log;
-import com.futurepress.staticserver.Errors;
+import com.drpogodin.reactnativestaticserver.Errors;
 
 /**
  * Java interface for native Lighttpd server running in a dedicated Thread.
