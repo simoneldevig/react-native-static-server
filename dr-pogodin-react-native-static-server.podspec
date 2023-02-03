@@ -45,13 +45,16 @@ Pod::Spec.new do |s|
           ${BUILT_PRODUCTS_DIR}
     CMD
   }
+
+  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_staticfile -lmod_indexfile -lmod_dirlisting"
+
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
     s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
     s.pod_target_xcconfig    = {
         "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
         "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
-        "OTHER_LIBTOOLFLAGS" => "-llighttpd -lpcre2-8 -lmod_staticfile -lmod_indexfile -lmod_dirlisting"
+        "OTHER_LIBTOOLFLAGS" => $otherLibToolFlags,
         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
     }
     s.dependency "React-Codegen"
@@ -63,7 +66,7 @@ Pod::Spec.new do |s|
     # TODO: Can we put these flags into a variable, and then qoute it here,
     # and above where the same flags should be set?
     s.pod_target_xcconfig    = {
-        "OTHER_LIBTOOLFLAGS" => "-llighttpd -lpcre2-8 -lmod_staticfile -lmod_indexfile -lmod_dirlisting"
+        "OTHER_LIBTOOLFLAGS" => $otherLibToolFlags
     }
   end
 end

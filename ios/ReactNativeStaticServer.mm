@@ -11,7 +11,7 @@ static NSString * const EVENT_NAME = @"RNStaticServer";
     Server *server;
 }
 
-RCT_EXPORT_MODULE(StaticServer);
+RCT_EXPORT_MODULE();
 
 - (instancetype)init {
   return [super init];
