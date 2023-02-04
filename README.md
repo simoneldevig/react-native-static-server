@@ -28,7 +28,7 @@ Embed HTTP server for [React Native](https://reactnative.dev) applications.
 [CMake]: https://cmake.org
 
 **Note:** _In addition to these instructions, have a look at
-[the example project](https://github.com/birdofpreyru/react-native-static-server/example)
+[the example project](https://github.com/birdofpreyru/react-native-static-server/tree/master/example)
 included into the library repository on GitHub_.
 
 - [CMake] is required on the build host.
