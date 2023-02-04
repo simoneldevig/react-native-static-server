@@ -38,9 +38,9 @@ export default class Emitter {
    * @param  {...any} args
    */
   emit(...args: any[]) {
-    const {listeners} = this;
+    const { listeners } = this;
     for (let i = 0; i < listeners.length; ++i) {
-      listeners[i](...args);
+      listeners[i]!(...args);
     }
   }
 

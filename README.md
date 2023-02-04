@@ -8,77 +8,28 @@ Embed HTTP server for [React Native](https://reactnative.dev) applications.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
+<!-- links -->
+[Expo]: https://expo.dev
+
 ## Content
-- [Project History and Roadmap](#project-history-and-roadmap)
-- [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
+
 - [Getting Started](#getting-started)
   - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
 - [Reference](#reference)
+- [Project History and Roadmap](#project-history-and-roadmap)
+  - [Notable Versions of the Library]
+  - [Roadmap]
+- [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
 - [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
 
-## Project History and Roadmap
-
-[GCDWebServer]: https://github.com/swisspol/GCDWebServer
-[NanoHttpd]: https://github.com/NanoHttpd/nanohttpd
-[Lighttpd]: https://www.lighttpd.net
-[RN's New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
-[RN's Old Architecture]: https://reactnative.dev/docs/native-modules-intro
-
-This project started as a fork of the original
-[`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server)
-library, abandoned by its creators.
-It is published to NPM as
-[@dr.pogodin/react-native-static-server](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server),
-and it aims to provide a well-maintained embed HTTP server for React Native (RN)
-applications.
-
-**These are notable versions of the library:**
-
-- **v0.7.0-alpha.5** &mdash; The aim for upcoming **v0.7** release is to
-  migrate from the currently used, and not actively maintained, native server
-  implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
-  the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
-  platforms, and Windows, in perspective. See
-  [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
-  for details.
-
-  Also, library interface will be reworked in this version, with a bunch of
-  breaking changes, and library documentation will be enhanced.
-
-  As of the latest alpha version, the status is:
-  - **Android**: Migration to [Lighttpd] is completed and tested with RN@0.70,
-    [RN's New Architecture], and library version **v0.7.0-alpha.5**. Support of
-    [RN's Old Architecture] is also implemented, but is not tested.
-  - **iOS**: Migration to [Lighttpd] is completed and tested with RN@0.70,
-    [RN's Old Architecture], and library version **v0.7.0-alpha.5**. Support of
-    [RN's New Architecture] is implemented, but is not tested.
-
-- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
-  to refactor the library to support [RN's New Architecture],
-  while keeping backward compatibility with [RN's Old Architecture],
-  and the original library API. Also, the codebase will be refactored to follow
-  the standard RN library template.
-
-  As of the latest alpha version, the status is:
-  - The code refactoring is completed.
-  - **Android**: relies on [NanoHttpd], tested with RN@0.70, and both
-  [RN's New Architecture], and [RN's Old Architecture].
-  - **iOS**: reliles on [GCDWebServer], tested with RN@0.70 and
-    [RN's Old Architecture]. \
-    **NOT TESTED** with [RN's New Architecture], it is likely to require minor
-    fixes to support it.
-
-- **v0.5.5** &mdash; The latest version of the original library, patched to work
-  with RN@0.67&ndash;0.68, and with all dependencies updated (as of May 17, 2022). Relies
-  on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
-  [RN's Old Architecture], and was not tested with RN@0.69+.
-
-## Documentation for Older Library Versions (v0.6, v0.5)
-See [OLD-README.md](./OLD-README.md)
 
 ## Getting Started
 
 [CMake]: https://cmake.org
+
+**Note:** _In addition to these instructions, have a look at
+[the example project](https://github.com/birdofpreyru/react-native-static-server/example)
+included into the library repository on GitHub_.
 
 - [CMake] is required on the build host.
   - On **MacOS** you may get it by installing [Homebrew](https://brew.sh),
@@ -91,10 +42,12 @@ See [OLD-README.md](./OLD-README.md)
     $ sudo apt-get update && sudo apt-get install cmake
     ```
 
-- Install the package
+- Install the package:
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
+  _**Note:** In case you prefer to install this library from its source code (i.e. directly from its GitHub repo, or a local folder), mind that it depends on several Git sub-modules, which should be clonned and checked out by this command in the library's codebase root: `$ git submodule update --init --recursive`. Released NPM packages of the library have correct versions of the code from these sub-modules bundled into the package, thus no need to clone and check them out after installation from NPM._
+
 - For **Android**:
   - In the `build.gradle` file set `minSdkVersion` equal `28`
     ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
@@ -108,7 +61,7 @@ See [OLD-README.md](./OLD-README.md)
     $ pod install
     ```
 
-- For [Expo](https://expo.dev): \
+- For [Expo]: \
   _It probably works with some additional setup (see
   [Issue#8](https://github.com/birdofpreyru/react-native-static-server/issues/8)),
   however at the moment we don't support it officially. If anybody wants
@@ -120,7 +73,9 @@ See [OLD-README.md](./OLD-README.md)
 
   // NOTE: In practice, you probably want to create and persitently keep
   // server instance within a RN component, presumably using useRef() hook,
-  // so this example should be enhanced to demonstrate it.
+  // so this example should be enhanced to demonstrate it. For now, have
+  // a look at the example project in the repo, which demonstrates more
+  // realistic code.
 
   const server = new Server({
     // See further in the docs how to statically bundle assets into the App,
@@ -161,7 +116,7 @@ outside platform-specific sub-folders.
     ```gradle
     android {
       sourceSets {
-        main: {
+        main {
           assets.srcDirs = [
             '../../assets'
             // This array may contain additional asset folders to bundle-in.
@@ -192,7 +147,17 @@ outside platform-specific sub-folders.
       // the apps's update, thus you'll need to check it and act accordingly,
       // which is abstracted as needsOverwrite() function in the condition.
       const alreadyExtracted = await RNFS.exists(targetWebrootPathOnDevice);
+
+      // TODO: Give an example of needsOverwrite(), relying on app version
+      // stored in local files. Maybe we should provide with the library
+      // an utility function which writes to disk a version fingerprint of
+      // the app, thus allowing to detect app updates. For now, have
+      // a look at the example project in the repo, which demonstrates more
+      // realistic code.
       if (!alreadyExtracted || needsOverwrite()) {
+        // TODO: Careful here, as on platforms different from Android we do not
+        // need to extract assets, we also should not remove them, thus we need
+        // a guard when entering this clean-up / re-extract block.
         if (alreadyExtracted) await RNFS.unlink(targetWebrootPathOnDevice);
 
         // This function is a noop on other platforms than Android, thus no need
@@ -206,8 +171,14 @@ outside platform-specific sub-folders.
     ```
 
 - **iOS**
-
-  _TODO: To be written..._
+  - Open you project's workspace in XCode. In the &laquo;_Project
+    Navigator_&raquo; panel right-click on the project name and select
+    &laquo;_Add Files to "YOUR-PROJECT-NAME"..._&raquo; (alternatively,
+    you can find this option in the XCode head menu under _Files >
+    Add Files to "YOUR-PROJECT-NAME"..._). In the opened menu uncheck
+    &laquo;_Copy items if needed_&raquo;, then select our `webroot` folder,
+    and press &laquo;_Add_&raquo; button to add "webroot" assets
+    to the project target.
 
 ## Reference
 - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
@@ -294,15 +265,15 @@ within `options` argument:
   path; however, empty `fileDir` value is forbidden: if you really want to serve
   entire documents directory of the app, provide its absolute path explicitly.
 
-- `nonLocal` &mdash; **boolean** &mdash; By default, the server is started on
+- `nonLocal` &mdash; **boolean** &mdash; Optional. By default, the server is started on
   `localhost` address, and it is only accessible within the app. With this flag
   set **true** the server will be started on a local IP adress also accessible
   from outside the app.
 
-- `port` &mdash; **number** &mdash; The port at which to start the server.
+- `port` &mdash; **number** &mdash; Optional. The port at which to start the server.
   If 0 (default) an available port will be automatically selected.
 
-- `stopInBackground` &mdash; **boolean** &mdash; By default, server intents
+- `stopInBackground` &mdash; **boolean** &mdash; Optional. By default, server intents
   to keep working as usual when app enters background / returns to foreground.
   Setting this flag **true** will cause an active server to automatically stop
   each time the app transitions to background, and then automatically restart
@@ -441,6 +412,86 @@ The [STATES] enumerator provides possible states of a server instance:
 - `STATES.INACTIVE` &mdash; Yet not started, or gracefully shut down.
 - `STATES.STARTING` &mdash; Starting up.
 - `STATES.STOPPING` &mdash; Shutting down.
+
+It also contains the backward mapping between state numeric values and their
+human-readable names used above.
+
+## Project History and Roadmap
+
+[GCDWebServer]: https://github.com/swisspol/GCDWebServer
+[NanoHttpd]: https://github.com/NanoHttpd/nanohttpd
+[Lighttpd]: https://www.lighttpd.net
+[New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
+[Old Architecture]: https://reactnative.dev/docs/native-modules-intro
+
+This project started as a fork of the original
+[`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server)
+library, abandoned by its creators.
+It is published to NPM as
+[@dr.pogodin/react-native-static-server](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server),
+and it aims to provide a well-maintained embed HTTP server for React Native (RN)
+applications.
+
+### Notable Versions of the Library
+[Notable Versions of the Library]: #notable-versions-of-the-library
+
+- **v0.7.0-alpha.6** &mdash; The aim for upcoming **v0.7** release is to
+  migrate from the currently used, and not actively maintained, native server
+  implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
+  the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
+  platforms, and Windows, in perspective. See
+  [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
+  for details.
+
+  Also, library interface will be reworked in this version, with a bunch of
+  breaking changes, and library documentation will be enhanced.
+
+  As of the latest alpha version, the status is:
+  - **Android**: Migration to [Lighttpd] is completed, and tested with
+    React Native v0.71.2 for both [old][Old Architecture]
+    and [new][New Architecture] architectures.
+  - **iOS**: Migration to [Lighttpd] is completed, and tested with
+    React Native v0.71.2 for the [old architecture][Old Architecture].
+    Support of the [new architecture][New Architecture] is mostly implemented,
+    but still broken.
+
+- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
+  to refactor the library to support React Native's [New Architecture],
+  while keeping backward compatibility with RN's [Old Architecture],
+  and the original library API. Also, the codebase will be refactored to follow
+  the standard RN library template.
+
+  As of the latest alpha version, the status is:
+  - The code refactoring is completed.
+  - **Android**: relies on [NanoHttpd], tested with React Native v0.70.0 for
+    both RN's [old][Old Architecture] and [new][New Architecture] architectures.
+  - **iOS**: reliles on [GCDWebServer], tested with React Native v0.70.0 for
+    RN's [Old Architecture]. \
+    **NOT TESTED** with RN's [New Architecture], it is likely to require minor
+    fixes to support it.
+
+- **v0.5.5** &mdash; The latest version of the original library, patched to work
+  with RN@0.67&ndash;0.68, and with all dependencies updated (as of May 17, 2022). Relies
+  on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
+  RN's [Old Architecture], and was not tested with RN@0.69+.
+
+### Roadmap
+[Roadmap]: #roadmap
+
+These are future development aims, ordered by their current priority (from
+the top priority, to the least priority):
+
+- Support of React Native for Windows 10/11 (_tentatively, by mid-March 2023_).
+- Support of React Native for macOS (Catalyst) (_tentatively, by mid-March 2023_).
+- Support of custom configurartion of HTTP server, and inclusion of
+  additional [Lighttpd] plugins (only three plugins for serving static
+  assets are included now by default).
+- Support of [Expo].
+- Better documentation (migration of the documentation
+  to a [Docusaurus](https://docusaurus.io) website.
+
+## Documentation for Older Library Versions (v0.6, v0.5)
+See [OLD-README.md](./OLD-README.md)
 
 ## Migration from Older Versions (v0.6, v0.5)
 
