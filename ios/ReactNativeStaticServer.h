@@ -1,11 +1,11 @@
+#import <React/RCTEventEmitter.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "RNReactNativeStaticServerSpec.h"
 
-@interface ReactNativeStaticServer : NSObject <NativeReactNativeStaticServerSpec>
+@interface ReactNativeStaticServer : RCTEventEmitter <NativeReactNativeStaticServerSpec>
 #else
 #import <React/RCTBridgeModule.h>
-#import <React/RCTEventEmitter.h>
 
 @interface ReactNativeStaticServer : RCTEventEmitter <RCTBridgeModule>
 #endif
