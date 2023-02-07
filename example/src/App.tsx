@@ -15,7 +15,14 @@ import {
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
+// TODO: rn-fs does not work on Windows out of the box,
+// which is a know issue with a known workaround:
+// https://github.com/microsoft/react-native-windows/issues/2829
+// The workaround has been applied to this example app for now,
+// but it would be nice to figure out why it has not been fixed
+// in rn-fs itself?
 import RNFS from 'react-native-fs';
+
 import { WebView } from 'react-native-webview';
 
 import Server, {
