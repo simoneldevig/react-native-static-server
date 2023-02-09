@@ -6,7 +6,7 @@
     <CppWinRTOptimized>true</CppWinRTOptimized>
     <CppWinRTRootNamespaceAutoMerge>true</CppWinRTRootNamespaceAutoMerge>
     <MinimalCoreWin>true</MinimalCoreWin>
-    <ProjectGuid>{8262c635-010f-416c-89af-ab946d3ead7f}</ProjectGuid>
+    <ProjectGuid>{89cc3f9c-3b5d-4898-9216-748cad337b35}</ProjectGuid>
     <ProjectName>ReactNativeStaticServer</ProjectName>
     <RootNamespace>ReactNativeStaticServer</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
@@ -109,10 +109,11 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="NativeReactNativeStaticServerSpec.g.h" />
     <ClInclude Include="ReactPackageProvider.h">
       <DependentUpon>ReactPackageProvider.idl</DependentUpon>
     </ClInclude>
-    <ClInclude Include="ReactNativeStaticServer.h" />
+    <ClInclude Include="ReactNativeModule.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

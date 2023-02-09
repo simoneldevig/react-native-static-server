@@ -62,7 +62,10 @@ module.exports = {
         if (context2.originModulePath.startsWith(`${rnPath}\\`)) {
           context2 = {
             ...context2,
-            originModulePath: context2.originModulePath.replace(rnPath, rnwPath),
+            originModulePath: context2.originModulePath.replace(
+              rnPath,
+              rnwPath,
+            ),
           };
         }
       }

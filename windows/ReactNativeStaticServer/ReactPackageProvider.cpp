@@ -4,7 +4,7 @@
 #include "ReactPackageProvider.g.cpp"
 #endif
 
-#include "ReactNativeStaticServer.h"
+#include "ReactNativeModule.h"
 
 using namespace winrt::Microsoft::ReactNative;
 

@@ -4,12 +4,14 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
-Embed HTTP server for [React Native](https://reactnative.dev) applications.
+Embed HTTP server for [React Native] applications,
+powered by [Lighttpd].
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
 [Expo]: https://expo.dev
+[React Native]: https://reactnative.dev
 
 ## Content
 
@@ -438,7 +440,7 @@ applications.
 - **v0.7.0-alpha.6** &mdash; The aim for upcoming **v0.7** release is to
   migrate from the currently used, and not actively maintained, native server
   implementations ([NanoHttpd] on Android, and [GCDWebServer] on iOS) to
-  the same, actively maintained [Lighttpd] sever (current **v1.4.68**) on both
+  the same, actively maintained [Lighttpd] sever (current v1.4.68) on both
   platforms, and Windows, in perspective. See
   [Issue #12](https://github.com/birdofpreyru/react-native-static-server/issues/12)
   for details.
@@ -455,13 +457,14 @@ applications.
     Support of the [new architecture][New Architecture] is mostly implemented,
     but still broken.
 
-- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
+- **v0.6.0-alpha.8** &mdash; The aim for **v0.6** release was
   to refactor the library to support React Native's [New Architecture],
   while keeping backward compatibility with RN's [Old Architecture],
-  and the original library API. Also, the codebase will be refactored to follow
-  the standard RN library template.
+  and the original library API. The aim was mostly achieved as of
+  v0.6.0-alpha.8, but as development focus shifted into v0.7 development,
+  the v0.6 was effectively abandoned.
 
-  As of the latest alpha version, the status is:
+  As of the latest alpha v0.6 version, the status was:
   - The code refactoring is completed.
   - **Android**: relies on [NanoHttpd], tested with React Native v0.70.0 for
     both RN's [old][Old Architecture] and [new][New Architecture] architectures.
@@ -470,10 +473,11 @@ applications.
     **NOT TESTED** with RN's [New Architecture], it is likely to require minor
     fixes to support it.
 
-- **v0.5.5** &mdash; The latest version of the original library, patched to work
-  with RN@0.67&ndash;0.68, and with all dependencies updated (as of May 17, 2022). Relies
-  on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
-  RN's [Old Architecture], and was not tested with RN@0.69+.
+- **v0.5.5** &mdash; The latest version of the original library, patched
+  to work with React Native v0.67&ndash;0.68, and with all dependencies
+  updated (as of May 17, 2022). Relies on [NanoHttpd] on Android,
+  and [GCDWebServer] on iOS; only supports RN's [Old Architecture],
+  and was not tested with RN v0.69+.
 
 ### Roadmap
 [Roadmap]: #roadmap
