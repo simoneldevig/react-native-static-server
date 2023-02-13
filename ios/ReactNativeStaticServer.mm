@@ -31,6 +31,10 @@ RCT_EXPORT_MODULE();
   };
 }
 
+- (NSDictionary*) getConstants {
+  return [self constantsToExport];
+}
+
 RCT_REMAP_METHOD(getLocalIpAddress,
   getLocalIpAddress:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
