@@ -4,7 +4,7 @@
   <ItemGroup>
     <!-- Projects from @dr.pogodin/react-native-static-server -->
     <ProjectReference Include="$(ProjectDir)..\..\..\windows\ReactNativeStaticServer\ReactNativeStaticServer.vcxproj">
-      <Project>{89cc3f9c-3b5d-4898-9216-748cad337b35}</Project>
+      <Project>{262a7409-f396-49eb-9f4c-c2f13fc27d5e}</Project>
     </ProjectReference>
     <!-- Projects from react-native-webview -->
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj">

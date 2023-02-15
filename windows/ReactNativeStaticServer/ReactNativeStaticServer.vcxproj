@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This project was created with react-native-windows 0.71.0 -->
+<!-- This project was created with react-native-windows 0.71.1 -->
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(SolutionDir)\ExperimentalFeatures.props" Condition="Exists('$(SolutionDir)\ExperimentalFeatures.props')" />
   <PropertyGroup Label="Globals">
     <CppWinRTOptimized>true</CppWinRTOptimized>
     <CppWinRTRootNamespaceAutoMerge>true</CppWinRTRootNamespaceAutoMerge>
     <MinimalCoreWin>true</MinimalCoreWin>
-    <ProjectGuid>{89cc3f9c-3b5d-4898-9216-748cad337b35}</ProjectGuid>
+    <ProjectGuid>{262a7409-f396-49eb-9f4c-c2f13fc27d5e}</ProjectGuid>
     <ProjectName>ReactNativeStaticServer</ProjectName>
     <RootNamespace>ReactNativeStaticServer</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>

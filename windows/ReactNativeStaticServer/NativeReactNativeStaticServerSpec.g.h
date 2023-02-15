@@ -9,7 +9,7 @@
 //   --libraryName RNReactNativeStaticServerSpec
 //   --file .\src\NativeReactNativeStaticServer.ts
 //   --namespace winrt::ReactNativeStaticServer
-//   --moduleWindows true
+//   --modulesWindows true
 
 /*
  * This file is auto-generated from a NativeModule spec file in js.
