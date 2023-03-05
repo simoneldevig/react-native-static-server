@@ -13,4 +13,20 @@
     -->
   <PropertyGroup />
   <ItemDefinitionGroup />
+  <!--
+    The following ItemGroup and Target bundle folders with custom assets
+    into generated UWP app package.
+  -->
+  <ItemGroup>
+    <_CustomResource Include="..\..\assets\webroot\**\*">
+      <Link>webroot\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <DeploymentContent>true</DeploymentContent>
+    </_CustomResource>
+  </ItemGroup>
+  <Target Name="_CollectCustomResources" BeforeTargets="AssignTargetPaths">
+    <Message Text="Adding resource: %(_CustomResource.Identity) -&gt; %(_CustomResource.Link)" />
+    <ItemGroup>
+      <None Include="@(_CustomResource)" />
+    </ItemGroup>
+  </Target>
 </Project>

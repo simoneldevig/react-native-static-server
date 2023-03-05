@@ -1,5 +1,7 @@
 #include "pch.h"
 
+// #pragma warning(disable:4996)
+
 #include "App.h"
 
 #include "AutolinkedNativeModules.g.h"
@@ -20,6 +22,11 @@ namespace winrt::ReactNativeStaticServerExample::implementation
 /// </summary>
 App::App() noexcept
 {
+    /*
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+    */
 #if BUNDLE
     JavaScriptBundleFile(L"index.windows");
     InstanceSettings().UseWebDebugger(false);

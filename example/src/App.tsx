@@ -44,12 +44,12 @@ export default function App() {
   const [origin, setOrigin] = useState<string>('');
 
   useEffect(() => {
-    let fileDir: string = Platform.select({
-      android: RNFS.DocumentDirectoryPath,
-      ios: RNFS.MainBundlePath,
+    const fileDir: string = Platform.select({
+      android: `${RNFS.DocumentDirectoryPath}/webroot`,
+      ios: `${RNFS.MainBundlePath}/webroot`,
+      windows: `${RNFS.MainBundlePath}\\webroot`,
       default: '',
     });
-    fileDir += '/webroot';
 
     // In our example, `server` is reset to null when the component is unmount,
     // thus signalling that server init sequence below should be aborted, if it
@@ -138,6 +138,7 @@ export default function App() {
       />
       <View style={styles.webview}>
         <WebView
+          cacheMode="LOAD_NO_CACHE"
           // This way we can receive messages sent by the WebView content.
           onMessage={(event) => {
             const message = event.nativeEvent.data;
@@ -145,6 +146,11 @@ export default function App() {
           }}
           // This way selected links displayed inside this WebView can be opened
           // in a separate system browser, instead of the WebView itself.
+          // BEWARE: Currently, it does not seem working on Windows,
+          // the onShouldStartLoadWithRequest() method just is not triggered
+          // there when links inside WebView are pressed. However, it is worth
+          // to re-test, troubleshoot, and probably fix. It works fine both
+          // Android and iOS.
           onShouldStartLoadWithRequest={(request) => {
             const load = request.url.startsWith(origin);
             if (!load) {

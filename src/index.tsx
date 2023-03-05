@@ -78,6 +78,22 @@ nativeEventEmitter.addListener('RNStaticServer', ({ event, serverId }) => {
   }
 });
 
+/**
+ * Returns `true` if given path is absolute, `false` otherwise.
+ * @param {string} path
+ * @return {boolean}
+ */
+function isAbsolutePath(path: string): boolean {
+  if (!path) return false;
+
+  if (Platform.OS === 'windows') {
+    return !!path.match(/^[a-zA-Z]:\\/);
+  }
+
+  // This should do for Android and iOS.
+  return path.startsWith('/') || path.startsWith('file:///');
+}
+
 // TODO: This should go into a dedicated .ts file, to make it easy to refer
 // to the default config we use from documentation, and also to not pollute
 // with lighttpd configuration other .ts files with actual business logic.
@@ -106,6 +122,7 @@ async function generateConfig(
     server.port = ${port}
     # debug.log-file-not-found = "enable"
     # debug.log-request-handling = "enable"
+    # server.errorlog = "${workDir}/errors.txt"
     index-file.names += ("index.xhtml", "index.html", "index.htm", "default.htm", "index.php")
     mimetype.assign = (
       # These are default types from https://redmine.lighttpd.net/projects/lighttpd/wiki/Mimetype_assignDetails
@@ -229,7 +246,13 @@ class StaticServer {
   // to RN setup to get around some issues with randombytes support in
   // RN JS engine. Anyway, it should be double-checked later, but using
   // timestamps as ID will do for now.
-  _id = Date.now();
+
+  // NOTE: For some reasons RN-Windows corrupts large numbers sent
+  // as event arguments across JS / Native boundary.
+  // Everything smaller than 65535 seems to work fine, so let's just
+  // truncate these IDs for now.
+  // See: https://github.com/microsoft/react-native-windows/issues/11322
+  _id = Date.now() % 65535;
 
   // It is used to serialize state change requests, thus ensuring that parallel
   // requests to start / stop the server won't result in a corrupt state.
@@ -300,7 +323,7 @@ class StaticServer {
     this._stopInBackground = stopInBackground;
 
     if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
-    else if (!fileDir.startsWith('/') && !fileDir.startsWith('file:///')) {
+    else if (!isAbsolutePath(fileDir)) {
       fileDir = `${RNFS.DocumentDirectoryPath}/${fileDir}`;
     }
     this._fileDir = fileDir;

@@ -106,7 +106,7 @@ covered in this section.
 
 Let's assume the assets to be served by the server are located in the app's
 codebase inside the folder `assets/webroot` (the path relative to the codebase
-root), outside `android` and `ios` project folders, as we presumably want
+root), outside `android`, `ios`, and `windows` project folders, as we presumably want
 to reuse the same assets in both projects, thus it makes sense to keep them
 outside platform-specific sub-folders.
 
@@ -182,6 +182,25 @@ outside platform-specific sub-folders.
     &laquo;_Copy items if needed_&raquo;, then select our `webroot` folder,
     and press &laquo;_Add_&raquo; button to add "webroot" assets
     to the project target.
+
+- **Windows**
+  - Edit `PropertySheet.props` file inside your app's
+    `windows/YOUR_PROJECT_NAME` folder, adding the following nodes into its root
+    `<Project>` element:
+    ```xml
+    <ItemGroup>
+      <_CustomResource Include="..\..\assets\webroot\**\*">
+        <Link>webroot\%(RecursiveDir)%(FileName)%(Extension)</Link>
+        <DeploymentContent>true</DeploymentContent>
+      </_CustomResource>
+    </ItemGroup>
+    <Target Name="_CollectCustomResources" BeforeTargets="AssignTargetPaths">
+      <Message Text="Adding resource: %(_CustomResource.Identity) -&gt; %(_CustomResource.Link)" />
+      <ItemGroup>
+        <None Include="@(_CustomResource)" />
+      </ItemGroup>
+    </Target>
+    ```
 
 ## Reference
 - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder

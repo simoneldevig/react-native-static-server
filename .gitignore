@@ -70,3 +70,4 @@ lib/
 # Other
 /dr.pogodin-react-native-static-server-*.tgz
 /.vscode
+/.vs

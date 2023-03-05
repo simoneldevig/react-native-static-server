@@ -6,7 +6,7 @@ endmacro(install)
 
 add_subdirectory(pcre2)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Android")
+if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
 
@@ -16,15 +16,22 @@ add_subdirectory(lighttpd1.4)
 
 add_dependencies(lighttpd pcre2-8-static)
 
-target_include_directories(lighttpd
-  PRIVATE ${CMAKE_BINARY_DIR}/lighttpd1.4/build
-  PRIVATE ${CMAKE_BINARY_DIR}/pcre2
-)
+# TODO:
+# When building for Windows using MSYS/MinGW with pre-installed
+# PCRE2 library these commands below confuse the linker, failing
+# the build. Should revisit, if these are really needed/correct
+# for Android and iOS builds.
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+  target_include_directories(lighttpd
+    PRIVATE ${CMAKE_BINARY_DIR}/lighttpd1.4/build
+    PRIVATE ${CMAKE_BINARY_DIR}/pcre2
+  )
 
-target_link_directories(lighttpd
-  PRIVATE ${CMAKE_BINARY_DIR}/lighttpd1.4/build
-  PRIVATE ${CMAKE_BINARY_DIR}/pcre2
-)
+  target_link_directories(lighttpd
+    PRIVATE ${CMAKE_BINARY_DIR}/lighttpd1.4/build
+    PRIVATE ${CMAKE_BINARY_DIR}/pcre2
+  )
+endif()
 
 file(WRITE ${CMAKE_BINARY_DIR}/lighttpd1.4/build/plugin-static.h
   PLUGIN_INIT(mod_indexfile)\n
