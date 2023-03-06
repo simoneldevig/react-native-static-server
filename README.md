@@ -4,9 +4,9 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
-Embed HTTP server for [React Native] applications, powered by [Lighttpd] server,
-and supporting both [new][New Architecture] and [old][Old Architecture] RN
-architectures.
+Embed HTTP server for [React Native] applications for Android, iOS, and Windows
+platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
+and [old][Old Architecture] RN architectures.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
