@@ -1,8 +1,17 @@
 project(rn-static-server C)
 cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
-macro(install)
-endmacro(install)
+# This prevents CMake from complaining that INSTALL(..) directives in
+# Lighttpd CMakeLists.txt miss BUNDLE DESTINATION.
+set(CMAKE_MACOSX_BUNDLE OFF)
+
+# These ensure pkg-config, if present, attempts to link Lighttpd against our
+# local build of PCRE2, rather than the host system's one, if present. Though,
+# we don't really install PCRE2 into this location, we just add extra include
+# and link directories to ensure that compiler and linker will find the library
+# without installation.
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/sysroot")
+set(ENV{PKG_CONFIG_PATH} "${CMAKE_BINARY_DIR}/pcre2")
 
 add_subdirectory(pcre2)
 
@@ -10,7 +19,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
 
-set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/pcre2)
+# set(CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/pcre2)
 
 add_subdirectory(lighttpd1.4)
 
