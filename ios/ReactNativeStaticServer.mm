@@ -144,6 +144,13 @@ RCT_REMAP_METHOD(stop,
       // TODO: In Java we do server.join() here to wait for server thread to exit,
       // can't find counterpart of .join() for NSThread. Probably, there is
       // another way to do it, and we should use it.
+      // TODO: Though... event if there is no .join(),
+      // we can sync this promise resolution with the actual
+      // server termination the same way we do in .start()
+      // method. Do it! Otherwise this method resolves while
+      // the server is still running, and in some edge-cases
+      // it will lead to crashes, if the user tries to
+      // immediately start a server again after stop() resolved.
       self->server = NULL;
       NSLog(@"Stopped");
       resolve(NULL);

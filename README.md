@@ -4,14 +4,15 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
-Embed HTTP server for [React Native] applications, powered by [Lighttpd] server,
-and supporting both [new][New Architecture] and [old][Old Architecture] RN
-architectures.
+Embed HTTP server for [React Native] applications for Android, iOS, and Windows
+platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
+and [old][Old Architecture] RN architectures.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
 [Expo]: https://expo.dev
+[React Native]: https://reactnative.dev
 
 ## Content
 
@@ -105,7 +106,7 @@ covered in this section.
 
 Let's assume the assets to be served by the server are located in the app's
 codebase inside the folder `assets/webroot` (the path relative to the codebase
-root), outside `android` and `ios` project folders, as we presumably want
+root), outside `android`, `ios`, and `windows` project folders, as we presumably want
 to reuse the same assets in both projects, thus it makes sense to keep them
 outside platform-specific sub-folders.
 
@@ -181,6 +182,25 @@ outside platform-specific sub-folders.
     &laquo;_Copy items if needed_&raquo;, then select our `webroot` folder,
     and press &laquo;_Add_&raquo; button to add "webroot" assets
     to the project target.
+
+- **Windows**
+  - Edit `PropertySheet.props` file inside your app's
+    `windows/YOUR_PROJECT_NAME` folder, adding the following nodes into its root
+    `<Project>` element:
+    ```xml
+    <ItemGroup>
+      <_CustomResource Include="..\..\assets\webroot\**\*">
+        <Link>webroot\%(RecursiveDir)%(FileName)%(Extension)</Link>
+        <DeploymentContent>true</DeploymentContent>
+      </_CustomResource>
+    </ItemGroup>
+    <Target Name="_CollectCustomResources" BeforeTargets="AssignTargetPaths">
+      <Message Text="Adding resource: %(_CustomResource.Identity) -&gt; %(_CustomResource.Link)" />
+      <ItemGroup>
+        <None Include="@(_CustomResource)" />
+      </ItemGroup>
+    </Target>
+    ```
 
 ## Reference
 - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
@@ -437,30 +457,37 @@ applications.
 
 ### Notable Versions of the Library
 [Notable Versions of the Library]: #notable-versions-of-the-library
+[Releases Page on GitHub]: https://github.com/birdofpreyru/react-native-static-server/releases
 
-- **v0.7.0** &mdash; The latest library release. Powered by [Lighttpd] v1.4.69
-  and [React Native] v0.71.2 on both Android and iOS, supports both
-  [new][New Architecture] and [old][Old Architecture] RN Architectures.
+- See [Releases Page on GitHub] for details on latest library versions,
+  which did not deserve a special mention here.
 
-- **v0.6.0-alpha.8** &mdash; The aim for upcoming **v0.6** release is
+- **v0.7.0** &mdash; The new version of the library. Reworked API,
+  powered by [Lighttpd] v1.4.69 and latest [React Native] v0.71.2
+  on both Android and iOS, supports both [new][New Architecture]
+  and [old][Old Architecture] RN Architectures.
+
+- **v0.6.0-alpha.8** &mdash; The aim for **v0.6** release was
   to refactor the library to support React Native's [New Architecture],
   while keeping backward compatibility with RN's [Old Architecture],
-  and the original library API. Also, the codebase will be refactored to follow
-  the standard RN library template.
+  and the original library API. The aim was mostly achieved as of
+  v0.6.0-alpha.8, but as development focus shifted into v0.7 development,
+  the v0.6 was effectively abandoned.
 
-  As of the latest alpha version, the status is:
-  - The code refactoring is completed.
-  - **Android**: relies on [NanoHttpd], tested with React Native v0.70.0 for
+  As of the latest alpha v0.6 version, the status was:
+  - The code refactoring was completed.
+  - **Android**: relied on [NanoHttpd], tested with React Native v0.70.0 for
     both RN's [old][Old Architecture] and [new][New Architecture] architectures.
-  - **iOS**: reliles on [GCDWebServer], tested with React Native v0.70.0 for
+  - **iOS**: relied on [GCDWebServer], tested with React Native v0.70.0 for
     RN's [Old Architecture]. \
-    **NOT TESTED** with RN's [New Architecture], it is likely to require minor
-    fixes to support it.
+    **NOT TESTED** with RN's [New Architecture], it likely required minor fixes
+    to support it.
 
-- **v0.5.5** &mdash; The latest version of the original library, patched to work
-  with RN@0.67&ndash;0.68, and with all dependencies updated (as of May 17, 2022). Relies
-  on [NanoHttpd] on Android, and [GCDWebServer] on iOS; only supports
-  RN's [Old Architecture], and was not tested with RN@0.69+.
+- **v0.5.5** &mdash; The latest version of the original library, patched
+  to work with React Native v0.67&ndash;0.68, and with all dependencies
+  updated (as of May 17, 2022). Relies on [NanoHttpd] on Android,
+  and [GCDWebServer] on iOS; only supports RN's [Old Architecture],
+  and was not tested with RN v0.69+.
 
 ### Roadmap
 [Roadmap]: #roadmap

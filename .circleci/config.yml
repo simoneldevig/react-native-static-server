@@ -11,7 +11,7 @@ jobs:
       - run: git submodule update --init --recursive
       - restore_cache:
           key: node-modules-{{ checksum "package-lock.json" }}-{{ checksum "example/package-lock.json" }}
-      - run: npm install
+      - run: npm install --force
       - run: npm run bootstrap
       - save_cache:
           key: node-modules-{{ checksum "package-lock.json" }}-{{ checksum "example/package-lock.json" }}
