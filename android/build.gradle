@@ -37,7 +37,7 @@ android {
     externalNativeBuild {
       cmake {
         arguments "-DWITH_ANDROID_NDK_SYSLOG_INTERCEPT=ON", "-DWITH_JAVA_NATIVE_INTERFACE=ON", "-DBUILD_STATIC=ON"
-        targets "pcre2-8-static", "mod_indexfile", "mod_dirlisting", "mod_staticfile", "lighttpd"
+        targets "mod_indexfile", "mod_dirlisting", "mod_staticfile", "lighttpd"
       }
     }
   }

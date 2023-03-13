@@ -28,5 +28,8 @@ mkdir -p $OUTPUT_FOLDER
 cd $BUILD_FOLDER/lighttpd1.4/build
 cp *.dll $OUTPUT_FOLDER
 
+# NOTE: The Lemon binary created here is used by Android builds on Windows.
+cp lemon.exe $OUTPUT_FOLDER
+
 cd $MSYS2_PATH/bin
 cp libpcre2-8-0.dll libwinpthread-1.dll $OUTPUT_FOLDER
