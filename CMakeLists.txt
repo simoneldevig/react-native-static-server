@@ -1,5 +1,5 @@
 project(rn-static-server C)
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
 # This prevents CMake from complaining that INSTALL(..) directives in
 # Lighttpd CMakeLists.txt miss BUNDLE DESTINATION.
@@ -32,12 +32,11 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
     -DCMAKE_IOS_INSTALL_COMBINED=${CMAKE_IOS_INSTALL_COMBINED}
     -GXcode
   )
-  set(PCRE2_TARGETS pcre2-8-static)
+  set(PCRE2_TARGET --target pcre2-8-static)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(EXTRA_BUILD_ARGS ${EXTRA_BUILD_ARGS} -DBUILD_SHARED_LIBS=ON)
-  set(PCRE2_TARGETS pcre2-8-shared)
 endif()
 
 execute_process(
@@ -48,15 +47,22 @@ execute_process(
     -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
     ${EXTRA_BUILD_ARGS}
-  COMMAND_ERROR_IS_FATAL ANY
+
+  # TODO: This is a useful argument, but requires CMake >= 3.19.0.
+  # Probably, include it conditionally, depending on CMake version.
+  # COMMAND_ERROR_IS_FATAL ANY
 )
 
 execute_process(
   COMMAND cmake --build ${CMAKE_BINARY_DIR}/pcre2
     --config Release
-    --target ${PCRE2_TARGETS}
+    ${PCRE2_TARGET}
 )
 
+# TODO: This, either previous command, fails on iOS because it can't sign
+# compiled PCRE2 binaries and shared libraries without additional setup.
+# Double-check, if we need to set ${PCRE2_TARGET} on iOS to only compile
+# static libs, or it will be enough to just disable this installation step?
 execute_process(COMMAND cmake --install ${CMAKE_BINARY_DIR}/pcre2)
 
 # Copies shared PCRE2 library into the folder from where Gradle automatically
