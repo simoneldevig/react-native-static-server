@@ -16,7 +16,7 @@ LighttpdShutdownT LighttpdShutdown;
 Server* Server::activeServer;
 
 void LoadLighttpdDll() {
-    LoadPackagedLibrary(L"ReactNativeStaticServer\\libpcre2-8-0.dll", 0);
+    LoadPackagedLibrary(L"ReactNativeStaticServer\\libpcre2-8.dll", 0);
     LoadPackagedLibrary(L"ReactNativeStaticServer\\libwinpthread-1.dll", 0);
     HMODULE dll = LoadPackagedLibrary(L"ReactNativeStaticServer\\lighttpd.dll", 0);
     if (dll) {

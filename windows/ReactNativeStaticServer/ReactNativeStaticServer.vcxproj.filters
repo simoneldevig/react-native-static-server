@@ -26,9 +26,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="lighttpd\libpcre2-8-0.dll">
-      <Filter>Lighttpd</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="lighttpd\libwinpthread-1.dll">
       <Filter>Lighttpd</Filter>
     </CopyFileToFolders>
@@ -42,6 +39,9 @@
       <Filter>Lighttpd</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="lighttpd\lighttpd.dll">
+      <Filter>Lighttpd</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="lighttpd\libpcre2-8.dll">
       <Filter>Lighttpd</Filter>
     </CopyFileToFolders>
   </ItemGroup>
