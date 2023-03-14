@@ -49,7 +49,6 @@ execute_process(
     ${EXTRA_BUILD_ARGS}
 
   # TODO: This is a useful argument, but requires CMake >= 3.19.0.
-  # Probably, include it conditionally, depending on CMake version.
   # COMMAND_ERROR_IS_FATAL ANY
 )
 
@@ -59,11 +58,9 @@ execute_process(
     ${PCRE2_TARGET}
 )
 
-# TODO: This, either previous command, fails on iOS because it can't sign
-# compiled PCRE2 binaries and shared libraries without additional setup.
-# Double-check, if we need to set ${PCRE2_TARGET} on iOS to only compile
-# static libs, or it will be enough to just disable this installation step?
-execute_process(COMMAND cmake --install ${CMAKE_BINARY_DIR}/pcre2)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "iOS")
+  execute_process(COMMAND cmake --install ${CMAKE_BINARY_DIR}/pcre2)
+endif()
 
 # Copies shared PCRE2 library into the folder from where Gradle automatically
 # will bundle it in the host app package.
