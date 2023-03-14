@@ -1,5 +1,5 @@
 project(rn-static-server C)
-cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 # This prevents CMake from complaining that INSTALL(..) directives in
 # Lighttpd CMakeLists.txt miss BUNDLE DESTINATION.
@@ -23,20 +23,40 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
     -DANDROID_STL=${ANDROID_STL}
     -GNinja
   )
+elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
+  set(
+    EXTRA_BUILD_ARGS
+    -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+    -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=${CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH}
+    -DCMAKE_IOS_INSTALL_COMBINED=${CMAKE_IOS_INSTALL_COMBINED}
+    -GXcode
+  )
+  set(PCRE2_TARGETS pcre2-8-static)
+endif()
+
+if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
+  set(EXTRA_BUILD_ARGS ${EXTRA_BUILD_ARGS} -DBUILD_SHARED_LIBS=ON)
+  set(PCRE2_TARGETS pcre2-8-shared)
 endif()
 
 execute_process(
   COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/pcre2
     -B ${CMAKE_BINARY_DIR}/pcre2
-    -DBUILD_SHARED_LIBS=ON
     -DCMAKE_BUILD_TYPE=Release
     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/sysroot
     -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
     ${EXTRA_BUILD_ARGS}
+  COMMAND_ERROR_IS_FATAL ANY
 )
 
-execute_process(COMMAND cmake --build ${CMAKE_BINARY_DIR}/pcre2 --config Release)
+execute_process(
+  COMMAND cmake --build ${CMAKE_BINARY_DIR}/pcre2
+    --config Release
+    --target ${PCRE2_TARGETS}
+)
+
 execute_process(COMMAND cmake --install ${CMAKE_BINARY_DIR}/pcre2)
 
 # Copies shared PCRE2 library into the folder from where Gradle automatically

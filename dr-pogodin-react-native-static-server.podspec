@@ -38,10 +38,10 @@ Pod::Spec.new do |s|
         -DBUILD_LIBRARY=1 \
         -GXcode
       cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} \
-        --target pcre2-8-static mod_indexfile mod_dirlisting mod_staticfile \
+        --target mod_indexfile mod_dirlisting mod_staticfile \
           lighttpd
       cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build/${CONFIGURATION}${EFFECTIVE_PLATFORM_NAME}/*.a \
-          ${TARGET_TEMP_DIR}/pcre2/${CONFIGURATION}${EFFECTIVE_PLATFORM_NAME}/*.a \
+          ${TARGET_TEMP_DIR}/pcre2/Release${EFFECTIVE_PLATFORM_NAME}/*.a \
           ${BUILT_PRODUCTS_DIR}
     CMD
   }
