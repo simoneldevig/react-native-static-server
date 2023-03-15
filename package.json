@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "HTTP static file server for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -20,6 +20,8 @@
     "react-native",
     "ios",
     "android",
+    "lighttpd",
+    "windows",
     "embed",
     "server",
     "http",
@@ -39,18 +41,20 @@
   "devDependencies": {
     "@react-native-community/eslint-config": "^3.2.0",
     "@types/react": "^18.0.28",
+    "@types/jest": "^29.4.1",
     "del-cli": "^5.0.0",
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-prettier": "^4.0.0",
     "metro-config": "^0.76.0",
-    "pod-install": "^0.1.38",
     "prettier": "^2.8.4",
+    "jest": "^29.5.0",
+    "pod-install": "^0.1.38",
     "react": "18.2.0",
-    "react-native": "^0.71.2",
     "react-native-builder-bob": "^0.20.4",
     "react-native-windows": "^0.71.3",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "react-native": "0.71.4"
   },
   "peerDependencies": {
     "react": "*",
@@ -58,6 +62,43 @@
   },
   "engines": {
     "node": ">= 16.0.0"
+  },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@react-native-community",
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "quoteProps": "consistent",
+          "singleQuote": true,
+          "tabWidth": 2,
+          "trailingComma": "all",
+          "useTabs": false
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "useTabs": false
   },
   "react-native-builder-bob": {
     "source": "src",

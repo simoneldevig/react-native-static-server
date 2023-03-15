@@ -3,7 +3,6 @@ import {
   AppStateStatus,
   NativeEventEmitter,
   NativeEventSubscription,
-  NativeModules,
   Platform,
 } from 'react-native';
 
@@ -11,37 +10,11 @@ import RNFS from 'react-native-fs';
 
 import { Barrier } from './Barrier';
 import { SIGNALS, STATES } from './constants';
+import ReactNativeStaticServer from './ReactNativeStaticServer';
 import Semaphore from './Semaphore';
 import Emitter from './Emitter';
 
 export { STATES };
-
-const LINKING_ERROR =
-  `The package '@dr.pogodin/react-native-static-server' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
-
-declare global {
-  var __turboModuleProxy: object | undefined;
-}
-
-const isTurboModuleEnabled = global.__turboModuleProxy != null;
-
-const ReactNativeStaticServerModule = isTurboModuleEnabled
-  ? require('./NativeReactNativeStaticServer').default
-  : NativeModules.ReactNativeStaticServer;
-
-const ReactNativeStaticServer = ReactNativeStaticServerModule
-  ? ReactNativeStaticServerModule
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      },
-    );
 
 // ID-to-StaticServer map for all potentially active server instances,
 // used to route native events back to JS server objects.
