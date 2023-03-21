@@ -4,6 +4,7 @@
 
 #include "Server.h"
 
+using namespace std::chrono_literals;
 using namespace winrt::ReactNativeStaticServer;
 
 double activeServerId;
@@ -109,60 +110,23 @@ void ReactNativeModule::getLocalIpAddress(React::ReactPromise<React::JSValue>&& 
 }
 
 void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result) noexcept {
-    result.Resolve(3333);
-
-    /* TODO: For now we'll just always return 3000,
-        below are Android and iOS implementations hinting
-        what we really need here:
-
-        ANDROID:
-
-            try {
-  ServerSocket socket = new ServerSocket(0);
-  int port = socket.getLocalPort();
-  socket.close();
-  promise.resolve(port);
-} catch (Exception e) {
-  Errors.FAIL_GET_OPEN_PORT.log(e).reject(promise);
-}
-
-        IOS:
-
-        @try {
-int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-if (sockfd < 0) {
-  reject(ERROR_DOMAIN, @"Error creating socket", NULL);
-  return;
-}
-
-struct sockaddr_in serv_addr;
-memset(&serv_addr, 0, sizeof(serv_addr));
-serv_addr.sin_family = AF_INET;
-// INADDR_ANY is used to specify that the socket should be bound
-// to any available network interface.
-serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-serv_addr.sin_port = 0;
-
-if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-  reject(ERROR_DOMAIN, @"Error binding socket", NULL);
-  return;
-}
-
-socklen_t len = sizeof(serv_addr);
-if (getsockname(sockfd, (struct sockaddr *) &serv_addr, &len) < 0) {
-  reject(ERROR_DOMAIN, @"Error getting socket name", NULL);
-  return;
-}
-int port = ntohs(serv_addr.sin_port);
-
-close(sockfd);
-resolve(@(port));
-}
-@catch (NSException *e) {
-  NSError *error = [NSError errorWithDomain:ERROR_DOMAIN code:12345 userInfo:e.userInfo];
-  reject(e.name, e.reason, error);
-}
-      */
+    try {
+        auto socket = winrt::Windows::Networking::Sockets::StreamSocketListener();
+        // TODO: This will fail if nor InternetClientServer neither PrivateNetworkClientServer
+        // capability is granted to the app. The error messaging should be improved, to make it
+        // clear to the library consumer why the failure happened.
+        if (socket.BindServiceNameAsync(L"").wait_for(5s) != AsyncStatus::Completed) {
+            throw "Binding time out";
+        }
+        double port = std::stod(winrt::to_string(socket.Information().LocalPort()));
+        socket.Close();
+        result.Resolve(port);
+    }
+    catch (...) {
+        auto error = winrt::Microsoft::ReactNative::ReactError();
+        error.Message = "Failed to get an open port";
+        result.Reject(error);
+    }
 }
 
 void ReactNativeModule::isRunning(React::ReactPromise<React::JSValue>&& result) noexcept {
