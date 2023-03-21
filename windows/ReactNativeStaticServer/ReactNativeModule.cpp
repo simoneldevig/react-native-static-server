@@ -6,6 +6,7 @@
 
 using namespace std::chrono_literals;
 using namespace winrt::ReactNativeStaticServer;
+using namespace winrt::Windows::Networking::Connectivity;
 
 double activeServerId;
 ReactNativeModule* mod;
@@ -39,74 +40,35 @@ ReactNativeStaticServerSpec_Constants ReactNativeModule::GetConstants() noexcept
 }
 
 void ReactNativeModule::getLocalIpAddress(React::ReactPromise<React::JSValue>&& result) noexcept {
-    result.Resolve("localhost");
-    /*
-        TODO: For now, we just always return "localhost",
-        below is Java and iOS code of this method, showing
-        what we really wanna do here (and also we should double-
-        check we can't do the same already using rn-netinfo lib).
-
-        JAVA IMPLEMENTATION:
-
-        try {
-            Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-            while(en.hasMoreElements()) {
-                NetworkInterface intf = en.nextElement();
-                Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
-                while(enumIpAddr.hasMoreElements()) {
-                InetAddress inetAddress = enumIpAddr.nextElement();
-                if (!inetAddress.isLoopbackAddress()) {
-                    String ip = inetAddress.getHostAddress();
-                    if(InetAddressUtils.isIPv4Address(ip)) {
-                    promise.resolve(ip);
-                    return;
-                    }
-                }
+    try {
+        auto hosts = NetworkInformation::GetHostNames();
+        for (winrt::Windows::Networking::HostName host: hosts) {
+            if (host.Type() == winrt::Windows::Networking::HostNameType::Ipv4) {
+                auto network = host.IPInformation().NetworkAdapter();
+                int32_t netType = network.IanaInterfaceType();
+                // TODO: This needs second thoughts, and a lot of testing.
+                // The current values 6 & 72 mean "either Ethernet network,
+                // or IEEE 802.11 wireless network interface", see:
+                // https://learn.microsoft.com/en-us/uwp/api/windows.networking.connectivity.networkadapter.ianainterfacetype?view=winrt-22621#property-value
+                // For now we just pick up the first IP for such connected
+                // network, but we probably should give library consumer
+                // control over what network is selected, and stuff (there
+                // are related tickets for other os).
+                if (netType == 6 || netType == 71) {
+                    // TODO: Here we can use network.GetConnectedProfileAsync()
+                    // to get more info about the current connection status,
+                    // but for now just let return the first IP we found.
+                    result.Resolve(winrt::to_string(host.CanonicalName()));
                 }
             }
-            promise.resolve("localhost");
-            } catch (Exception e) {
-            Errors.FAIL_GET_LOCAL_IP_ADDRESS.reject(promise);
         }
-
-        OBJECTIVE-C IMPLEMENTATION:
-
-        struct ifaddrs *interfaces = NULL; // a linked list of network interfaces
-        @try {
-            struct ifaddrs *temp_addr = NULL;
-            int success = getifaddrs(&interfaces); // get the list of network interfaces
-            if (success == 0) {
-            NSLog(@"Found network interfaces, iterating.");
-            temp_addr = interfaces;
-            while(temp_addr != NULL) {
-                // Check if the current interface is of type AF_INET (IPv4)
-                // and not the loopback interface (lo0)
-                if(temp_addr->ifa_addr->sa_family == AF_INET) {
-                if([[NSString stringWithUTF8String:temp_addr->ifa_name] isEqualToString:@"en0"]) {
-                    NSLog(@"Found IPv4 address of the local wifi connection. Returning address.");
-                    NSString *ip = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
-                    resolve(ip);
-                    return;
-                }
-                }
-                temp_addr = temp_addr->ifa_next;
-            }
-            }
-            NSLog(@"Could not find IP address, falling back to localhost.");
-            resolve(@"localhost");
-        }
-        @catch (NSException *e) {
-            // TODO: First, it is probably not the best way to map NSException fields
-            // into NSError object; second, we should adopt approach from Android code,
-            // where there is a dedicated error handling and reporting singletone, which
-            // simplifies such error handling with promise rejection and optional logging.
-            NSError *error = [NSError errorWithDomain:ERROR_DOMAIN code:12345 userInfo:e.userInfo];
-            reject(e.name, e.reason, error);
-        }
-        @finally {
-            freeifaddrs(interfaces);
-        }
-    */
+        throw "Failed to find non-local IP address";
+    }
+    catch (...) {
+        auto error = winrt::Microsoft::ReactNative::ReactError();
+        error.Message = "Failed to get a non-local IP address";
+        result.Reject(error);
+    }
 }
 
 void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result) noexcept {

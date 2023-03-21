@@ -20,6 +20,7 @@
 #include <winrt/Microsoft.UI.Xaml.XamlTypeInfo.h>
 
 #include <winrt/Windows.ApplicationModel.h>
+#include <winrt/Windows.Networking.Connectivity.h>
 #include <winrt/Windows.Networking.Sockets.h>
 #include <winrt/Windows.Storage.h>
 
