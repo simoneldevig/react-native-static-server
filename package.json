@@ -52,8 +52,8 @@
     "pod-install": "^0.1.38",
     "react": "18.2.0",
     "react-native-builder-bob": "^0.20.4",
-    "react-native-windows": "^0.71.3",
-    "typescript": "^4.9.4",
+    "react-native-windows": "^0.71.4",
+    "typescript": "^5.0.2",
     "react-native": "0.71.4"
   },
   "peerDependencies": {
