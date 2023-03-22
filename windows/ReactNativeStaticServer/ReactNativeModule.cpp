@@ -91,17 +91,6 @@ void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result
     }
 }
 
-void ReactNativeModule::isRunning(React::ReactPromise<React::JSValue>&& result) noexcept {
-    result.Reject("NOT IMPLEMENTED YET");
-    /*
-        ANDROID:
-         promise.resolve(server != null && server.isAlive());
-        IOS:
-
-resolve(@(self->server && self->server.executing));
-        */
-}
-
 void ReactNativeModule::sendEvent(std::string signal) {
     JSValueObject obj = JSValueObject{
             {"serverId", activeServerId},

@@ -40,13 +40,12 @@ struct ReactNativeStaticServerSpec : winrt::Microsoft::ReactNative::TurboModuleS
       TypedConstant<ReactNativeStaticServerSpec_Constants>{0},
   };
   static constexpr auto methods = std::tuple{
-      Method<void(Promise<::React::JSValue>) noexcept>{0, L"isRunning"},
-      Method<void(std::string) noexcept>{1, L"addListener"},
-      Method<void(double) noexcept>{2, L"removeListeners"},
-      Method<void(double, std::string, Promise<::React::JSValue>) noexcept>{3, L"start"},
-      Method<void(Promise<::React::JSValue>) noexcept>{4, L"getLocalIpAddress"},
-      Method<void(Promise<::React::JSValue>) noexcept>{5, L"getOpenPort"},
-      Method<void(Promise<::React::JSValue>) noexcept>{6, L"stop"},
+      Method<void(std::string) noexcept>{0, L"addListener"},
+      Method<void(double) noexcept>{1, L"removeListeners"},
+      Method<void(double, std::string, Promise<::React::JSValue>) noexcept>{2, L"start"},
+      Method<void(Promise<::React::JSValue>) noexcept>{3, L"getLocalIpAddress"},
+      Method<void(Promise<::React::JSValue>) noexcept>{4, L"getOpenPort"},
+      Method<void(Promise<::React::JSValue>) noexcept>{5, L"stop"},
   };
 
   template <class TModule>
@@ -62,36 +61,31 @@ struct ReactNativeStaticServerSpec : winrt::Microsoft::ReactNative::TurboModuleS
 
     REACT_SHOW_METHOD_SPEC_ERRORS(
           0,
-          "isRunning",
-          "    REACT_METHOD(isRunning) void isRunning(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
-          "    REACT_METHOD(isRunning) static void isRunning(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
-    REACT_SHOW_METHOD_SPEC_ERRORS(
-          1,
           "addListener",
           "    REACT_METHOD(addListener) void addListener(std::string eventName) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(addListener) static void addListener(std::string eventName) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
-          2,
+          1,
           "removeListeners",
           "    REACT_METHOD(removeListeners) void removeListeners(double count) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(removeListeners) static void removeListeners(double count) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
-          3,
+          2,
           "start",
           "    REACT_METHOD(start) void start(double id, std::string configPath, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(start) static void start(double id, std::string configPath, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
-          4,
+          3,
           "getLocalIpAddress",
           "    REACT_METHOD(getLocalIpAddress) void getLocalIpAddress(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(getLocalIpAddress) static void getLocalIpAddress(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
-          5,
+          4,
           "getOpenPort",
           "    REACT_METHOD(getOpenPort) void getOpenPort(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(getOpenPort) static void getOpenPort(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
-          6,
+          5,
           "stop",
           "    REACT_METHOD(stop) void stop(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(stop) static void stop(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");

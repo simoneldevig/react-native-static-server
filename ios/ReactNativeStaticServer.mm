@@ -76,13 +76,6 @@ RCT_REMAP_METHOD(getLocalIpAddress,
   }
 }
 
-RCT_REMAP_METHOD(isRunning,
-  isRunning:(RCTPromiseResolveBlock)resolve
-  rejecter:(RCTPromiseRejectBlock)reject
-) {
-  resolve(@(self->server && self->server.executing));
-}
-
 RCT_REMAP_METHOD(start,
   start:(NSNumber* _Nonnull)serverId
   configPath:(NSString*)configPath

@@ -8,8 +8,6 @@ export interface Spec extends TurboModule {
     TERMINATED: string;
   };
 
-  isRunning(): Promise<boolean>;
-
   addListener(eventName: string): void;
 
   removeListeners(count: number): void;

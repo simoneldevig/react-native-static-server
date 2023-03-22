@@ -18,9 +18,6 @@ struct ReactNativeModule
     REACT_GET_CONSTANTS(GetConstants)
     ReactNativeStaticServerSpec_Constants GetConstants() noexcept;
 
-    REACT_METHOD(isRunning)
-    void isRunning(React::ReactPromise<React::JSValue>&& result) noexcept;
-
     REACT_METHOD(addListener)
     void addListener(std::string eventName) noexcept {
         // NOOP
