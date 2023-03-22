@@ -70,6 +70,15 @@ included into the library repository on GitHub_.
   however at the moment we don't support it officially. If anybody wants
   to help with this, contributions to the documentation / codebase are welcome._
 
+- For **Windows**:
+  - Add _Internet (Client & Server)_, _Internet (Client)_,
+    and _Private Networks (Client & Server)_ capabilities to your app.
+
+    NOTE: _It seems, the core server functionality is able to work without these
+    capabilities, however some functions might be affected, and the error reporting
+    in the current Windows implementation probably won't make it clear that something
+    failed due to the lack of declared capabilities._
+
 - Create and run server instance:
   ```js
   import Server from '@dr.pogodin/react-native-static-server';

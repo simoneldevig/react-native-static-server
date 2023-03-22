@@ -1,8 +1,8 @@
 import {
   AppState,
-  AppStateStatus,
+  type AppStateStatus,
   NativeEventEmitter,
-  NativeEventSubscription,
+  type NativeEventSubscription,
   Platform,
 } from 'react-native';
 

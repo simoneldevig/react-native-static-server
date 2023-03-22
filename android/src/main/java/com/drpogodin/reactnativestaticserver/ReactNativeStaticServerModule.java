@@ -158,11 +158,6 @@ public class ReactNativeStaticServerModule
     // NOOP
   }
 
-  @ReactMethod
-  public void isRunning(Promise promise) {
-    promise.resolve(server != null && server.isAlive());
-  }
-
   // NOTE: Pause/resume operations, if opted, are managed in JS layer.
   @Override
   public void onHostResume() {}
