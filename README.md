@@ -12,6 +12,7 @@ and [old][Old Architecture] RN architectures.
 
 <!-- links -->
 [Expo]: https://expo.dev
+[react-native-fs]: https://www.npmjs.com/package/react-native-fs
 [React Native]: https://reactnative.dev
 
 ## Content
@@ -71,6 +72,14 @@ included into the library repository on GitHub_.
   to help with this, contributions to the documentation / codebase are welcome._
 
 - For **Windows**:
+  - Out of the box, the current version of [react-native-fs] library (v2.20.0),
+    we depend upon, is broken on Windows. For now, it can be worked around by
+    picking up
+    [RNFSManager.h](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/windows/ReactNativeStaticServerExample/RNFSManager.h) and
+    [RNFSManager.cpp](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/windows/ReactNativeStaticServerExample/RNFSManager.cpp) files
+    from the example app, and including them into the host app codebase,
+    the same way as the example app does.
+
   - Add _Internet (Client & Server)_, _Internet (Client)_,
     and _Private Networks (Client & Server)_ capabilities to your app.
 
