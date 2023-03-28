@@ -15,6 +15,8 @@ import {
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
+import { getDeviceType } from 'react-native-device-info';
+
 // TODO: rn-fs does not work on Windows out of the box,
 // which is a know issue with a known workaround:
 // https://github.com/microsoft/react-native-windows/issues/2829
@@ -44,12 +46,18 @@ export default function App() {
   const [origin, setOrigin] = useState<string>('');
 
   useEffect(() => {
-    const fileDir: string = Platform.select({
+    let fileDir: string = Platform.select({
       android: `${RNFS.DocumentDirectoryPath}/webroot`,
       ios: `${RNFS.MainBundlePath}/webroot`,
       windows: `${RNFS.MainBundlePath}\\webroot`,
       default: '',
     });
+
+    // This check detects Mac Catalyst build, where bundled assets land
+    // to a different folder, compared to a regular iOS mobile device.
+    if (Platform.OS === 'ios' && getDeviceType() === 'Desktop') {
+      fileDir = `${RNFS.MainBundlePath}/Contents/Resources/webroot`;
+    }
 
     // In our example, `server` is reset to null when the component is unmount,
     // thus signalling that server init sequence below should be aborted, if it
