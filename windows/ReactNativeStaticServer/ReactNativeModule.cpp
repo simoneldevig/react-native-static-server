@@ -2,6 +2,7 @@
 #include "ReactNativeModule.h"
 #include <ppltasks.h>
 
+#include "Errors.h"
 #include "Server.h"
 
 using namespace std::chrono_literals;
@@ -10,23 +11,20 @@ using namespace winrt::Windows::Networking::Connectivity;
 
 double activeServerId;
 ReactNativeModule* mod;
-React::ReactPromise<::React::JSValue>* pendingResultPromise;
+React::ReactPromise<::React::JSValue>* pendingResult;
 Server *server;
 
-void OnLaunchedCallback(std::string signal) {
-    if (pendingResultPromise) {
-        if (signal == LAUNCHED) pendingResultPromise->Resolve(NULL);
-        else {
-            // TODO: There is an elegant solution in Android/Java version
-            // of the native code, that prevents having error-handling
-            // boilerplate all around, instead encapsulating it in a dedicated
-            // error-handling module. Should adopt it for Windows eventually.
-            auto error = winrt::Microsoft::ReactNative::ReactError();
-            error.Message = "Native server failed to launch";
-            pendingResultPromise->Reject(error);
-        }
-        delete pendingResultPromise;
-        pendingResultPromise = NULL;
+void OnSignal(std::string signal) {
+    if (signal == CRASHED || signal == TERMINATED) {
+        delete server;
+        server = NULL;
+    }
+    if (pendingResult) {
+        auto result = pendingResult;
+        pendingResult = NULL;
+        if (signal == CRASHED) RNException("Server crashed").reject(*result);
+        else result->Resolve(NULL);
+        delete result;
     }
     mod->sendEvent(signal);
 }
@@ -58,17 +56,15 @@ void ReactNativeModule::getLocalIpAddress(React::ReactPromise<React::JSValue>&& 
                     // TODO: Here we can use network.GetConnectedProfileAsync()
                     // to get more info about the current connection status,
                     // but for now just let return the first IP we found.
-                    result.Resolve(winrt::to_string(host.CanonicalName()));
+                    return result.Resolve(winrt::to_string(host.CanonicalName()));
                 }
             }
         }
-        throw "Failed to find non-local IP address";
     }
     catch (...) {
-        auto error = winrt::Microsoft::ReactNative::ReactError();
-        error.Message = "Failed to get a non-local IP address";
-        result.Reject(error);
+        // NOOP
     }
+    RNException("Failed to get a non-local IP address").reject(result);
 }
 
 void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result) noexcept {
@@ -78,17 +74,16 @@ void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result
         // capability is granted to the app. The error messaging should be improved, to make it
         // clear to the library consumer why the failure happened.
         if (socket.BindServiceNameAsync(L"").wait_for(5s) != AsyncStatus::Completed) {
-            throw "Binding time out";
+            return RNException("Binding time out").reject(result);
         }
         double port = std::stod(winrt::to_string(socket.Information().LocalPort()));
         socket.Close();
-        result.Resolve(port);
+        return result.Resolve(port);
     }
     catch (...) {
-        auto error = winrt::Microsoft::ReactNative::ReactError();
-        error.Message = "Failed to get an open port";
-        result.Reject(error);
+        // NOOP
     }
+    RNException("Failed to get an open port").reject(result);
 }
 
 void ReactNativeModule::sendEvent(std::string signal) {
@@ -104,42 +99,37 @@ void ReactNativeModule::start(
     std::string configPath,
     React::ReactPromise<::React::JSValue>&& result
 ) noexcept {
-    if (server) {
-        auto error = winrt::Microsoft::ReactNative::ReactError();
-        error.Message = "Another server instance is active";
-        result.Reject(error);
-        return;
-    }
+    if (server) return RNException("Another server instance is active").reject(result);
+    if (pendingResult) return RNException("Internal error").reject(result);
     mod = this;
     activeServerId = id;
-    pendingResultPromise = new React::ReactPromise<React::JSValue>(result);
-    server = new Server(configPath, OnLaunchedCallback);
+    pendingResult = new React::ReactPromise<React::JSValue>(result);
+    server = new Server(configPath, OnSignal);
     server->launch();
 }
 
 void ReactNativeModule::stop(React::ReactPromise<React::JSValue>&& result) noexcept {
     try {
-        if (server) {
-            server->shutdown();
-            delete server;
-            server = NULL;
-        }
-        if (pendingResultPromise) {
-            delete pendingResultPromise;
-            pendingResultPromise = NULL;
-        }
-        // TODO: Well... this is not quite correct, we should instead
-        // syncronize this promise resolution with the Server sending
-        // out TERMINATED signal, similarly to how we do on the startup
-        // with the LAUNCHED signal. Will do without synchronization
-        // for now: should not cause troubles apart of edge cases when
-        // somebody tries to start a server immediately after previos
-        // .stop() call resolved.
-        result.Resolve(NULL);
+        // The synchronization in JS layer is supposed to ensure this native
+        // .stop() is never called before any previous pendingResult is settled
+        // and cleaned up.
+        if (pendingResult) return RNException("Internal error").reject(result);
+
+        // This means either the server has crashed at the same time we were
+        // about to ask it to gracefully shutdown, or there is some error in
+        // JS layer, which is not supposed to call this native .stop() unless
+        // an active server instance exists.
+        if (!server) return RNException("No active server").reject(result);
+
+        pendingResult = new React::ReactPromise<React::JSValue>(result);
+        server->shutdown();
+
+        // The OnSignal() handler will dispose the server once TERMINATED,
+        // or CRASHED signal is received, and it will settle and clean up
+        // pendingPromise; anything else going wrong, the try/catch block
+        // will catch it and report to JS layer in RN way.
     }
     catch (...) {
-        auto error = winrt::Microsoft::ReactNative::ReactError();
-        error.Message = "Failed to gracefully shutdown the server";
-        result.Reject(error);
+        RNException("Failed to gracefully shutdown the server").reject(result);
     }
 }

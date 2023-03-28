@@ -4,14 +4,17 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
-Embed HTTP server for [React Native] applications for Android, iOS, and Windows
-platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
+Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
+and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
+[example app]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
 [Expo]: https://expo.dev
+[react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
+[react-native-fs]: https://www.npmjs.com/package/react-native-fs
 [React Native]: https://reactnative.dev
 
 ## Content
@@ -27,11 +30,12 @@ and [old][Old Architecture] RN architectures.
 
 
 ## Getting Started
+[Getting Started]: #getting-started
 
 [CMake]: https://cmake.org
 
 **Note:** _In addition to these instructions, have a look at
-[the example project](https://github.com/birdofpreyru/react-native-static-server/tree/master/example)
+[the example project][example app]
 included into the library repository on GitHub_.
 
 - [CMake] is required on the build host.
@@ -70,7 +74,31 @@ included into the library repository on GitHub_.
   however at the moment we don't support it officially. If anybody wants
   to help with this, contributions to the documentation / codebase are welcome._
 
+- For **Mac Catalyst**:
+  - Disable Flipper in your app's Podfile.
+  - Add _Incoming Connections (Server)_ entitlement to the _App Sandbox_
+    (`com.apple.security.network.server` entitlement).
+  - If you bundle inside your app the assets to serve by the server,
+    keep in mind that in Mac Catalyst build they'll end up in a different
+    path, compared to the regular iOS bundle (see [example app]): \
+    iOS: `${RNFS.MainBundlePath}/webroot` \;
+    Mac Catalyst: `${RNFS.MainBundlePath}/Content/Resources/webroot`.Also keep
+
+    Also keep in mind that `Platform.OS` value equals `iOS` both for the normal
+    iOS and for the Mac Catalyst builds, and you should use different methods
+    to distinguish them; for example relying on `getDeviceType()` method of
+    [react-native-device-info] library, which returns 'Desktop' in case of
+    Catalyst build.
+
 - For **Windows**:
+  - Out of the box, the current version of [react-native-fs] library (v2.20.0),
+    we depend upon, is broken on Windows. For now, it can be worked around by
+    picking up
+    [RNFSManager.h](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/windows/ReactNativeStaticServerExample/RNFSManager.h) and
+    [RNFSManager.cpp](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/windows/ReactNativeStaticServerExample/RNFSManager.cpp) files
+    from the example app, and including them into the host app codebase,
+    the same way as the example app does.
+
   - Add _Internet (Client & Server)_, _Internet (Client)_,
     and _Private Networks (Client & Server)_ capabilities to your app.
 
@@ -191,6 +219,12 @@ outside platform-specific sub-folders.
     &laquo;_Copy items if needed_&raquo;, then select our `webroot` folder,
     and press &laquo;_Add_&raquo; button to add "webroot" assets
     to the project target.
+
+- **Mac Catalyst**
+  - The bundling for iOS explained above also bundles assets for Mac Catalyst;
+    beware, however, the bundled assets end up in a slightly different location
+    inside the bundle in this case (see details earlier in the [Getting Started]
+    section).
 
 - **Windows**
   - Edit `PropertySheet.props` file inside your app's

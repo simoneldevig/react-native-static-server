@@ -9,6 +9,7 @@
     <ClCompile Include="ReactPackageProvider.cpp" />
     <ClCompile Include="ReactNativeModule.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="Errors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -16,6 +17,7 @@
     <ClInclude Include="ReactNativeModule.h" />
     <ClInclude Include="NativeReactNativeStaticServerSpec.g.h" />
     <ClInclude Include="Server.h" />
+    <ClInclude Include="Errors.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />
