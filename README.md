@@ -81,8 +81,8 @@ included into the library repository on GitHub_.
   - If you bundle inside your app the assets to serve by the server,
     keep in mind that in Mac Catalyst build they'll end up in a different
     path, compared to the regular iOS bundle (see [example app]): \
-    iOS: `${RNFS.MainBundlePath}/webroot` \;
-    Mac Catalyst: `${RNFS.MainBundlePath}/Content/Resources/webroot`.Also keep
+    iOS: `${RNFS.MainBundlePath}/webroot`; \
+    Mac Catalyst: `${RNFS.MainBundlePath}/Content/Resources/webroot`.
 
     Also keep in mind that `Platform.OS` value equals `iOS` both for the normal
     iOS and for the Mac Catalyst builds, and you should use different methods
