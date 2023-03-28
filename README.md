@@ -538,8 +538,8 @@ applications.
 These are future development aims, ordered by their current priority (from
 the top priority, to the least priority):
 
-- Support of React Native for Windows 10/11 (_tentatively, by mid-March 2023_).
-- Support of React Native for macOS (Catalyst) (_tentatively, by mid-March 2023_).
+- Support of React Native for Windows 10/11 (_ready as of v0.7.4, but has not been tested extensively yet_).
+- Support of React Native for macOS (Catalyst) (_ready as of v0.7.4, but has not been tested extensively yet_).
 - Support of custom configurartion of HTTP server, and inclusion of
   additional [Lighttpd] plugins (only three plugins for serving static
   assets are included now by default).
