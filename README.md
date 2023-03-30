@@ -2,6 +2,7 @@
 
 [![Latest NPM Release](https://img.shields.io/npm/v/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/birdofpreyru/react-native-static-server/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/birdofpreyru/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 
 Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
