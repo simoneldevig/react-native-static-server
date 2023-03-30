@@ -202,7 +202,9 @@ class StaticServer {
   _configPath?: string;
   _fileDir: string;
   _hostname = '';
-  _nonLocal: boolean;
+
+  /* DEPRECATED */ _nonLocal: boolean;
+
   _origin: string = '';
   _stopInBackground: boolean;
   _port: number;
@@ -239,6 +241,7 @@ class StaticServer {
     return this._hostname;
   }
 
+  /** @deprecated */
   get nonLocal() {
     return this._nonLocal;
   }
@@ -265,33 +268,28 @@ class StaticServer {
   }
 
   /**
-   * Creates a new StaticServer instance.
-   *
-   * Because the legacy, the following alternative signatures are supported,
-   * and the overall constructor implementation is thus subpar.
-   *
-   * new StaticServer(port, root, opts);
-   * new StaticServer(port, opts);
-   * new StaticServer(port, root);
-   * new StaticServer(opts);
-   * new StaticServer(port);
-   * new StaticServer();
-   *
-   * @param {object} options
+   * Creates a new Server instance.
    */
   constructor({
     fileDir,
-    nonLocal = false,
+    hostname = 'localhost',
+
+    /* DEPRECATED */ nonLocal = false,
+
     port = 0,
     stopInBackground = false,
   }: {
     fileDir: string;
-    nonLocal?: boolean;
+    hostname?: string;
+
+    /* DEPRECATED */ nonLocal?: boolean;
+
     port?: number;
     stopInBackground?: boolean;
   }) {
     this._nonLocal = nonLocal;
-    if (!nonLocal) this._hostname = 'localhost';
+    this._hostname = nonLocal && hostname === 'localhost' ? '' : hostname;
+
     this._port = port;
     this._stopInBackground = stopInBackground;
 

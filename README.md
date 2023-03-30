@@ -362,10 +362,30 @@ within `options` argument:
   path; however, empty `fileDir` value is forbidden: if you really want to serve
   entire documents directory of the app, provide its absolute path explicitly.
 
-- `nonLocal` &mdash; **boolean** &mdash; Optional. By default, the server is started on
-  `localhost` address, and it is only accessible within the app. With this flag
-  set **true** the server will be started on a local IP adress also accessible
-  from outside the app.
+- `hostname` &mdash; **string** &mdash; Optional. Sets the address for server
+  to bind to.
+  - By default, if `nonLocal` option is **false**, `hostname` is set equal
+    "`localhost`" &mdash; the server binds to the localhost (127.0.0.1)
+    loopback address, and it is accessible only from within the host app.
+  - If `nonLocal` option is **true**, and `hostname` was not given, it is
+    initialized with empty string, and later assigned to a library-selected
+    non-local IP address, at the first launch of the server.
+  - If `hostname` value is provided, the server will bind to the given address,
+    and it will ignore `nonLocal` option.
+
+  _NOTE: In future we'll deprecate `nonLocal` option, and instead will use
+  special `hostname` values to ask the library to automatically select
+  appropriate non-local address._
+
+- `nonLocal` &mdash; **boolean** &mdash; Optional. By default, if `hostname`
+  option was not provided, the server starts at the "`localhost`" address,
+  and it is only accessible within the host app. With this flag set **true**
+  the server will be started on an IP adress also accessible from outside the app.
+
+  _NOTE: When `hostname` option is set to a value different from "`localhost",
+  the `nonLocal` option is ignored. The plan is to deprecate `nonLocal` option
+  in future, in favour of special `hostname` values supporting the current
+  `nonLocal` functionality._
 
 - `port` &mdash; **number** &mdash; Optional. The port at which to start the server.
   If 0 (default) an available port will be automatically selected.
