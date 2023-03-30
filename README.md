@@ -81,8 +81,8 @@ included into the library repository on GitHub_.
   - If you bundle inside your app the assets to serve by the server,
     keep in mind that in Mac Catalyst build they'll end up in a different
     path, compared to the regular iOS bundle (see [example app]): \
-    iOS: `${RNFS.MainBundlePath}/webroot` \;
-    Mac Catalyst: `${RNFS.MainBundlePath}/Content/Resources/webroot`.Also keep
+    iOS: `${RNFS.MainBundlePath}/webroot`; \
+    Mac Catalyst: `${RNFS.MainBundlePath}/Content/Resources/webroot`.
 
     Also keep in mind that `Platform.OS` value equals `iOS` both for the normal
     iOS and for the Mac Catalyst builds, and you should use different methods
@@ -107,30 +107,60 @@ included into the library repository on GitHub_.
     in the current Windows implementation probably won't make it clear that something
     failed due to the lack of declared capabilities._
 
-- Create and run server instance:
-  ```js
+- Create and run a server instance:
+
+  ```jsx
+  import { useEffect } from 'react';
+  import { Text, View } from 'react-native';
   import Server from '@dr.pogodin/react-native-static-server';
 
-  // NOTE: In practice, you probably want to create and persitently keep
-  // server instance within a RN component, presumably using useRef() hook,
-  // so this example should be enhanced to demonstrate it. For now, have
-  // a look at the example project in the repo, which demonstrates more
-  // realistic code.
+  // We assume no more than one instance of this component is mounted in the App
+  // at any given time; otherwise some additional logic will be needed to ensure
+  // no more than a single server instance can be launched at a time.
+  //
+  // Also, keep in mind, the call to "server.stop()" without "await" does not
+  // guarantee that the server has shut down immediately after that call, thus
+  // if such component is unmounted and immediately re-mounted again, the new
+  // server instance may fail to launch because of it.
+  export default function ExampleComponent() {
+    const [origin, setOrigin] = useState('');
 
-  const server = new Server({
-    // See further in the docs how to statically bundle assets into the App,
-    // alternatively assets to server might be created or downloaded during
-    // the app's runtime.
-    fileDir: '/path/to/static/assets/on/target/device',
-  });
+    useEffect(() => {
+      let server = new Server({
+        // See further in the docs how to statically bundle assets into the App,
+        // alernatively assets to serve might be created or downloaded during
+        // the app's runtime.
+        fileDir: '/path/to/static/assets/on/target/device',
+      });
+      (async () => {
+        // You can do additional async preparations here; e.g. on Android
+        // it is a good place to extract bundled assets into an accessible
+        // location.
 
-  // As BEWARE note below says, you may have multiple Server instances around,
-  // but you MUST NOT start more than one instance a time, i.e. before calling
-  // .start() on an instance you MUST .stop() a previously started instance,
-  // if any.
-  server.start().then((origin) => {
-    console.log(`Serving at URL ${url}`);
-  });
+        // Note, on unmount this hook resets "server" variable to "undefined",
+        // thus if "undefined" the hook has unmounted while we were doing
+        // async operations above, and we don't need to launch
+        // the server anymore.
+        if (server) setOrigin(await server.start());
+      })();
+
+      return () => {
+        setOrigin('');
+
+        // No harm to trigger .stop() even if server has not been launched yet.
+        server.stop();
+
+        server = undefined;
+      }
+    }, []);
+
+    return (
+      <View>
+        <Text>Hello World!</Text>
+        <Text>Server is up at: {origin}</Text>
+      </View>
+    );
+  }
   ```
 
 ### Bundling-in Server Assets Into an App Statically
@@ -174,6 +204,8 @@ outside platform-specific sub-folders.
     To facilitate it, this library provides [extractBundledAssets()] function.
     You want to use it in this manner:
     ```jsx
+    // TODO: To be updated, see a better code inside the example app.
+
     import RNFS from 'react-native-fs';
     import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
 
@@ -308,7 +340,7 @@ import Server from '@dr.pogodin/react-native-static-server';
 ```
 The [Server] class represents individual server instances.
 
-**BEWARE:** On **Android** and **iOS** at most one server instance can be active
+**BEWARE:** At most one server instance can be active
 within an app at the same time. Attempts to start a new server instance will
 result in the crash of that new instance. That means, although you may have
 multiple instances of [Server] class created, you should not call [.start()]
@@ -538,8 +570,8 @@ applications.
 These are future development aims, ordered by their current priority (from
 the top priority, to the least priority):
 
-- Support of React Native for Windows 10/11 (_tentatively, by mid-March 2023_).
-- Support of React Native for macOS (Catalyst) (_tentatively, by mid-March 2023_).
+- Support of React Native for Windows 10/11 (_ready as of v0.7.4, but has not been tested extensively yet_).
+- Support of React Native for macOS (Catalyst) (_ready as of v0.7.4, but has not been tested extensively yet_).
 - Support of custom configurartion of HTTP server, and inclusion of
   additional [Lighttpd] plugins (only three plugins for serving static
   assets are included now by default).
