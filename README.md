@@ -532,7 +532,11 @@ The [STATES] enumerator provides possible states of a server instance:
 - `STATES.STOPPING` &mdash; Shutting down.
 
 It also contains the backward mapping between state numeric values and their
-human-readable names used above.
+human-readable names used above, _i.e._
+```js
+console.log(STATES.ACTIVE); // Logs: 0
+console.log(STATES[0]);     // Logs: ACTIVE
+```
 
 ## Project History and Roadmap
 
