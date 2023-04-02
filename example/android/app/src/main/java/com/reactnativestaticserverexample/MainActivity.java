@@ -30,7 +30,7 @@ public class MainActivity extends ReactActivity {
 
         // react-native-webview used in this example does not support Fabric
         // yet.
-        false, // DefaultNewArchitectureEntryPoint.getFabricEnabled(), // fabricEnabled
+        DefaultNewArchitectureEntryPoint.getFabricEnabled(), // fabricEnabled
 
         // If you opted-in for the New Architecture, we enable Concurrent React (i.e. React 18).
         DefaultNewArchitectureEntryPoint.getConcurrentReactEnabled() // concurrentRootEnabled
