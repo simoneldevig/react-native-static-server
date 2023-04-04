@@ -36,8 +36,7 @@ public class ReactNativeStaticServerModule
   private Server server = null;
 
   public static final String NAME = "ReactNativeStaticServer";
-  public static final String LOGTAG = Errors.LOGTAG
-    + ": FPStaticServerModuleImpl";
+  public static final String LOGTAG = Errors.LOGTAG + " (Module)";
 
   ReactNativeStaticServerModule(ReactApplicationContext context) {
     super(context);
@@ -105,6 +104,7 @@ public class ReactNativeStaticServerModule
       new Consumer<String>() {
         private boolean settled = false;
         public void accept(String signal) {
+          if (signal != Server.LAUNCHED) server = null;
           if (!settled) {
             settled = true;
             if (signal == Server.LAUNCHED) promise.resolve(null);
@@ -137,9 +137,10 @@ public class ReactNativeStaticServerModule
     try {
       Log.i(LOGTAG, "stop() triggered.");
       if (server != null) {
-        server.interrupt();
-        server.join();
-        server = null;
+        // Server signals handler will reset "server" to null, thus local copy.
+        Server s = server;
+        s.interrupt();
+        s.join();
         Log.i(LOGTAG, "Active server stopped");
       } else Log.i(LOGTAG, "No active server");
       if (promise != null) promise.resolve(null);
