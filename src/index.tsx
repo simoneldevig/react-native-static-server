@@ -41,7 +41,6 @@ nativeEventEmitter.addListener(
             server._setState(STATES.CRASHED, details);
           }
           break;
-        case SIGNALS.LAUNCHED:
         case SIGNALS.TERMINATED:
           if (server._signalBarrier) {
             server._signalBarrier.resolve();
@@ -346,13 +345,18 @@ class StaticServer {
     }
   }
 
-  async start(): Promise<string> {
+  /**
+   * @param {string} [details] Optional. If provided, it will be added
+   * to the STARTING message emitted to the server state change listeners.
+   * @returns {Promise<string>}
+   */
+  async start(details?: string): Promise<string> {
     try {
       await this._sem.seize();
       this._stableStateGuard();
       if (this._state === STATES.ACTIVE) return this._origin!;
       servers[this._id] = this;
-      this._setState(STATES.STARTING);
+      this._setState(STATES.STARTING, details);
       this._configureAppStateHandling();
 
       // NOTE: This is done at the first start only, to avoid hostname changes
@@ -372,27 +376,17 @@ class StaticServer {
         this._port,
       );
 
-      // Our synchronization logic assumes when we arrive here any previously
-      // set barriers should be cleared up already.
-      if (this._signalBarrier) throw Error('Internal error');
-
-      this._signalBarrier = new Barrier();
-
-      // This resolves once startup is initiated, but we need to wait for
-      // "LAUNCHED" signal from the native side to be sure the server is up.
+      // Native implementations of .start() method must resolve only once
+      // the server has been launched (ready to handle incoming requests).
       await ReactNativeStaticServer.start(this._id, this._configPath);
-      await (this._signalBarrier as Promise<void>);
-
       this._origin = `http://${this._hostname}:${this._port}`;
-      await this._removeConfigFile();
-
       this._setState(STATES.ACTIVE);
+      this._removeConfigFile();
       return this._origin;
     } catch (e: any) {
       this._setState(STATES.CRASHED, e.message);
       throw e;
     } finally {
-      this._signalBarrier = undefined;
       this._sem.setReady(true);
     }
   }
@@ -402,14 +396,16 @@ class StaticServer {
    * it will be automatically reactivated when the app goes into foreground
    * again. End users are expected to use public .stop() method below, which
    * additionally cleans-up that automatic re-activation.
+   * @param {string} [details] Optional. If provided, it will be added
+   *  to the STOPPING message emitted to the server state change listeners.
    * @returns {Promise<>}
    */
-  async _stop() {
+  async _stop(details?: string) {
     try {
       await this._sem.seize();
       this._stableStateGuard();
       if (this._state !== STATES.ACTIVE) return;
-      this._setState(STATES.STOPPING);
+      this._setState(STATES.STOPPING, details);
 
       // Our synchronization logic assumes when we arrive here any previously
       // set barriers should be cleared up already.
@@ -439,20 +435,21 @@ class StaticServer {
    * to foreground. To ensure the server is stopped for good, pass in `kill`
    * flag. In that case only explicit call to .start() will start the server
    * again.
-   * @param kill
+   * @param {string} [details] Optional. If provided, it will be added
+   *  to the STOPPING message emitted to the server state change listeners.
    * @returns {Promise<>}
    */
-  async stop() {
+  async stop(details?: string) {
     if (this._appStateSub) {
       this._appStateSub.remove();
       this._appStateSub = undefined;
     }
-    await this._stop();
+    await this._stop(details);
   }
 
   _handleAppStateChange(appState: AppStateStatus) {
-    if (appState === 'active') this.start();
-    else this._stop();
+    if (appState === 'active') this.start('App entered foreground');
+    else this._stop('App entered background');
   }
 }
 

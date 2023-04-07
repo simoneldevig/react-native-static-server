@@ -105,16 +105,17 @@ public class ReactNativeStaticServerModule
         private boolean settled = false;
         public void accept(String signal, String details) {
           if (signal != Server.LAUNCHED) server = null;
-          if (!settled) {
+          if (settled) {
+            WritableMap event = Arguments.createMap();
+            event.putDouble("serverId", id);
+            event.putString("event", signal);
+            event.putString("details", details);
+            emitter.emit("RNStaticServer", event);
+          } else {
             settled = true;
             if (signal == Server.LAUNCHED) promise.resolve(null);
             else Errors.LAUNCH_FAILURE.reject(promise, details);
           }
-          WritableMap event = Arguments.createMap();
-          event.putDouble("serverId", id);
-          event.putString("event", signal);
-          event.putString("details", details);
-          emitter.emit("RNStaticServer", event);
         }
       }
     );
