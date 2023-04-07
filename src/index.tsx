@@ -22,34 +22,37 @@ const servers: { [id: string]: StaticServer } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(ReactNativeStaticServer);
 
-nativeEventEmitter.addListener('RNStaticServer', ({ event, serverId }) => {
-  const server = servers[serverId];
-  if (server) {
-    switch (event) {
-      case SIGNALS.CRASHED:
-        // TODO: When server crashes,
-        // we should get and message the crash
-        // reason.
-        if (server._signalBarrier) {
-          server._signalBarrier.reject(Error('Native server crashed'));
-        } else {
-          // NOTE: Beside this state change, when server crashes while in active
-          // state, other state changes are managed by .start() and ._stop()
-          // methods, thus no need to do ._setState() explicitly here.
-          server._setState(STATES.CRASHED);
-        }
-        break;
-      case SIGNALS.LAUNCHED:
-      case SIGNALS.TERMINATED:
-        if (server._signalBarrier) {
-          server._signalBarrier.resolve();
-        }
-        break;
-      default:
-        throw Error(`Unexpected signal ${event}`);
+nativeEventEmitter.addListener(
+  'RNStaticServer',
+  ({ serverId, event, details }) => {
+    const server = servers[serverId];
+    if (server) {
+      switch (event) {
+        case SIGNALS.CRASHED:
+          // TODO: When server crashes,
+          // we should get and message the crash
+          // reason.
+          if (server._signalBarrier) {
+            server._signalBarrier.reject(Error('Native server crashed'));
+          } else {
+            // NOTE: Beside this state change, when server crashes while in active
+            // state, other state changes are managed by .start() and ._stop()
+            // methods, thus no need to do ._setState() explicitly here.
+            server._setState(STATES.CRASHED, details);
+          }
+          break;
+        case SIGNALS.LAUNCHED:
+        case SIGNALS.TERMINATED:
+          if (server._signalBarrier) {
+            server._signalBarrier.resolve();
+          }
+          break;
+        default:
+          throw Error(`Unexpected signal ${event}`);
+      }
     }
-  }
-});
+  },
+);
 
 /**
  * Returns `true` if given path is absolute, `false` otherwise.
@@ -262,9 +265,9 @@ class StaticServer {
     return this._state;
   }
 
-  _setState(neu: STATES) {
+  _setState(neu: STATES, details: string = '') {
     this._state = neu;
-    this._stateChangeEmitter.emit(neu);
+    this._stateChangeEmitter.emit(neu, details);
   }
 
   /**
@@ -300,7 +303,7 @@ class StaticServer {
     this._fileDir = fileDir;
   }
 
-  addStateListener(listener: (newState: STATES) => void) {
+  addStateListener(listener: (newState: STATES, details: string) => void) {
     return this._stateChangeEmitter.addListener(listener);
   }
 
@@ -386,7 +389,7 @@ class StaticServer {
       this._setState(STATES.ACTIVE);
       return this._origin;
     } catch (e: any) {
-      this._setState(STATES.CRASHED);
+      this._setState(STATES.CRASHED, e.message);
       throw e;
     } finally {
       this._signalBarrier = undefined;

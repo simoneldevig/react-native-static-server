@@ -90,7 +90,7 @@ export default function App() {
         }
       }
 
-      server?.addStateListener((newState) => {
+      server?.addStateListener((newState, details) => {
         // Depending on your use case, you may want to use such callback
         // to implement a logic which prevents other pieces of your app from
         // sending any requests to the server when it is inactive.
@@ -99,7 +99,10 @@ export default function App() {
         // and `STATES[newState]` equals to its human-readable name,
         // because `STATES` contains both forward and backward mapping
         // between state names and corresponding numeric values.
-        console.log(`New server state is "${STATES[newState]}"`);
+        console.log(
+          `New server state is "${STATES[newState]}".`,
+          `Details: "${details}".`,
+        );
       });
       const res = await server?.start();
       if (res && server) {

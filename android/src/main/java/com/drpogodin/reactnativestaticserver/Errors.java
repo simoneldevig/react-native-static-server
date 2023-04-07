@@ -46,6 +46,14 @@ public enum Errors {
     }
   }
 
+  public void reject(Promise promise, String details) {
+    if (promise != null) {
+      String message = this.getMessage();
+      if (details != null) message += ": " + details;
+      promise.reject(this.toString(), message, this.getError());
+    }
+  }
+
   public String toString() {
     return Errors.LOGTAG + ":" + this.name();
   }

@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.util.Enumeration;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import android.util.Log;
 
@@ -101,18 +101,19 @@ public class ReactNativeStaticServerModule
 
     server = new Server(
       configPath,
-      new Consumer<String>() {
+      new BiConsumer<String,String>() {
         private boolean settled = false;
-        public void accept(String signal) {
+        public void accept(String signal, String details) {
           if (signal != Server.LAUNCHED) server = null;
           if (!settled) {
             settled = true;
             if (signal == Server.LAUNCHED) promise.resolve(null);
-            else Errors.LAUNCH_FAILURE.reject(promise);
+            else Errors.LAUNCH_FAILURE.reject(promise, details);
           }
           WritableMap event = Arguments.createMap();
           event.putDouble("serverId", id);
           event.putString("event", signal);
+          event.putString("details", details);
           emitter.emit("RNStaticServer", event);
         }
       }
