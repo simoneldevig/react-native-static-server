@@ -97,21 +97,30 @@ RCT_REMAP_METHOD(start,
     }
 
     __block BOOL settled = false;
-    SignalConsumer signalConsumer = ^void(NSString * const signal) {
-      if (!settled) {
+    SignalConsumer signalConsumer = ^void(NSString * const signal,
+                                          NSString * const details)
+    {
+      if (settled) {
+        [self sendEventWithName:EVENT_NAME
+          body: @{
+            @"serverId": serverId,
+            @"event": signal,
+            @"details": details == nil ? @"" : details
+          }
+        ];
+      } else {
         settled = true;
         if (signal == LAUNCHED) {
           NSLog(@"SERVER LAUNCHED!");
           resolve(NULL);
+        } else {
+          NSString *msg = @"Launch failure";
+          if (details != nil) {
+            msg = [NSString stringWithFormat:@"%@: %@", msg, details];
+          }
+          reject(ERROR_DOMAIN, msg, NULL);
         }
-        else reject(ERROR_DOMAIN, @"Launch failure", NULL);
       }
-      [self sendEventWithName:EVENT_NAME
-        body: @{
-          @"serverId": serverId,
-          @"event": signal
-        }
-      ];
     };
 
     self->server = [Server
