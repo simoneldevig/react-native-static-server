@@ -33,7 +33,7 @@ void LoadLighttpdDll() {
 }
 
 void Server::OnLaunchedCallback() {
-    Server::activeServer->_signalConsumer(LAUNCHED);
+    Server::activeServer->_signalConsumer(LAUNCHED, "");
 }
 
 Server::Server(std::string configPath, SignalConsumer signalConsumer):
@@ -48,7 +48,7 @@ void Server::launch() {
         [this] {
             if (Server::activeServer) {
                 // Bail out with error if another server instance is running.
-                this->_signalConsumer(CRASHED);
+                this->_signalConsumer(CRASHED, "Another Server instance is active");
                 return;
             }
             winrt::hstring appPath = Package::Current().InstalledLocation().Path();
@@ -64,10 +64,10 @@ void Server::launch() {
                 if (res) {
                     throw new std::exception("Ligttpd exited with status " + res);
                 }
-                this->_signalConsumer(TERMINATED);
+                this->_signalConsumer(TERMINATED, "");
             }
             catch (...) {
-                this->_signalConsumer(CRASHED);
+                this->_signalConsumer(CRASHED, "");
             }
             Server::activeServer = NULL;
         }

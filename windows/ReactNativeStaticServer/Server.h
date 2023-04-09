@@ -8,7 +8,7 @@ namespace winrt::ReactNativeStaticServer {
 	static const std::string LAUNCHED = "LAUNCHED";
 	static const std::string TERMINATED = "TERMINATED";
 
-	typedef void (*SignalConsumer)(std::string signal);
+	typedef void (*SignalConsumer)(std::string signal, std::string details);
 
 	class Server {
 	public:

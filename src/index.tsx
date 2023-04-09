@@ -29,22 +29,9 @@ nativeEventEmitter.addListener(
     if (server) {
       switch (event) {
         case SIGNALS.CRASHED:
-          // TODO: When server crashes,
-          // we should get and message the crash
-          // reason.
-          if (server._signalBarrier) {
-            server._signalBarrier.reject(Error('Native server crashed'));
-          } else {
-            // NOTE: Beside this state change, when server crashes while in active
-            // state, other state changes are managed by .start() and ._stop()
-            // methods, thus no need to do ._setState() explicitly here.
-            server._setState(STATES.CRASHED, details);
-          }
-          break;
-        case SIGNALS.TERMINATED:
-          if (server._signalBarrier) {
-            server._signalBarrier.resolve();
-          }
+          server._setState(STATES.CRASHED, details);
+          // TODO: Should we do here the following?
+          // delete servers[this._id];
           break;
         default:
           throw Error(`Unexpected signal ${event}`);
@@ -210,10 +197,6 @@ class StaticServer {
   _origin: string = '';
   _stopInBackground: boolean;
   _port: number;
-
-  // This barrier is used during start-up and stopage of the server to wait for
-  // a success/failure signal from the native side.
-  _signalBarrier?: Barrier<void>;
 
   _state: STATES = STATES.INACTIVE;
   _stateChangeEmitter = new Emitter();
@@ -407,21 +390,15 @@ class StaticServer {
       if (this._state !== STATES.ACTIVE) return;
       this._setState(STATES.STOPPING, details);
 
-      // Our synchronization logic assumes when we arrive here any previously
-      // set barriers should be cleared up already.
-      if (this._signalBarrier) throw Error('Internal error');
-
-      this._signalBarrier = new Barrier();
+      // Native implementations of .stop() method must resolve only once
+      // the server has been completely shut down (released the port it listens).
       await ReactNativeStaticServer.stop();
-      await (this._signalBarrier as Promise<void>);
-
       this._setState(STATES.INACTIVE);
     } catch (e: any) {
       this._setState(STATES.CRASHED);
       throw e;
     } finally {
       delete servers[this._id];
-      this._signalBarrier = undefined;
       this._sem.setReady(true);
     }
   }
