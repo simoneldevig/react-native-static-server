@@ -8,7 +8,6 @@ import {
 
 import RNFS from 'react-native-fs';
 
-import { Barrier } from './Barrier';
 import { SIGNALS, STATES } from './constants';
 import ReactNativeStaticServer from './ReactNativeStaticServer';
 import Semaphore from './Semaphore';
