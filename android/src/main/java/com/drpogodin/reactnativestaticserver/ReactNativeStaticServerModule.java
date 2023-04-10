@@ -35,6 +35,8 @@ public class ReactNativeStaticServerModule
   // instance.
   private Server server = null;
 
+  private Promise pendingPromise = null;
+
   public static final String NAME = "ReactNativeStaticServer";
   public static final String LOGTAG = Errors.LOGTAG + " (Module)";
 
@@ -95,6 +97,13 @@ public class ReactNativeStaticServerModule
       return;
     }
 
+    if (pendingPromise != null) {
+      Errors.INTERNAL_ERROR.log().reject(promise, "Unexpected pending promise");
+      return;
+    }
+
+    pendingPromise = promise;
+
     DeviceEventManagerModule.RCTDeviceEventEmitter emitter =
       getReactApplicationContext()
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
@@ -102,19 +111,20 @@ public class ReactNativeStaticServerModule
     server = new Server(
       configPath,
       new BiConsumer<String,String>() {
-        private boolean settled = false;
         public void accept(String signal, String details) {
           if (signal != Server.LAUNCHED) server = null;
-          if (settled) {
+          if (pendingPromise == null) {
             WritableMap event = Arguments.createMap();
             event.putDouble("serverId", id);
             event.putString("event", signal);
             event.putString("details", details);
             emitter.emit("RNStaticServer", event);
           } else {
-            settled = true;
-            if (signal == Server.LAUNCHED) promise.resolve(null);
-            else Errors.LAUNCH_FAILURE.reject(promise, details);
+            Promise p = pendingPromise;
+            pendingPromise = null;
+            if (signal == Server.CRASHED) {
+              Errors.SERVER_CRASHED.reject(p, details);
+            } else p.resolve(details);
           }
         }
       }
@@ -138,14 +148,15 @@ public class ReactNativeStaticServerModule
   public void stop(Promise promise) {
     try {
       Log.i(LOGTAG, "stop() triggered.");
-      if (server != null) {
-        // Server signals handler will reset "server" to null, thus local copy.
-        Server s = server;
-        s.interrupt();
-        s.join();
-        Log.i(LOGTAG, "Active server stopped");
-      } else Log.i(LOGTAG, "No active server");
-      if (promise != null) promise.resolve(null);
+
+      if (pendingPromise != null) {
+        Errors.INTERNAL_ERROR
+          .reject(pendingPromise, "Unexpected pending promise");
+        return;
+      }
+
+      pendingPromise = promise;
+      server.interrupt();
     } catch (Exception e) {
       Errors.STOP_FAILURE.log(e).reject(promise);
     }

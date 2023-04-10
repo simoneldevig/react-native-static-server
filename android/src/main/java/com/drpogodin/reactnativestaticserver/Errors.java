@@ -8,7 +8,8 @@ public enum Errors {
     "Failed to launch, another server instance is active."),
   FAIL_GET_LOCAL_IP_ADDRESS("Failed to get local IP adddress"),
   FAIL_GET_OPEN_PORT("Failed to get an open port"),
-  LAUNCH_FAILURE("Native server failed to launch"),
+  INTERNAL_ERROR("Internal error"),
+  SERVER_CRASHED("Server crashed"),
   STOP_FAILURE("Failed to gracefully shutdown the server");
 
   private String message;
