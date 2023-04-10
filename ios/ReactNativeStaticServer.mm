@@ -101,6 +101,7 @@ RCT_REMAP_METHOD(start,
     SignalConsumer signalConsumer = ^void(NSString * const signal,
                                           NSString * const details)
     {
+      if (signal != LAUNCHED) self->server = nil;
       if (pendingResolve == nil && pendingReject == nil) {
         [self sendEventWithName:EVENT_NAME
           body: @{
@@ -140,20 +141,17 @@ RCT_REMAP_METHOD(stop,
   try {
     if (self->server) {
       NSLog(@"Stopping...");
+
+      if (pendingResolve != nil || pendingReject != nil) {
+        auto e = [[RNException name:@"Internal error"
+                            details:@"Unexpected pending promise"] log];
+        [e reject:reject];
+        return;
+      }
+
+      pendingResolve = resolve;
+      pendingReject = reject;
       [self->server cancel];
-      // TODO: In Java we do server.join() here to wait for server thread to exit,
-      // can't find counterpart of .join() for NSThread. Probably, there is
-      // another way to do it, and we should use it.
-      // TODO: Though... event if there is no .join(),
-      // we can sync this promise resolution with the actual
-      // server termination the same way we do in .start()
-      // method. Do it! Otherwise this method resolves while
-      // the server is still running, and in some edge-cases
-      // it will lead to crashes, if the user tries to
-      // immediately start a server again after stop() resolved.
-      self->server = NULL;
-      NSLog(@"Stopped");
-      resolve(NULL);
     }
   } catch (NSException *e) {
     [[RNException from:e] reject:reject];
