@@ -1,10 +1,10 @@
 #import "ReactNativeStaticServer.h"
 #import "Server.h"
+#import "Errors.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #include <net/if.h>
 
-static NSString * const ERROR_DOMAIN = @"RNStaticServer";
 static NSString * const EVENT_NAME = @"RNStaticServer";
 
 @implementation ReactNativeStaticServer {
@@ -64,17 +64,15 @@ RCT_REMAP_METHOD(getLocalIpAddress,
     resolve(@"localhost");
   }
   @catch (NSException *e) {
-    // TODO: First, it is probably not the best way to map NSException fields
-    // into NSError object; second, we should adopt approach from Android code,
-    // where there is a dedicated error handling and reporting singletone, which
-    // simplifies such error handling with promise rejection and optional logging.
-    NSError *error = [NSError errorWithDomain:ERROR_DOMAIN code:12345 userInfo:e.userInfo];
-    reject(e.name, e.reason, error);
+    [[RNException from:e] reject:reject];
   }
   @finally {
     freeifaddrs(interfaces);
   }
 }
+
+RCTPromiseResolveBlock pendingResolve = nil;
+RCTPromiseRejectBlock pendingReject = nil;
 
 RCT_REMAP_METHOD(start,
   start:(NSNumber* _Nonnull)serverId
@@ -85,22 +83,25 @@ RCT_REMAP_METHOD(start,
     NSLog(@"Starting the server...");
 
     if (self->server) {
-      NSString *msg = @"Another server instance is active";
-      NSError *e = [NSError
-        errorWithDomain:ERROR_DOMAIN
-        code:12345
-        userInfo:NULL
-      ];
-      NSLog(@"%@", msg);
-      reject(e.domain, msg, e);
+      auto e = [[RNException name:@"Another server instance is active"] log];
+      [e reject:reject];
       return;
     }
 
-    __block BOOL settled = false;
+    if (pendingResolve != nil || pendingReject != nil) {
+      auto e = [[RNException name:@"Internal error"
+                          details:@"Non-expected pending promise"] log];
+      [e reject:reject];
+      return;
+    }
+
+    pendingResolve = resolve;
+    pendingReject = reject;
+
     SignalConsumer signalConsumer = ^void(NSString * const signal,
                                           NSString * const details)
     {
-      if (settled) {
+      if (pendingResolve == nil && pendingReject == nil) {
         [self sendEventWithName:EVENT_NAME
           body: @{
             @"serverId": serverId,
@@ -109,17 +110,14 @@ RCT_REMAP_METHOD(start,
           }
         ];
       } else {
-        settled = true;
-        if (signal == LAUNCHED) {
-          NSLog(@"SERVER LAUNCHED!");
-          resolve(NULL);
-        } else {
-          NSString *msg = @"Launch failure";
-          if (details != nil) {
-            msg = [NSString stringWithFormat:@"%@: %@", msg, details];
-          }
-          reject(ERROR_DOMAIN, msg, NULL);
-        }
+        auto resolve = pendingResolve;
+        auto reject = pendingReject;
+        pendingResolve = nil;
+        pendingReject = nil;
+        if (signal == CRASHED) {
+          [[RNException name:@"Server crashed" details:details]
+           reject:reject];
+        } else resolve(details);
       }
     };
 
@@ -158,9 +156,7 @@ RCT_REMAP_METHOD(stop,
       resolve(NULL);
     }
   } catch (NSException *e) {
-    NSString *msg = @"Failed to stop";
-    NSLog(@"%@", msg);
-    reject(e.name, msg, NULL);
+    [[RNException from:e] reject:reject];
   }
 }
 
@@ -171,7 +167,7 @@ RCT_REMAP_METHOD(getOpenPort,
   @try {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
-      reject(ERROR_DOMAIN, @"Error creating socket", NULL);
+      [[RNException name:@"Error creating socket"] reject:reject];
       return;
     }
 
@@ -184,13 +180,13 @@ RCT_REMAP_METHOD(getOpenPort,
     serv_addr.sin_port = 0;
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-      reject(ERROR_DOMAIN, @"Error binding socket", NULL);
+      [[RNException name:@"Error binding socket"] reject:reject];
       return;
     }
 
     socklen_t len = sizeof(serv_addr);
     if (getsockname(sockfd, (struct sockaddr *) &serv_addr, &len) < 0) {
-      reject(ERROR_DOMAIN, @"Error getting socket name", NULL);
+      [[RNException name:@"Error getting socket name"] reject:reject];
       return;
     }
     int port = ntohs(serv_addr.sin_port);
@@ -199,8 +195,7 @@ RCT_REMAP_METHOD(getOpenPort,
     resolve(@(port));
   }
   @catch (NSException *e) {
-    NSError *error = [NSError errorWithDomain:ERROR_DOMAIN code:12345 userInfo:e.userInfo];
-    reject(e.name, e.reason, error);
+    [[RNException from:e] reject:reject];
   }
 }
 
