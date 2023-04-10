@@ -4,7 +4,7 @@ import java.io.File;
 import java.lang.Runnable;
 import java.lang.System;
 import java.lang.Thread;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import android.util.Log;
 import com.drpogodin.reactnativestaticserver.Errors;
@@ -40,13 +40,13 @@ public class Server extends Thread {
   private static final String LOGTAG = Errors.LOGTAG;
 
   String configPath;
-  private Consumer<String> signalConsumer;
+  private BiConsumer<String,String> signalConsumer;
 
   static public void onLaunchedCallback() {
-    activeServer.signalConsumer.accept(LAUNCHED);
+    activeServer.signalConsumer.accept(LAUNCHED, null);
   }
 
-  public Server(String configPath, Consumer<String> signalConsumer) {
+  public Server(String configPath, BiConsumer<String,String> signalConsumer) {
     this.configPath = configPath;
     this.signalConsumer = signalConsumer;
   }
@@ -68,8 +68,9 @@ public class Server extends Thread {
     Log.i(LOGTAG, "Server.run() triggered");
 
     if (Server.activeServer != null) {
-      Log.e(LOGTAG, "Another Server instance is active");
-      signalConsumer.accept(CRASHED);
+      String msg = "Another Server instance is active";
+      Log.e(LOGTAG, msg);
+      signalConsumer.accept(CRASHED, msg);
       return;
     }
 
@@ -80,10 +81,10 @@ public class Server extends Thread {
         throw new Exception("Native server exited with status " + res);
       }
       Log.i(LOGTAG, "Server terminated gracefully");
-      signalConsumer.accept(TERMINATED);
+      signalConsumer.accept(TERMINATED, null);
     } catch (Exception error) {
       Log.e(LOGTAG, "Server crashed", error);
-      signalConsumer.accept(CRASHED);
+      signalConsumer.accept(CRASHED, error.getMessage());
     } finally {
       activeServer = null;
     }

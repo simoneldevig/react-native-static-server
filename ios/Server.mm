@@ -3,7 +3,7 @@
 Server *activeServer;
 
 void onLaunchedCallback() {
-  activeServer.signalConsumer(LAUNCHED);
+  activeServer.signalConsumer(LAUNCHED, nil);
 }
 
 extern "C" {
@@ -34,8 +34,9 @@ extern "C" {
   NSLog(@"Server.main() triggered");
 
   if (activeServer) {
-    NSLog(@"Another Server instance is active");
-    self.signalConsumer(CRASHED);
+    NSString *msg = @"Another Server instance is active";
+    NSLog(@"%@", msg);
+    self.signalConsumer(CRASHED, msg);
     return;
   }
 
@@ -47,11 +48,11 @@ extern "C" {
     );
     if (res) [NSException raise:@"Server exited with error" format:@"%d", res];
     NSLog(@"Server terminated gracefully");
-    self.signalConsumer(TERMINATED);
+    self.signalConsumer(TERMINATED, nil);
   }
   @catch (NSException *error) {
     NSLog(@"Server crashed %@", error.name);
-    self.signalConsumer(CRASHED);
+    self.signalConsumer(CRASHED, error.name);
   }
   @finally {
     activeServer = NULL;

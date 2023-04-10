@@ -31,7 +31,7 @@ struct ReactNativeModule
     REACT_EVENT(EmitEvent, L"RNStaticServer");
     std::function<void(JSValue)> EmitEvent;
 
-    void sendEvent(std::string signal);
+    void sendEvent(std::string signal, std::string details);
 
     REACT_METHOD(getLocalIpAddress)
     void getLocalIpAddress(React::ReactPromise<React::JSValue>&& result) noexcept;

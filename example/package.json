@@ -12,10 +12,10 @@
   "dependencies": {
     "react": "18.2.0",
     "react-native": "0.71.6",
-    "react-native-device-info": "^10.5.1",
+    "react-native-device-info": "^10.6.0",
     "react-native-fs": "^2.20.0",
-    "react-native-webview": "^12.0.0",
-    "react-native-windows": "0.71.4"
+    "react-native-webview": "^12.0.2",
+    "react-native-windows": "0.71.5"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",

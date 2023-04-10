@@ -391,23 +391,40 @@ within `options` argument:
 - `port` &mdash; **number** &mdash; Optional. The port at which to start the server.
   If 0 (default) an available port will be automatically selected.
 
-- `stopInBackground` &mdash; **boolean** &mdash; Optional. By default, server intents
-  to keep working as usual when app enters background / returns to foreground.
-  Setting this flag **true** will cause an active server to automatically stop
-  each time the app transitions to background, and then automatically restart
-  once the app re-enters foreground. Note that calling [.stop()] explicitly
-  will stop the server for good&nbsp;&mdash; no matter `stopInBackground` value;
+- `stopInBackground` &mdash; **boolean** &mdash; Optional.
+
+  By default, the server continues to work as usual when its host app enters
+  the background / returns to the foreground (better say, by default, it does
+  not attempt anything special in these situations, but the host OS may kill or
+  restrict it in the background forcefully, depending on OS and app configs).
+
+  With this flag set **true**, an active server will stop automatically each
+  time the app enters the background, and then automatically launch again each
+  time the app re-enters the foreground. Note that calling [.stop()] explicitly
+  will stop the server for good&nbsp;&mdash; no matter `stopInBackground` value,
   once [.stop()] is called the server won't restart automatically unless you
   explicitly [.start()] it again.
+
+  To faciliate debugging, when a server starts / stops automatically because of
+  the `stopInBackground` option and app transitions between the foreground and
+  the background; the corresponding `STARTING` and `STOPPING` messages emitted
+  to the server state listeners (see [.addStateListener()]) will have their
+  `details` values set equal "_App entered background_",
+   and "_App entered foreground_" strings.
 
 #### .addStateListener()
 [.addStateListener()]: #addstatelistener
 ```ts
-server.addStateListener(listener: callback): function;
+server.addStateListener(listener: StateListener): Unsubscribe;
+
+// where StateListener and Unsubscribe signatures are:
+type StateListener = (state: string, details: string) => void;
+type UnsubscribeFunction = () => void;
 ```
 Adds given state listener to the server instance. The listener will be called
-each time the server state changes with a single argument passed in, the new
-state, which will be one of [STATES] values.
+each time the server state changes, with two string arguments passed in &mdash;
+the new state (one of [STATES] values), and details about the state change
+reason, if any can be provided.
 
 This method also returns "unsubscribe" function, call it to remove added
 listener from the server instance.
@@ -415,7 +432,7 @@ listener from the server instance.
 #### .start()
 [.start()]: #start
 ```ts
-server.start(): Promise<string>
+server.start(details?: string): Promise<string>
 ```
 Starts [Server] instance. It returns a [Promise], which resolves
 to the server's [origin][.origin] once the server reaches `ACTIVE`
@@ -429,6 +446,11 @@ if `CRASHED`, it attempts a new start of the server; otherwise (`STARTING` or
 `STOPPING`), it will wait until the server reaches one of resulting states
 (`ACTIVE`, `CRASHED`, or `INACTIVE`), then acts accordingly.
 
+The optional `details` argument, if provided, will be added to
+the `STARTING` message emitted to the server state change listeners
+(see [.addStateListener()]) in the beginning of this method, if the server
+launch is necessary.
+
 **BEWARE:** With the current library version, at most one server instance can be
 active within an app at any time. Calling [.start()] when another server instance
 is running will result in the start failure and `CRASHED` state. See also
@@ -437,7 +459,7 @@ is running will result in the start failure and `CRASHED` state. See also
 #### .stop()
 [.stop()]: #stop
 ```ts
-server.stop(): Promise<>
+server.stop(details?: string): Promise<>
 ```
 Gracefully shuts down the server. It returns a [Promise] which resolve once
 the server is shut down, _i.e._ reached `INACTIVE` [state](.state). The promise
@@ -455,6 +477,11 @@ of the server, if one is scheduled by `pauseInBackground` option, as mentioned
 above. If it is `STARTING` or `STOPPING`, this method will wait till server
 reaching another state (`ACTIVE`, `INACTIVE` or `CRASHED`), then it will act
 accordingly.
+
+The optional `details` argument, if provided, will be added to
+the `STARTING` message emitted to the server state change listeners
+(see [.addStateListener()]) in the beginning of this method, if the server
+launch is necessary.
 
 #### .fileDir
 [.fileDir]: #filedir

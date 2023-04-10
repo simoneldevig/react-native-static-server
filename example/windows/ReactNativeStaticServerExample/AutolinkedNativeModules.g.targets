@@ -6,6 +6,10 @@
     <ProjectReference Include="$(ProjectDir)..\..\..\windows\ReactNativeStaticServer\ReactNativeStaticServer.vcxproj">
       <Project>{262a7409-f396-49eb-9f4c-c2f13fc27d5e}</Project>
     </ProjectReference>
+    <!-- Projects from react-native-device-info -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-device-info\windows\RNDeviceInfoCPP\RNDeviceInfoCPP.vcxproj">
+      <Project>{3e3931f2-4735-4417-8cb0-33668a7314d6}</Project>
+    </ProjectReference>
     <!-- Projects from react-native-webview -->
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj">
       <Project>{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}</Project>

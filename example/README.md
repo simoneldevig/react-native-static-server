@@ -7,7 +7,22 @@ demonstrates a few optional features relevant to such example, like messaging
 between the native app and a web app inside [react-native-webview], and opening
 selected web app links separately in the system browser app.
 
-To run it follow the usual RN drill:
+**BEWARE:** To facilitate library development needs, this example is set up
+differently from a real project &mdash; instead of consuming library code from
+a node module installed from NPM, this example consumes the library from its
+parent folder. Because of this, be sure to execute in the parent folder:
+```shell
+# This might be not strictly needed, but good to be consistent with
+# the usual environment of the example during library development.
+npm install
+
+# This clones and checks out the source code for PCRE2 and Lighttpd,
+# which would be already packed into the library package from NPM.
+git submodule update --init --recursive
+```
+
+With parent folder dependencies taken care of, follow the usual RN drill
+to prepare and run the example:
 - `npm install`
 - `npm start`
 - On **Android**:

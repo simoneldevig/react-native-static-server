@@ -14,7 +14,7 @@ ReactNativeModule* mod;
 React::ReactPromise<::React::JSValue>* pendingResult;
 Server *server;
 
-void OnSignal(std::string signal) {
+void OnSignal(std::string signal, std::string details) {
     if (signal == CRASHED || signal == TERMINATED) {
         delete server;
         server = NULL;
@@ -25,8 +25,7 @@ void OnSignal(std::string signal) {
         if (signal == CRASHED) RNException("Server crashed").reject(*result);
         else result->Resolve(NULL);
         delete result;
-    }
-    mod->sendEvent(signal);
+    } else mod->sendEvent(signal, details);
 }
 
 ReactNativeStaticServerSpec_Constants ReactNativeModule::GetConstants() noexcept {
@@ -86,10 +85,11 @@ void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result
     RNException("Failed to get an open port").reject(result);
 }
 
-void ReactNativeModule::sendEvent(std::string signal) {
+void ReactNativeModule::sendEvent(std::string signal, std::string details) {
     JSValueObject obj = JSValueObject{
             {"serverId", activeServerId},
             {"event", signal},
+            {"details", details}
     };
     this->EmitEvent(std::move(obj));
 }
