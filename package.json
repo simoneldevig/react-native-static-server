@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "HTTP static file server for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -40,7 +40,7 @@
   "title": "React Native Static Server",
   "devDependencies": {
     "@react-native-community/eslint-config": "^3.2.0",
-    "@types/react": "^18.0.34",
+    "@types/react": "^18.0.35",
     "@types/jest": "^29.5.0",
     "del-cli": "^5.0.0",
     "eslint": "^8.38.0",
