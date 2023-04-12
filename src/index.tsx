@@ -28,7 +28,10 @@ nativeEventEmitter.addListener(
     if (server) {
       switch (event) {
         case SIGNALS.CRASHED:
-          server._setState(STATES.CRASHED, details);
+          // TODO: We probably can, and should, capture the native stack trace
+          // and pass it along with the error.
+          const error = Error(details);
+          server._setState(STATES.CRASHED, details, error);
           // TODO: Should we do here the following?
           // delete servers[this._id];
           break;
@@ -246,9 +249,9 @@ class StaticServer {
     return this._state;
   }
 
-  _setState(neu: STATES, details: string = '') {
+  _setState(neu: STATES, details: string = '', error?: Error) {
     this._state = neu;
-    this._stateChangeEmitter.emit(neu, details);
+    this._stateChangeEmitter.emit(neu, details, error);
   }
 
   /**
@@ -284,7 +287,9 @@ class StaticServer {
     this._fileDir = fileDir;
   }
 
-  addStateListener(listener: (newState: STATES, details: string) => void) {
+  addStateListener(
+    listener: (newState: STATES, details: string, error?: Error) => void,
+  ) {
     return this._stateChangeEmitter.addListener(listener);
   }
 
@@ -366,8 +371,9 @@ class StaticServer {
       this._removeConfigFile();
       return this._origin;
     } catch (e: any) {
-      this._setState(STATES.CRASHED, e.message);
-      throw e;
+      const error = e instanceof Error ? e : Error(e.message, { cause: e });
+      this._setState(STATES.CRASHED, error.message, error);
+      throw error;
     } finally {
       this._sem.setReady(true);
     }
@@ -394,8 +400,9 @@ class StaticServer {
       await ReactNativeStaticServer.stop();
       this._setState(STATES.INACTIVE);
     } catch (e: any) {
-      this._setState(STATES.CRASHED);
-      throw e;
+      const error = e instanceof Error ? e : Error(e.message, { cause: e });
+      this._setState(STATES.CRASHED, error.message, error);
+      throw error;
     } finally {
       delete servers[this._id];
       this._sem.setReady(true);
