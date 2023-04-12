@@ -90,7 +90,7 @@ export default function App() {
         }
       }
 
-      server?.addStateListener((newState, details) => {
+      server?.addStateListener((newState, details, error) => {
         // Depending on your use case, you may want to use such callback
         // to implement a logic which prevents other pieces of your app from
         // sending any requests to the server when it is inactive.
@@ -103,6 +103,7 @@ export default function App() {
           `New server state is "${STATES[newState]}".`,
           `Details: "${details}".`,
         );
+        if (error) console.error(error);
       });
       const res = await server?.start();
       if (res && server) {

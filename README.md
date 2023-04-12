@@ -12,6 +12,7 @@ and [old][Old Architecture] RN architectures.
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
+[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [example app]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
 [Expo]: https://expo.dev
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
@@ -418,15 +419,18 @@ within `options` argument:
 server.addStateListener(listener: StateListener): Unsubscribe;
 
 // where StateListener and Unsubscribe signatures are:
-type StateListener = (state: string, details: string) => void;
+type StateListener = (state: string, details: string, error?: Error) => void;
 type UnsubscribeFunction = () => void;
 ```
 Adds given state listener to the server instance. The listener will be called
-each time the server state changes, with two string arguments passed in &mdash;
-the new state (one of [STATES] values), and details about the state change
-reason, if any can be provided.
+each time the server state changes, with the following arguments:
+- `state` &mdash; **string** &mdash; The new state, one of [STATES] values.
+- `details` &mdash; **string** &mdash; Additional details about the state change,
+  if any can be provided; an empty string otherwise.
+- `error` &mdash; [Error] &mdash; If server instance crashes, this will be
+  the related error object; otherwise undefined.
 
-This method also returns "unsubscribe" function, call it to remove added
+This method returns "unsubscribe" function, call it to remove added
 listener from the server instance.
 
 #### .start()
