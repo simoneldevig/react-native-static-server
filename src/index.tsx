@@ -8,10 +8,13 @@ import {
 
 import RNFS from 'react-native-fs';
 
+import { newStandardConfigFile, type ErrorLogOptions } from './config';
 import { SIGNALS, STATES } from './constants';
 import ReactNativeStaticServer from './ReactNativeStaticServer';
 import Semaphore from './Semaphore';
 import Emitter from './Emitter';
+
+export { ERROR_LOG_FILE, UPLOADS_DIR, WORK_DIR } from './config';
 
 export { STATES };
 
@@ -58,122 +61,6 @@ function isAbsolutePath(path: string): boolean {
   return path.startsWith('/') || path.startsWith('file:///');
 }
 
-// TODO: This should go into a dedicated .ts file, to make it easy to refer
-// to the default config we use from documentation, and also to not pollute
-// with lighttpd configuration other .ts files with actual business logic.
-/**
- * Creates a temporary file with standard configuration for Lighttpd,
- * with just a few most important config values taken from the caller.
- * @param fileDir
- * @param hostname
- * @param port
- * @return {Promise<string>} Resolves to the name of the created config file.
- */
-async function generateConfig(
-  fileDir: string,
-  hostname: string,
-  port: number,
-): Promise<string> {
-  const workDir = `${RNFS.TemporaryDirectoryPath}/__rn-static-server__`;
-  await RNFS.mkdir(`${workDir}/uploads`);
-  const configFile = `${workDir}/config-${Date.now()}.txt`;
-  await RNFS.writeFile(
-    configFile,
-    `server.document-root = "${fileDir}"
-    server.bind = "${hostname}"
-    server.errorlog-use-syslog = "enable"
-    server.upload-dirs = ( "${workDir}/uploads" )
-    server.port = ${port}
-    # debug.log-file-not-found = "enable"
-    # debug.log-request-handling = "enable"
-    # server.errorlog = "${workDir}/errors.txt"
-    index-file.names += ("index.xhtml", "index.html", "index.htm", "default.htm", "index.php")
-    mimetype.assign = (
-      # These are default types from https://redmine.lighttpd.net/projects/lighttpd/wiki/Mimetype_assignDetails
-
-      ".epub" => "application/epub+zip",
-      ".ncx" => "application/xml",
-      ".pdf" => "application/pdf",
-      ".sig" => "application/pgp-signature",
-      ".spl" => "application/futuresplash",
-      ".class" => "application/octet-stream",
-      ".ps" => "application/postscript",
-      ".torrent" => "application/x-bittorrent",
-      ".dvi" => "application/x-dvi",
-      ".gz" => "application/x-gzip",
-      ".pac" => "application/x-ns-proxy-autoconfig",
-      ".swf" => "application/x-shockwave-flash",
-      ".tar.gz" => "application/x-tgz",
-      ".tgz"          =>      "application/x-tgz",
-      ".tar"          =>      "application/x-tar",
-      ".zip"          =>      "application/zip",
-      ".mp3"          =>      "audio/mpeg",
-      ".m3u"          =>      "audio/x-mpegurl",
-      ".wma"          =>      "audio/x-ms-wma",
-      ".wax"          =>      "audio/x-ms-wax",
-      ".ogg"          =>      "application/ogg",
-      ".wav"          =>      "audio/x-wav",
-      ".gif"          =>      "image/gif",
-      ".jpg"          =>      "image/jpeg",
-      ".jpeg"         =>      "image/jpeg",
-      ".png"          =>      "image/png",
-      ".xbm"          =>      "image/x-xbitmap",
-      ".xpm"          =>      "image/x-xpixmap",
-      ".xwd"          =>      "image/x-xwindowdump",
-      ".css"          =>      "text/css; charset=utf-8",
-      ".html"         =>      "text/html",
-      ".htm"          =>      "text/html",
-      ".js"           =>      "text/javascript",
-      ".asc"          =>      "text/plain; charset=utf-8",
-      ".c"            =>      "text/plain; charset=utf-8",
-      ".cpp"          =>      "text/plain; charset=utf-8",
-      ".log"          =>      "text/plain; charset=utf-8",
-      ".conf"         =>      "text/plain; charset=utf-8",
-      ".text"         =>      "text/plain; charset=utf-8",
-      ".txt"          =>      "text/plain; charset=utf-8",
-      ".spec"         =>      "text/plain; charset=utf-8",
-      ".dtd"          =>      "text/xml",
-      ".xml"          =>      "text/xml",
-      ".mpeg"         =>      "video/mpeg",
-      ".mpg"          =>      "video/mpeg",
-      ".mov"          =>      "video/quicktime",
-      ".qt"           =>      "video/quicktime",
-      ".avi"          =>      "video/x-msvideo",
-      ".asf"          =>      "video/x-ms-asf",
-      ".asx"          =>      "video/x-ms-asf",
-      ".wmv"          =>      "video/x-ms-wmv",
-      ".bz2"          =>      "application/x-bzip",
-      ".tbz"          =>      "application/x-bzip-compressed-tar",
-      ".tar.bz2" =>      "application/x-bzip-compressed-tar",
-      ".odt" => "application/vnd.oasis.opendocument.text",
-      ".ods" => "application/vnd.oasis.opendocument.spreadsheet",
-      ".odp" => "application/vnd.oasis.opendocument.presentation",
-      ".odg" => "application/vnd.oasis.opendocument.graphics",
-      ".odc" => "application/vnd.oasis.opendocument.chart",
-      ".odf" => "application/vnd.oasis.opendocument.formula",
-      ".odi" => "application/vnd.oasis.opendocument.image",
-      ".odm" => "application/vnd.oasis.opendocument.text-master",
-      ".opf" => "application/oebps-package+xml",
-      ".ott" => "application/vnd.oasis.opendocument.text-template",
-      ".ots" => "application/vnd.oasis.opendocument.spreadsheet-template",
-      ".otp" => "application/vnd.oasis.opendocument.presentation-template",
-      ".otg" => "application/vnd.oasis.opendocument.graphics-template",
-      ".otc" => "application/vnd.oasis.opendocument.chart-template",
-      ".otf" => "font/otf",
-      ".oti" => "application/vnd.oasis.opendocument.image-template",
-      ".oth" => "application/vnd.oasis.opendocument.text-web",
-      ".svg" => "image/svg+xml",
-      ".ttf" => "font/ttf",
-      ".xhtml" => "application/xhtml+xml",
-
-    # make the default mime type application/octet-stream.
-      ""     => "application/octet-stream",
-    )`,
-    'utf8',
-  );
-  return configFile;
-}
-
 // TODO: The idea for later implementation is to allow users to provide their
 // own lighttpd config files with completely custom configuration. To do so,
 // we'll probably split StaticServer class in two: the BaseServer will run
@@ -191,6 +78,7 @@ class StaticServer {
   // and: https://github.com/birdofpreyru/react-native-static-server/issues/9
   _appStateSub?: NativeEventSubscription;
   _configPath?: string;
+  _errorLog?: ErrorLogOptions;
   _fileDir: string;
   _hostname = '';
 
@@ -219,6 +107,10 @@ class StaticServer {
   // It is used to serialize state change requests, thus ensuring that parallel
   // requests to start / stop the server won't result in a corrupt state.
   _sem = new Semaphore(true);
+
+  get errorLog(): false | ErrorLogOptions {
+    return this._errorLog || false;
+  }
 
   get fileDir() {
     return this._fileDir;
@@ -262,6 +154,7 @@ class StaticServer {
    * Creates a new Server instance.
    */
   constructor({
+    errorLog = false,
     fileDir,
     hostname = 'localhost',
 
@@ -270,6 +163,7 @@ class StaticServer {
     port = 0,
     stopInBackground = false,
   }: {
+    errorLog?: boolean | ErrorLogOptions;
     fileDir: string;
     hostname?: string;
 
@@ -278,6 +172,8 @@ class StaticServer {
     port?: number;
     stopInBackground?: boolean;
   }) {
+    if (errorLog) this._errorLog = errorLog === true ? {} : errorLog;
+
     this._nonLocal = nonLocal;
     this._hostname = nonLocal && hostname === 'localhost' ? '' : hostname;
 
@@ -361,11 +257,12 @@ class StaticServer {
       }
 
       await this._removeConfigFile();
-      this._configPath = await generateConfig(
-        this._fileDir,
-        this._hostname,
-        this._port,
-      );
+      this._configPath = await newStandardConfigFile({
+        errorLog: this._errorLog,
+        fileDir: this._fileDir,
+        hostname: this._hostname,
+        port: this._port,
+      });
 
       // Native implementations of .start() method must resolve only once
       // the server has been launched (ready to handle incoming requests).

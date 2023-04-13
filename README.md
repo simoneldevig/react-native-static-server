@@ -30,7 +30,6 @@ and [old][Old Architecture] RN architectures.
 - [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
 - [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
 
-
 ## Getting Started
 [Getting Started]: #getting-started
 
@@ -280,6 +279,8 @@ outside platform-specific sub-folders.
     ```
 
 ## Reference
+- [ERROR_LOG_FILE] &mdash; Location of the error log file.
+- [ErrorLogOptions] &mdash; Options for error logging.
 - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
   (Android-specific).
 - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
@@ -299,10 +300,45 @@ outside platform-specific sub-folders.
   - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
     [constructor()].
 - [STATES] &mdash; Enumerates possible states of [Server] instance.
+- [UPLOADS_DIR] &mdash; Location for uploads.
+- [WORK_DIR] &mdash; Location of the working files.
+
+### ERROR_LOG_FILE
+[ERROR_LOG_FILE]: #error_log_file
+```ts
+import {ERROR_LOG_FILE} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location of the error log file
+(see `errorLog` option of Server's [constructor()]). The actual value is
+"[WORK_DIR]`/errorlog.txt`" &mdash; all server instances within an app output
+their logs, when opted, into the same file; and it is up to the host app
+to purge this file when needed.
+
+### ErrorLogOptions
+[ErrorLogOptions]: #errorlogoptions
+```ts
+import {type ErrorLogOptions} from '@dr.pogodin/react-native-static-server';
+```
+The type of `errorLog` option of the Server's [constructor()]. It describes an
+object with the following optional boolean flags; each of them enables
+the similarly named
+[Lighttpd debug option](https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables):
+- `conditionCacheHandling` &mdash; **boolean** &mdash; Optional.
+- `conditionHandling` &mdash; **boolean** &mdash; Optional.
+- `fileNotFound` &mdash; **boolean** &mdash; Optional.
+- `requestHandling` &mdash; **boolean** &mdash; Optional.
+- `requestHeader` &mdash; **boolean** &mdash; Optional.
+- `requestHeaderOnError` &mdash; **boolean** &mdash; Optional.
+- `responseHeader` &mdash; **boolean** &mdash; Optional.
+- `sslNoise` &mdash; **boolean** &mdash; Optional.
+- `timeouts` &mdash; **boolean** &mdash; Optional.
+
+Without any flag set the server instance will still output very basic state
+and error messages into the log file.
 
 ### extractBundledAssets()
 [extractBundledAssets()]: #extractbundledassets
-```jsx
+```ts
 import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
 
 extractBundledAssets(into, from): Promise<>;
@@ -365,6 +401,19 @@ within `options` argument:
   path; however, empty `fileDir` value is forbidden: if you really want to serve
   entire documents directory of the app, provide its absolute path explicitly.
 
+- `errorLog` &mdash; **boolean** | [ErrorLogOptions] &mdash; Optional.
+  If set **true** (treated equivalent to `{}`) the server instance will
+  output basic server state and error logs from the Lighttpd native core
+  into the [ERROR_LOG_FILE]. Passing in an [ErrorLogOptions] object with
+  additional flags allows to add additional debug output from Lighttpd core
+  into the log file. Default value is **false**, in which case the server
+  instance only outputs basic server state and error logs into the OS
+  system log; note that enabling the file logging with this option disables
+  the logging into the system log.
+
+  **BEWARE:** If you opt for file logging with this option, it is up to you
+  to control and purge the [ERROR_LOG_FILE] as needed.
+
 - `hostname` &mdash; **string** &mdash; Optional. Sets the address for server
   to bind to.
   - By default, if `nonLocal` option is **false**, `hostname` is set equal
@@ -385,7 +434,7 @@ within `options` argument:
   and it is only accessible within the host app. With this flag set **true**
   the server will be started on an IP adress also accessible from outside the app.
 
-  _NOTE: When `hostname` option is set to a value different from "`localhost",
+  _NOTE: When `hostname` option is set to a value different from "`localhost`",
   the `nonLocal` option is ignored. The plan is to deprecate `nonLocal` option
   in future, in favour of special `hostname` values supporting the current
   `nonLocal` functionality._
@@ -585,6 +634,26 @@ human-readable names used above, _i.e._
 console.log(STATES.ACTIVE); // Logs: 0
 console.log(STATES[0]);     // Logs: ACTIVE
 ```
+
+### UPLOADS_DIR
+[UPLOADS_DIR]: #uploads_dir
+```ts
+import {UPLOADS_DIR} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location where all server instances
+within an app keep any uploads to the server. The actual value is
+"[WORK_DIR]`/uploads`".
+
+### WORK_DIR
+[WORK_DIR]: #work_dir
+```ts
+import {WORK_DIR} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location where all server instances
+within an app keep their working files (configs, logs, uploads). The actual
+value is "**RNFS.TemporaryDirectoryPath**`/__rn-static-server__`",
+where **RNFS.TemporaryDirectoryPath** is the temporary directory path for
+the app as reported by the [react-native-fs] library.
 
 ## Project History and Roadmap
 
