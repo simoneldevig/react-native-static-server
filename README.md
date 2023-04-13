@@ -28,7 +28,7 @@ and [old][Old Architecture] RN architectures.
   - [Notable Versions of the Library]
   - [Roadmap]
 - [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
-- [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
+- [Migration from Older Versions (v0.6, v0.5) to v0.7](#migration-from-older-versions-v06-v05-to-v07)
 
 ## Getting Started
 [Getting Started]: #getting-started
@@ -724,7 +724,7 @@ the top priority, to the least priority):
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
 
-## Migration from Older Versions (v0.6, v0.5)
+## Migration from Older Versions (v0.6, v0.5) to v0.7
 
 - On **Android** it now requires `minSdkVersion` to be set in equal 28 or larger
   (in `build.gradle` file). Also, now it is not supported to start more than one
@@ -757,7 +757,7 @@ See [OLD-README.md](./OLD-README.md)
     of server in background allows more advanced usage scenario.
 
 - The new server implementation relies on app's temporary data folder to store
-  some internal files (all within its `__rn-static-server__` subfolder), don't
-  mess with it if you do anything special with the temporary folder.
+  internal files (all within its [WORK_DIR]), don't mess with it if you do
+  anything special with the temporary folder.
 
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
