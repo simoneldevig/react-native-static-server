@@ -63,6 +63,7 @@ export default function App() {
     // thus signalling that server init sequence below should be aborted, if it
     // is still underway.
     let server: null | Server = new Server({ fileDir, stopInBackground: true });
+    const serverId = server.id;
 
     (async () => {
       // On Android we should extract web server assets from the application
@@ -100,7 +101,8 @@ export default function App() {
         // because `STATES` contains both forward and backward mapping
         // between state names and corresponding numeric values.
         console.log(
-          `New server state is "${STATES[newState]}".`,
+          `Server #${serverId}.\n`,
+          `New state: "${STATES[newState]}".\n`,
           `Details: "${details}".`,
         );
         if (error) console.error(error);

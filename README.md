@@ -291,6 +291,7 @@ outside platform-specific sub-folders.
   - [.stop()] &mdash; Stops the server.
   - [.fileDir] &mdash; Holds absolute path to static assets on target device.
   - [.hostname] &mdash; Holds the hostname used by server.
+  - [.id] &mdash; Hold unique ID of the server instance.
   - [.nonLocal] &mdash; Holds `nonLocal` value provided to [constructor()].
   - [.origin] &mdash; Holds server origin.
   - [.port] &mdash; Holds the port used by server.
@@ -506,6 +507,22 @@ will equal "`localhost`" from the beginning. Otherwise, it will be empty string
 till the first launch of server instance, after which it will be equal to IP
 address automatically selected for the server. This IP address won't change
 upon subsequent re-starts of the server.
+
+#### .id
+[.id]: #id
+```ts
+server.id: number;
+```
+Readonly. It holds unique ID number of the server instance, which is used
+internally for communication between JS an native layers, and also exposed
+to the library consumer, for debug.
+
+**BEWARE:** In the current library implementation, this ID is generated simply
+as `Date.now() % 65535`, which is not random, and not truly unique &mdash;
+the ID collision probability across different server instances is high.
+This should be fine as long as you don't create many server instances in your
+app, and don't rely on the uniqueness of these IDs across different app launches.
+Switching to real UUIDs is on radar, but not the highest priority for now.
 
 #### .nonLocal
 [.nonLocal]: #nonlocal

@@ -228,6 +228,10 @@ class StaticServer {
     return this._hostname;
   }
 
+  get id() {
+    return this._id;
+  }
+
   /** @deprecated */
   get nonLocal() {
     return this._nonLocal;
