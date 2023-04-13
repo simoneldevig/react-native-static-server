@@ -284,6 +284,7 @@ outside platform-specific sub-folders.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
   - [.start()] &mdash; Launches the server.
   - [.stop()] &mdash; Stops the server.
+  - [.errorLog] &mdash; Holds `errorLog` configuration.
   - [.fileDir] &mdash; Holds absolute path to static assets on target device.
   - [.hostname] &mdash; Holds the hostname used by server.
   - [.id] &mdash; Hold unique ID of the server instance.
@@ -467,6 +468,17 @@ The optional `details` argument, if provided, will be added to
 the `STARTING` message emitted to the server state change listeners
 (see [.addStateListener()]) in the beginning of this method, if the server
 launch is necessary.
+
+#### .errorLog
+[.errorLog]: #errorlog
+```ts
+server.errorLog: false | ErrorLogOptions;
+```
+Readonly property. It holds the error log configuration, opted for at the time
+of this server instance [construction][constructor()]. Note, it will be `{}`
+if `errorLog` option of [constructor()] was set **true**; and it will be
+**false** (default) if `errorLog` option was omitted in the [constructor()]
+call.
 
 #### .fileDir
 [.fileDir]: #filedir
