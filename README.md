@@ -279,12 +279,6 @@ outside platform-specific sub-folders.
     ```
 
 ## Reference
-- [ERROR_LOG_FILE] &mdash; Location of the error log file.
-- [ErrorLogOptions] &mdash; Options for error logging.
-- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
-  (Android-specific).
-- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
-  server instance, if any.
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
@@ -299,78 +293,15 @@ outside platform-specific sub-folders.
   - [.state] &mdash; Holds the current server state.
   - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
     [constructor()].
+- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
+  (Android-specific).
+- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+  server instance, if any.
+- [ERROR_LOG_FILE] &mdash; Location of the error log file.
 - [STATES] &mdash; Enumerates possible states of [Server] instance.
 - [UPLOADS_DIR] &mdash; Location for uploads.
 - [WORK_DIR] &mdash; Location of the working files.
-
-### ERROR_LOG_FILE
-[ERROR_LOG_FILE]: #error_log_file
-```ts
-import {ERROR_LOG_FILE} from '@dr.pogodin/react-native-static-server';
-```
-Constant **string**. It holds the filesystem location of the error log file
-(see `errorLog` option of Server's [constructor()]). The actual value is
-"[WORK_DIR]`/errorlog.txt`" &mdash; all server instances within an app output
-their logs, when opted, into the same file; and it is up to the host app
-to purge this file when needed.
-
-### ErrorLogOptions
-[ErrorLogOptions]: #errorlogoptions
-```ts
-import {type ErrorLogOptions} from '@dr.pogodin/react-native-static-server';
-```
-The type of `errorLog` option of the Server's [constructor()]. It describes an
-object with the following optional boolean flags; each of them enables
-the similarly named
-[Lighttpd debug option](https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables):
-- `conditionCacheHandling` &mdash; **boolean** &mdash; Optional.
-- `conditionHandling` &mdash; **boolean** &mdash; Optional.
-- `fileNotFound` &mdash; **boolean** &mdash; Optional.
-- `requestHandling` &mdash; **boolean** &mdash; Optional.
-- `requestHeader` &mdash; **boolean** &mdash; Optional.
-- `requestHeaderOnError` &mdash; **boolean** &mdash; Optional.
-- `responseHeader` &mdash; **boolean** &mdash; Optional.
-- `sslNoise` &mdash; **boolean** &mdash; Optional.
-- `timeouts` &mdash; **boolean** &mdash; Optional.
-
-Without any flag set the server instance will still output very basic state
-and error messages into the log file.
-
-### extractBundledAssets()
-[extractBundledAssets()]: #extractbundledassets
-```ts
-import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
-
-extractBundledAssets(into, from): Promise<>;
-```
-Extracts bundled assets into the specified regular folder, preserving asset
-folder structure, and overwriting any conflicting files in the destination.
-
-This is an Android-specific function; it does nothing on other platforms.
-
-**Arguments**
-- `into` &mdash; **string** &mdash; Optional. The destination folder for
-  extracted assets. By default assets are extracted into the app's document
-  folder.
-- `from` &mdash; **string** &mdash; Optional. Relative path to the root asset
-  folder, starting from which all assets contained in that folder and its
-  sub-folders will be extracted into the destination folder, preserving asset
-  folder structure. By default all bundled assets are extracted.
-
-**Returns** [Promise] which resolves once the extraction is completed.
-
-### getActiveServer()
-[getActiveServer()]: #getactiveserver
-```js
-import {getActiveServer} from '@dr.pogodin/react-native-static-server';
-
-getActiveServer(): Server;
-```
-Returns currently active, starting, or stopping [Server] instance, if any exist
-in the app. It does not return, however, any inactive server instance which has
-been stopped automatically because of `stopInBackground` option, when the app
-entered background, and might be automatically started in future if the app
-enters foreground again prior to an explicit [.stop()] call for that instance.
+- [ErrorLogOptions] &mdash; Options for error logging.
 
 ### Server
 [Server]: #server
@@ -616,6 +547,53 @@ server.stopInBackground: boolean;
 ```
 Readonly property. It holds `stopInBackground` value provided to [constructor()].
 
+### extractBundledAssets()
+[extractBundledAssets()]: #extractbundledassets
+```ts
+import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
+
+extractBundledAssets(into, from): Promise<>;
+```
+Extracts bundled assets into the specified regular folder, preserving asset
+folder structure, and overwriting any conflicting files in the destination.
+
+This is an Android-specific function; it does nothing on other platforms.
+
+**Arguments**
+- `into` &mdash; **string** &mdash; Optional. The destination folder for
+  extracted assets. By default assets are extracted into the app's document
+  folder.
+- `from` &mdash; **string** &mdash; Optional. Relative path to the root asset
+  folder, starting from which all assets contained in that folder and its
+  sub-folders will be extracted into the destination folder, preserving asset
+  folder structure. By default all bundled assets are extracted.
+
+**Returns** [Promise] which resolves once the extraction is completed.
+
+### getActiveServer()
+[getActiveServer()]: #getactiveserver
+```js
+import {getActiveServer} from '@dr.pogodin/react-native-static-server';
+
+getActiveServer(): Server;
+```
+Returns currently active, starting, or stopping [Server] instance, if any exist
+in the app. It does not return, however, any inactive server instance which has
+been stopped automatically because of `stopInBackground` option, when the app
+entered background, and might be automatically started in future if the app
+enters foreground again prior to an explicit [.stop()] call for that instance.
+
+### ERROR_LOG_FILE
+[ERROR_LOG_FILE]: #error_log_file
+```ts
+import {ERROR_LOG_FILE} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location of the error log file
+(see `errorLog` option of Server's [constructor()]). The actual value is
+"[WORK_DIR]`/errorlog.txt`" &mdash; all server instances within an app output
+their logs, when opted, into the same file; and it is up to the host app
+to purge this file when needed.
+
 ### STATES
 [STATES]: #states
 ```js
@@ -654,6 +632,28 @@ within an app keep their working files (configs, logs, uploads). The actual
 value is "**RNFS.TemporaryDirectoryPath**`/__rn-static-server__`",
 where **RNFS.TemporaryDirectoryPath** is the temporary directory path for
 the app as reported by the [react-native-fs] library.
+
+### ErrorLogOptions
+[ErrorLogOptions]: #errorlogoptions
+```ts
+import {type ErrorLogOptions} from '@dr.pogodin/react-native-static-server';
+```
+The type of `errorLog` option of the Server's [constructor()]. It describes an
+object with the following optional boolean flags; each of them enables
+the similarly named
+[Lighttpd debug option](https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables):
+- `conditionCacheHandling` &mdash; **boolean** &mdash; Optional.
+- `conditionHandling` &mdash; **boolean** &mdash; Optional.
+- `fileNotFound` &mdash; **boolean** &mdash; Optional.
+- `requestHandling` &mdash; **boolean** &mdash; Optional.
+- `requestHeader` &mdash; **boolean** &mdash; Optional.
+- `requestHeaderOnError` &mdash; **boolean** &mdash; Optional.
+- `responseHeader` &mdash; **boolean** &mdash; Optional.
+- `sslNoise` &mdash; **boolean** &mdash; Optional.
+- `timeouts` &mdash; **boolean** &mdash; Optional.
+
+Without any flag set the server instance will still output very basic state
+and error messages into the log file.
 
 ## Project History and Roadmap
 
