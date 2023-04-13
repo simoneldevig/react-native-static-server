@@ -709,6 +709,11 @@ applications.
 ### Roadmap
 [Roadmap]: #roadmap
 
+**NOTE:** _With an appropriate financial contribution you can influence
+the roadmap&nbsp;&mdash; the aims, priorities, and timelines for this
+library&nbsp;&mdash; everything can be adjusted for the needs of a paying
+customer._
+
 These are future development aims, ordered by their current priority (from
 the top priority, to the least priority):
 
