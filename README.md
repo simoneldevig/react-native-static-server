@@ -28,8 +28,7 @@ and [old][Old Architecture] RN architectures.
   - [Notable Versions of the Library]
   - [Roadmap]
 - [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
-- [Migration from Older Versions (v0.6, v0.5)](#migration-from-older-versions-v06-v05)
-
+- [Migration from Older Versions (v0.6, v0.5) to v0.7](#migration-from-older-versions-v06-v05-to-v07)
 
 ## Getting Started
 [Getting Started]: #getting-started
@@ -280,60 +279,30 @@ outside platform-specific sub-folders.
     ```
 
 ## Reference
-- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
-  (Android-specific).
-- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
-  server instance, if any.
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
   - [.start()] &mdash; Launches the server.
   - [.stop()] &mdash; Stops the server.
+  - [.errorLog] &mdash; Holds `errorLog` configuration.
   - [.fileDir] &mdash; Holds absolute path to static assets on target device.
   - [.hostname] &mdash; Holds the hostname used by server.
+  - [.id] &mdash; Hold unique ID of the server instance.
   - [.nonLocal] &mdash; Holds `nonLocal` value provided to [constructor()].
   - [.origin] &mdash; Holds server origin.
   - [.port] &mdash; Holds the port used by server.
   - [.state] &mdash; Holds the current server state.
   - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
     [constructor()].
+- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
+  (Android-specific).
+- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+  server instance, if any.
+- [ERROR_LOG_FILE] &mdash; Location of the error log file.
 - [STATES] &mdash; Enumerates possible states of [Server] instance.
-
-### extractBundledAssets()
-[extractBundledAssets()]: #extractbundledassets
-```jsx
-import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
-
-extractBundledAssets(into, from): Promise<>;
-```
-Extracts bundled assets into the specified regular folder, preserving asset
-folder structure, and overwriting any conflicting files in the destination.
-
-This is an Android-specific function; it does nothing on other platforms.
-
-**Arguments**
-- `into` &mdash; **string** &mdash; Optional. The destination folder for
-  extracted assets. By default assets are extracted into the app's document
-  folder.
-- `from` &mdash; **string** &mdash; Optional. Relative path to the root asset
-  folder, starting from which all assets contained in that folder and its
-  sub-folders will be extracted into the destination folder, preserving asset
-  folder structure. By default all bundled assets are extracted.
-
-**Returns** [Promise] which resolves once the extraction is completed.
-
-### getActiveServer()
-[getActiveServer()]: #getactiveserver
-```js
-import {getActiveServer} from '@dr.pogodin/react-native-static-server';
-
-getActiveServer(): Server;
-```
-Returns currently active, starting, or stopping [Server] instance, if any exist
-in the app. It does not return, however, any inactive server instance which has
-been stopped automatically because of `stopInBackground` option, when the app
-entered background, and might be automatically started in future if the app
-enters foreground again prior to an explicit [.stop()] call for that instance.
+- [UPLOADS_DIR] &mdash; Location for uploads.
+- [WORK_DIR] &mdash; Location of the working files.
+- [ErrorLogOptions] &mdash; Options for error logging.
 
 ### Server
 [Server]: #server
@@ -364,6 +333,19 @@ within `options` argument:
   path; however, empty `fileDir` value is forbidden: if you really want to serve
   entire documents directory of the app, provide its absolute path explicitly.
 
+- `errorLog` &mdash; **boolean** | [ErrorLogOptions] &mdash; Optional.
+  If set **true** (treated equivalent to `{}`) the server instance will
+  output basic server state and error logs from the Lighttpd native core
+  into the [ERROR_LOG_FILE]. Passing in an [ErrorLogOptions] object with
+  additional flags allows to add additional debug output from Lighttpd core
+  into the log file. Default value is **false**, in which case the server
+  instance only outputs basic server state and error logs into the OS
+  system log; note that enabling the file logging with this option disables
+  the logging into the system log.
+
+  **BEWARE:** If you opt for file logging with this option, it is up to you
+  to control and purge the [ERROR_LOG_FILE] as needed.
+
 - `hostname` &mdash; **string** &mdash; Optional. Sets the address for server
   to bind to.
   - By default, if `nonLocal` option is **false**, `hostname` is set equal
@@ -384,7 +366,7 @@ within `options` argument:
   and it is only accessible within the host app. With this flag set **true**
   the server will be started on an IP adress also accessible from outside the app.
 
-  _NOTE: When `hostname` option is set to a value different from "`localhost",
+  _NOTE: When `hostname` option is set to a value different from "`localhost`",
   the `nonLocal` option is ignored. The plan is to deprecate `nonLocal` option
   in future, in favour of special `hostname` values supporting the current
   `nonLocal` functionality._
@@ -487,6 +469,17 @@ the `STARTING` message emitted to the server state change listeners
 (see [.addStateListener()]) in the beginning of this method, if the server
 launch is necessary.
 
+#### .errorLog
+[.errorLog]: #errorlog
+```ts
+server.errorLog: false | ErrorLogOptions;
+```
+Readonly property. It holds the error log configuration, opted for at the time
+of this server instance [construction][constructor()]. Note, it will be `{}`
+if `errorLog` option of [constructor()] was set **true**; and it will be
+**false** (default) if `errorLog` option was omitted in the [constructor()]
+call.
+
 #### .fileDir
 [.fileDir]: #filedir
 ```ts
@@ -506,6 +499,22 @@ will equal "`localhost`" from the beginning. Otherwise, it will be empty string
 till the first launch of server instance, after which it will be equal to IP
 address automatically selected for the server. This IP address won't change
 upon subsequent re-starts of the server.
+
+#### .id
+[.id]: #id
+```ts
+server.id: number;
+```
+Readonly. It holds unique ID number of the server instance, which is used
+internally for communication between JS an native layers, and also exposed
+to the library consumer, for debug.
+
+**BEWARE:** In the current library implementation, this ID is generated simply
+as `Date.now() % 65535`, which is not random, and not truly unique &mdash;
+the ID collision probability across different server instances is high.
+This should be fine as long as you don't create many server instances in your
+app, and don't rely on the uniqueness of these IDs across different app launches.
+Switching to real UUIDs is on radar, but not the highest priority for now.
 
 #### .nonLocal
 [.nonLocal]: #nonlocal
@@ -550,6 +559,53 @@ server.stopInBackground: boolean;
 ```
 Readonly property. It holds `stopInBackground` value provided to [constructor()].
 
+### extractBundledAssets()
+[extractBundledAssets()]: #extractbundledassets
+```ts
+import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
+
+extractBundledAssets(into, from): Promise<>;
+```
+Extracts bundled assets into the specified regular folder, preserving asset
+folder structure, and overwriting any conflicting files in the destination.
+
+This is an Android-specific function; it does nothing on other platforms.
+
+**Arguments**
+- `into` &mdash; **string** &mdash; Optional. The destination folder for
+  extracted assets. By default assets are extracted into the app's document
+  folder.
+- `from` &mdash; **string** &mdash; Optional. Relative path to the root asset
+  folder, starting from which all assets contained in that folder and its
+  sub-folders will be extracted into the destination folder, preserving asset
+  folder structure. By default all bundled assets are extracted.
+
+**Returns** [Promise] which resolves once the extraction is completed.
+
+### getActiveServer()
+[getActiveServer()]: #getactiveserver
+```js
+import {getActiveServer} from '@dr.pogodin/react-native-static-server';
+
+getActiveServer(): Server;
+```
+Returns currently active, starting, or stopping [Server] instance, if any exist
+in the app. It does not return, however, any inactive server instance which has
+been stopped automatically because of `stopInBackground` option, when the app
+entered background, and might be automatically started in future if the app
+enters foreground again prior to an explicit [.stop()] call for that instance.
+
+### ERROR_LOG_FILE
+[ERROR_LOG_FILE]: #error_log_file
+```ts
+import {ERROR_LOG_FILE} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location of the error log file
+(see `errorLog` option of Server's [constructor()]). The actual value is
+"[WORK_DIR]`/errorlog.txt`" &mdash; all server instances within an app output
+their logs, when opted, into the same file; and it is up to the host app
+to purge this file when needed.
+
 ### STATES
 [STATES]: #states
 ```js
@@ -568,6 +624,48 @@ human-readable names used above, _i.e._
 console.log(STATES.ACTIVE); // Logs: 0
 console.log(STATES[0]);     // Logs: ACTIVE
 ```
+
+### UPLOADS_DIR
+[UPLOADS_DIR]: #uploads_dir
+```ts
+import {UPLOADS_DIR} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location where all server instances
+within an app keep any uploads to the server. The actual value is
+"[WORK_DIR]`/uploads`".
+
+### WORK_DIR
+[WORK_DIR]: #work_dir
+```ts
+import {WORK_DIR} from '@dr.pogodin/react-native-static-server';
+```
+Constant **string**. It holds the filesystem location where all server instances
+within an app keep their working files (configs, logs, uploads). The actual
+value is "**RNFS.TemporaryDirectoryPath**`/__rn-static-server__`",
+where **RNFS.TemporaryDirectoryPath** is the temporary directory path for
+the app as reported by the [react-native-fs] library.
+
+### ErrorLogOptions
+[ErrorLogOptions]: #errorlogoptions
+```ts
+import {type ErrorLogOptions} from '@dr.pogodin/react-native-static-server';
+```
+The type of `errorLog` option of the Server's [constructor()]. It describes an
+object with the following optional boolean flags; each of them enables
+the similarly named
+[Lighttpd debug option](https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables):
+- `conditionCacheHandling` &mdash; **boolean** &mdash; Optional.
+- `conditionHandling` &mdash; **boolean** &mdash; Optional.
+- `fileNotFound` &mdash; **boolean** &mdash; Optional.
+- `requestHandling` &mdash; **boolean** &mdash; Optional.
+- `requestHeader` &mdash; **boolean** &mdash; Optional.
+- `requestHeaderOnError` &mdash; **boolean** &mdash; Optional.
+- `responseHeader` &mdash; **boolean** &mdash; Optional.
+- `sslNoise` &mdash; **boolean** &mdash; Optional.
+- `timeouts` &mdash; **boolean** &mdash; Optional.
+
+Without any flag set the server instance will still output very basic state
+and error messages into the log file.
 
 ## Project History and Roadmap
 
@@ -623,6 +721,11 @@ applications.
 ### Roadmap
 [Roadmap]: #roadmap
 
+**NOTE:** _With an appropriate financial contribution you can influence
+the roadmap&nbsp;&mdash; the aims, priorities, and timelines for this
+library&nbsp;&mdash; everything can be adjusted for the needs of a paying
+customer._
+
 These are future development aims, ordered by their current priority (from
 the top priority, to the least priority):
 
@@ -638,7 +741,7 @@ the top priority, to the least priority):
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
 
-## Migration from Older Versions (v0.6, v0.5)
+## Migration from Older Versions (v0.6, v0.5) to v0.7
 
 - On **Android** it now requires `minSdkVersion` to be set in equal 28 or larger
   (in `build.gradle` file). Also, now it is not supported to start more than one
@@ -671,7 +774,7 @@ See [OLD-README.md](./OLD-README.md)
     of server in background allows more advanced usage scenario.
 
 - The new server implementation relies on app's temporary data folder to store
-  some internal files (all within its `__rn-static-server__` subfolder), don't
-  mess with it if you do anything special with the temporary folder.
+  internal files (all within its [WORK_DIR]), don't mess with it if you do
+  anything special with the temporary folder.
 
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
