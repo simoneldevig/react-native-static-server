@@ -208,12 +208,18 @@ class StaticServer {
   }
 
   async _removeConfigFile() {
-    try {
-      if (this._configPath) await RNFS.unlink(this._configPath);
-    } catch {
-      // noop
-    } finally {
+    if (this._configPath) {
+      const p = this._configPath;
+
+      // Resetting the field prior to the async unlink attempt is safer,
+      // in case the caller does not await for this method to complete.
       this._configPath = undefined;
+
+      try {
+        await RNFS.unlink(p);
+      } catch {
+        // IGNORE
+      }
     }
   }
 
