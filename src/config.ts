@@ -58,7 +58,6 @@ function errorLogConfig(errorLogOptions?: ErrorLogOptions): string {
       res.push(`debug.log-${op} = "enable"`);
     };
 
-    res.push(`server.errorlog = "${ERROR_LOG_FILE}"`);
     if (ops.conditionCacheHandling) enable('condition-cache-handling');
     if (ops.conditionHandling) enable('condition-handling');
     if (ops.fileNotFound) enable('file-not-found');

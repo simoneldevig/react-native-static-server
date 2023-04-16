@@ -12,7 +12,7 @@ export interface Spec extends TurboModule {
 
   removeListeners(count: number): void;
 
-  start(id: number, configPath: string): Promise<string>;
+  start(id: number, configPath: string, errlogPath: string): Promise<string>;
 
   // TODO: Instead of implementing these methods in native code ourselves,
   // we probably can use `@react-native-community/netinfo` library to retrieve

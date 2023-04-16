@@ -88,6 +88,7 @@ public class ReactNativeStaticServerModule
   public void start(
     double id, // Server ID for backward communication with JS layer.
     String configPath,
+    String errlogPath,
     Promise promise
   ) {
     Log.i(LOGTAG, "Starting...");
@@ -110,6 +111,7 @@ public class ReactNativeStaticServerModule
 
     server = new Server(
       configPath,
+      errlogPath,
       new BiConsumer<String,String>() {
         public void accept(String signal, String details) {
           if (signal != Server.LAUNCHED) server = null;

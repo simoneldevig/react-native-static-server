@@ -40,14 +40,20 @@ public class Server extends Thread {
   private static final String LOGTAG = Errors.LOGTAG;
 
   String configPath;
+  String errlogPath;
   private BiConsumer<String,String> signalConsumer;
 
   static public void onLaunchedCallback() {
     activeServer.signalConsumer.accept(LAUNCHED, null);
   }
 
-  public Server(String configPath, BiConsumer<String,String> signalConsumer) {
+  public Server(
+    String configPath,
+    String errlogPath,
+    BiConsumer<String,String> signalConsumer
+  ) {
     this.configPath = configPath;
+    this.errlogPath = errlogPath;
     this.signalConsumer = signalConsumer;
   }
 
@@ -61,7 +67,7 @@ public class Server extends Thread {
   }
 
   private native void gracefulShutdown();
-  public native int launch(String configPath);
+  public native int launch(String configPath, String errlogPath);
 
   @Override
   public void run() {
@@ -76,7 +82,7 @@ public class Server extends Thread {
 
     try {
       activeServer = this;
-      int res = launch(this.configPath);
+      int res = launch(this.configPath, this.errlogPath);
       if (res != 0) {
         throw new Exception("Native server exited with status " + res);
       }
