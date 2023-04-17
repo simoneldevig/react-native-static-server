@@ -474,11 +474,11 @@ launch is necessary.
 ```ts
 server.errorLog: false | ErrorLogOptions;
 ```
-Readonly property. It holds the error log configuration, opted for at the time
-of this server instance [construction][constructor()]. Note, it will be `{}`
-if `errorLog` option of [constructor()] was set **true**; and it will be
-**false** (default) if `errorLog` option was omitted in the [constructor()]
-call.
+Readonly property. It holds the error log configuration (see [ErrorLogOptions]),
+opted for at the time of this server instance [construction][constructor()].
+Note, it will be `{}` if `errorLog` option of [constructor()] was set **true**;
+and it will be **false** (default) if `errorLog` option was omitted in
+the [constructor()] call.
 
 #### .fileDir
 [.fileDir]: #filedir
