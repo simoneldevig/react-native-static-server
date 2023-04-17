@@ -12,11 +12,16 @@ namespace winrt::ReactNativeStaticServer {
 
 	class Server {
 	public:
-		Server(std::string configPath, SignalConsumer signalConsumer);
+		Server(
+			std::string configPath,
+			std::string errlogPath,
+			SignalConsumer signalConsumer);
+
 		void launch();
 		void shutdown();
 	private:
 		std::string _configPath;
+		std::string _errlogPath;
 		SignalConsumer _signalConsumer;
 
 		static Server* activeServer;

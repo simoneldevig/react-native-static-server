@@ -8,7 +8,12 @@ import {
 
 import RNFS from 'react-native-fs';
 
-import { newStandardConfigFile, type ErrorLogOptions } from './config';
+import {
+  ERROR_LOG_FILE,
+  newStandardConfigFile,
+  type ErrorLogOptions,
+} from './config';
+
 import { SIGNALS, STATES } from './constants';
 import ReactNativeStaticServer from './ReactNativeStaticServer';
 import Semaphore from './Semaphore';
@@ -208,12 +213,18 @@ class StaticServer {
   }
 
   async _removeConfigFile() {
-    try {
-      if (this._configPath) await RNFS.unlink(this._configPath);
-    } catch {
-      // noop
-    } finally {
+    if (this._configPath) {
+      const p = this._configPath;
+
+      // Resetting the field prior to the async unlink attempt is safer,
+      // in case the caller does not await for this method to complete.
       this._configPath = undefined;
+
+      try {
+        await RNFS.unlink(p);
+      } catch {
+        // IGNORE
+      }
     }
   }
 
@@ -266,7 +277,11 @@ class StaticServer {
 
       // Native implementations of .start() method must resolve only once
       // the server has been launched (ready to handle incoming requests).
-      await ReactNativeStaticServer.start(this._id, this._configPath);
+      await ReactNativeStaticServer.start(
+        this._id,
+        this._configPath,
+        this._errorLog ? ERROR_LOG_FILE : '',
+      );
       this._origin = `http://${this._hostname}:${this._port}`;
       this._setState(STATES.ACTIVE);
       this._removeConfigFile();
