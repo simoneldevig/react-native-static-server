@@ -1,7 +1,7 @@
 PODS:
   - boost (1.76.0)
   - DoubleConversion (1.1.6)
-  - dr-pogodin-react-native-static-server (0.7.5):
+  - dr-pogodin-react-native-static-server (0.7.9):
     - React-Core
   - FBLazyVector (0.71.6)
   - FBReactNativeSpec (0.71.6):
@@ -488,7 +488,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
-  dr-pogodin-react-native-static-server: 9f2e7d5af47e7e8d2f4f6311d8d23574c14ecaeb
+  dr-pogodin-react-native-static-server: c31ce06dc59ef5c8067b5a4483a75d45fb6cb433
   FBLazyVector: a83ceaa8a8581003a623facdb3c44f6d4f342ac5
   FBReactNativeSpec: 85eee79837cb797ab6176f0243a2b40511c09158
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9

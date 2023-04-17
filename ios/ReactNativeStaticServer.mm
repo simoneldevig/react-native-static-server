@@ -77,6 +77,7 @@ RCTPromiseRejectBlock pendingReject = nil;
 RCT_REMAP_METHOD(start,
   start:(NSNumber* _Nonnull)serverId
   configPath:(NSString*)configPath
+  errlogPath:(NSString*)errlogPath
   resolver:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
@@ -124,6 +125,7 @@ RCT_REMAP_METHOD(start,
 
     self->server = [Server
       serverWithConfig:configPath
+      errlogPath:errlogPath
       signalConsumer:signalConsumer
     ];
 

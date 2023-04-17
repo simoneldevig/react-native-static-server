@@ -7,19 +7,27 @@ void onLaunchedCallback() {
 }
 
 extern "C" {
-  int lighttpd_launch(const char * config_path, void (*cb)());
+  int lighttpd_launch(
+    const char * config_path,
+    const char * errlog_path,
+    void (*cb)()
+  );
+
   void lighttpd_graceful_shutdown();
 }
 
 @implementation Server {
   NSString *configPath;
+  NSString *errlogPath;
 }
 
 - (id) initWithConfig:(NSString*)configPath
+         errlogPath:(NSString*)errlogPath
          signalConsumer:(SignalConsumer)signalConsumer
 {
   self = [super init];
   self->configPath = configPath;
+  self->errlogPath = errlogPath;
   self.signalConsumer = signalConsumer;
   return self;
 }
@@ -44,6 +52,7 @@ extern "C" {
     activeServer = self;
     int res = lighttpd_launch(
       [self->configPath cStringUsingEncoding:NSASCIIStringEncoding],
+      [self->errlogPath cStringUsingEncoding:NSASCIIStringEncoding],
       onLaunchedCallback
     );
     if (res) [NSException raise:@"Server exited with error" format:@"%d", res];
@@ -60,10 +69,12 @@ extern "C" {
 }
 
 + (Server*) serverWithConfig:(NSString*)configPath
+                  errlogPath:(NSString*)errlogPath
               signalConsumer:(SignalConsumer)signalConsumer
 {
   return [[Server alloc]
     initWithConfig: configPath
+        errlogPath: errlogPath
     signalConsumer: signalConsumer];
 }
 
