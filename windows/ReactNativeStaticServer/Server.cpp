@@ -7,7 +7,14 @@ using namespace winrt::Windows::ApplicationModel;
 using namespace winrt::Windows::Storage;
 
 typedef void (*CallbackT)();
-typedef int (*LighttpdLaunchT)(const char *configPath, const char *modulesPath, CallbackT);
+
+typedef int (*LighttpdLaunchT)(
+    const char *configPath,
+    const char *modulesPath,
+    const char *errlogPath,
+    CallbackT
+);
+
 typedef void (*LighttpdShutdownT)();
 
 LighttpdLaunchT LighttpdLaunch;
@@ -36,8 +43,12 @@ void Server::OnLaunchedCallback() {
     Server::activeServer->_signalConsumer(LAUNCHED, "");
 }
 
-Server::Server(std::string configPath, SignalConsumer signalConsumer):
+Server::Server(std::string configPath,
+    std::string errlogPath,
+    SignalConsumer signalConsumer
+):
     _configPath(configPath),
+    _errlogPath(errlogPath),
     _signalConsumer(signalConsumer)
 {
      if (!LighttpdLaunch) LoadLighttpdDll();
@@ -59,6 +70,7 @@ void Server::launch() {
                 int res = LighttpdLaunch(
                     this->_configPath.c_str(),
                     modulesPath.c_str(),
+                    this->_errlogPath.c_str(),
                     Server::OnLaunchedCallback
                 );
                 if (res) {

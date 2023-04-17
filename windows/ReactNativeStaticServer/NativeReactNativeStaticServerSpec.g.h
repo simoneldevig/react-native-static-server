@@ -42,7 +42,7 @@ struct ReactNativeStaticServerSpec : winrt::Microsoft::ReactNative::TurboModuleS
   static constexpr auto methods = std::tuple{
       Method<void(std::string) noexcept>{0, L"addListener"},
       Method<void(double) noexcept>{1, L"removeListeners"},
-      Method<void(double, std::string, Promise<::React::JSValue>) noexcept>{2, L"start"},
+      Method<void(double, std::string, std::string, Promise<::React::JSValue>) noexcept>{2, L"start"},
       Method<void(Promise<::React::JSValue>) noexcept>{3, L"getLocalIpAddress"},
       Method<void(Promise<::React::JSValue>) noexcept>{4, L"getOpenPort"},
       Method<void(Promise<::React::JSValue>) noexcept>{5, L"stop"},
@@ -72,8 +72,8 @@ struct ReactNativeStaticServerSpec : winrt::Microsoft::ReactNative::TurboModuleS
     REACT_SHOW_METHOD_SPEC_ERRORS(
           2,
           "start",
-          "    REACT_METHOD(start) void start(double id, std::string configPath, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
-          "    REACT_METHOD(start) static void start(double id, std::string configPath, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
+          "    REACT_METHOD(start) void start(double id, std::string configPath, std::string errlogPath, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
+          "    REACT_METHOD(start) static void start(double id, std::string configPath, std::string errlogPath, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
           3,
           "getLocalIpAddress",

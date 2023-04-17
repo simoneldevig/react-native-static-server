@@ -40,7 +40,10 @@ struct ReactNativeModule
     void getOpenPort(React::ReactPromise<React::JSValue>&& result) noexcept;
 
     REACT_METHOD(start)
-    void start(double id, std::string configPath, React::ReactPromise<::React::JSValue>&& result) noexcept;
+    void start(double id,
+        std::string configPath,
+        std::string errlogPath,
+        React::ReactPromise<::React::JSValue>&& result) noexcept;
 
     REACT_METHOD(stop)
     void stop(React::ReactPromise<React::JSValue>&& result) noexcept;

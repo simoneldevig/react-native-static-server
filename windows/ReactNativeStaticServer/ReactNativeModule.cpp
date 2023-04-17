@@ -97,6 +97,7 @@ void ReactNativeModule::sendEvent(std::string signal, std::string details) {
 void ReactNativeModule::start(
     double id,
     std::string configPath,
+    std::string errlogPath,
     React::ReactPromise<::React::JSValue>&& result
 ) noexcept {
     if (server) return RNException("Another server instance is active").reject(result);
@@ -104,7 +105,7 @@ void ReactNativeModule::start(
     mod = this;
     activeServerId = id;
     pendingResult = new React::ReactPromise<React::JSValue>(result);
-    server = new Server(configPath, OnSignal);
+    server = new Server(configPath, errlogPath, OnSignal);
     server->launch();
 }
 
