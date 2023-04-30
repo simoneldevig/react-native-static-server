@@ -11,7 +11,7 @@ and [old][Old Architecture] RN architectures.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
-## Sponsored By:
+### Sponsored By:
 ![Luna4 Enterprises Inc.](.README/logo-luna4.png)
 
 ---
