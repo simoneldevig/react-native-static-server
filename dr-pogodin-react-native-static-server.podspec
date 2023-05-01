@@ -45,9 +45,7 @@ Pod::Spec.new do |s|
       cmake ${PODS_TARGET_SRCROOT} -B ${TARGET_TEMP_DIR} \
         -DBUILD_STATIC=1 -DBUILD_LIBRARY=1 ${EXTRA_CONFIG_ARGS}
 
-      cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} \
-        --target mod_indexfile mod_dirlisting mod_staticfile \
-          lighttpd
+      cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} --target lighttpd
 
       cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}/*.a \
           ${TARGET_TEMP_DIR}/pcre2${BUILD_OUTPUT_FOLDER_PCRE2}/*.a \
@@ -55,7 +53,7 @@ Pod::Spec.new do |s|
     CMD
   }
 
-  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_staticfile -lmod_indexfile -lmod_dirlisting"
+  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_dirlisting"
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
