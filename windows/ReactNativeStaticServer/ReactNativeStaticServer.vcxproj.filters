@@ -34,12 +34,6 @@
     <CopyFileToFolders Include="lighttpd\mod_dirlisting.dll">
       <Filter>Lighttpd</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="lighttpd\mod_indexfile.dll">
-      <Filter>Lighttpd</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="lighttpd\mod_staticfile.dll">
-      <Filter>Lighttpd</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="lighttpd\lighttpd.dll">
       <Filter>Lighttpd</Filter>
     </CopyFileToFolders>
