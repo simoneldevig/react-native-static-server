@@ -13,7 +13,18 @@ and [old][Old Architecture] RN architectures.
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 ### Sponsored By:
-![Luna4 Enterprises Inc.](.README/logo-luna4.png)
+<table>
+  <tr>
+    <td width="141px">
+      <img alt="Luna4 Enterprises Inc." width="141" height="70" src=".README/logo-luna4.png">
+    </td>
+    <td>
+      <strong>Luna4 Enterprises Inc.</strong> &mdash; The support for Windows
+      and Mac Catalyst systems would not happen any time soon without their
+      interest and financial contribution.
+    </td>
+  </tr>
+</table>
 
 ---
 
