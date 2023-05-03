@@ -8,6 +8,8 @@ import {
 
 import RNFS from 'react-native-fs';
 
+import { Emitter, Semaphore } from '@dr.pogodin/js-utils';
+
 import {
   ERROR_LOG_FILE,
   newStandardConfigFile,
@@ -16,8 +18,6 @@ import {
 
 import { SIGNALS, STATES } from './constants';
 import ReactNativeStaticServer from './ReactNativeStaticServer';
-import Semaphore from './Semaphore';
-import Emitter from './Emitter';
 
 export { ERROR_LOG_FILE, UPLOADS_DIR, WORK_DIR } from './config';
 

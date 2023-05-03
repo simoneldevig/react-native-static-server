@@ -4,12 +4,18 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/birdofpreyru/react-native-static-server/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/birdofpreyru/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
+[![Dr. Pogodin Studio](.README/logo-dr-pogodin-studio.png)](https://dr.pogodin.studio/docs/react-native-static-server)
 
 Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
 [![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
+
+### Sponsored By:
+![Luna4 Enterprises Inc.](.README/logo-luna4.png)
+
+---
 
 <!-- links -->
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
@@ -36,8 +42,7 @@ and [old][Old Architecture] RN architectures.
 [CMake]: https://cmake.org
 
 **Note:** _In addition to these instructions, have a look at
-[the example project][example app]
-included into the library repository on GitHub_.
+[the example project][example app] included into the library repository._
 
 - [CMake] is required on the build host.
   - On **MacOS** you may get it by installing [Homebrew](https://brew.sh),
@@ -54,13 +59,22 @@ included into the library repository on GitHub_.
   ```shell
   $ npm install --save @dr.pogodin/react-native-static-server
   ```
-  _**Note:** In case you prefer to install this library from its source code (i.e. directly from its GitHub repo, or a local folder), mind that it depends on several Git sub-modules, which should be clonned and checked out by this command in the library's codebase root: `$ git submodule update --init --recursive`. Released NPM packages of the library have correct versions of the code from these sub-modules bundled into the package, thus no need to clone and check them out after installation from NPM._
+  **Note:** _In case you prefer to install this library from its source code
+  (i.e. directly from its GitHub repo, or a local folder), mind that it depends
+  on several Git sub-modules, which should be clonned and checked out by this
+  command in the library's codebase root:
+  `$ git submodule update --init --recursive`. Released NPM packages of
+  the library have correct versions of the code from these sub-modules bundled
+  into the package, thus no need to clone and check them out after installation
+  from NPM._
 
 - For **Android**:
   - In the `build.gradle` file set `minSdkVersion` equal `28`
     ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
-    released in August 2018), or larger. _Support of older SDKs is technically
-    possible, but it is not a priority now._
+    released in August 2018), or larger.
+
+    **Note:** _Support of older SDKs is technically possible, but it is not
+    a priority now._
 
 - For **iOS**:
   - After installing the package, enter `ios` folder of the app's codebase
@@ -684,6 +698,24 @@ It is published to NPM as
 and it aims to provide a well-maintained embed HTTP server for React Native (RN)
 applications.
 
+### Roadmap
+[Roadmap]: #roadmap
+
+**NOTE:** _With an appropriate financial contribution you can influence
+the roadmap&nbsp;&mdash; the aims, priorities, and timelines for this
+library&nbsp;&mdash; everything can be adjusted for the needs of a paying
+customer._
+
+These are future development aims, ordered by their current priority (from
+the top priority, to the least priority):
+
+- Support of custom configurartion of HTTP server, and inclusion of
+  additional [Lighttpd] plugins (only three plugins for serving static
+  assets are included now by default on all platforms).
+- Support of [Expo].
+- Better documentation (migration of the documentation
+  to a [Docusaurus](https://docusaurus.io) website.
+
 ### Notable Versions of the Library
 [Notable Versions of the Library]: #notable-versions-of-the-library
 [Releases Page on GitHub]: https://github.com/birdofpreyru/react-native-static-server/releases
@@ -717,26 +749,6 @@ applications.
   updated (as of May 17, 2022). Relies on [NanoHttpd] on Android,
   and [GCDWebServer] on iOS; only supports RN's [Old Architecture],
   and was not tested with RN v0.69+.
-
-### Roadmap
-[Roadmap]: #roadmap
-
-**NOTE:** _With an appropriate financial contribution you can influence
-the roadmap&nbsp;&mdash; the aims, priorities, and timelines for this
-library&nbsp;&mdash; everything can be adjusted for the needs of a paying
-customer._
-
-These are future development aims, ordered by their current priority (from
-the top priority, to the least priority):
-
-- Support of React Native for Windows 10/11 (_ready as of v0.7.4, but has not been tested extensively yet_).
-- Support of React Native for macOS (Catalyst) (_ready as of v0.7.4, but has not been tested extensively yet_).
-- Support of custom configurartion of HTTP server, and inclusion of
-  additional [Lighttpd] plugins (only three plugins for serving static
-  assets are included now by default).
-- Support of [Expo].
-- Better documentation (migration of the documentation
-  to a [Docusaurus](https://docusaurus.io) website.
 
 ## Documentation for Older Library Versions (v0.6, v0.5)
 See [OLD-README.md](./OLD-README.md)
