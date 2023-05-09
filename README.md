@@ -4,7 +4,7 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/birdofpreyru/react-native-static-server/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/birdofpreyru/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
-[![Dr. Pogodin Studio](.README/logo-dr-pogodin-studio.png)](https://dr.pogodin.studio/docs/react-native-static-server)
+[![Dr. Pogodin Studio](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-dr-pogodin-studio.png)](https://dr.pogodin.studio/docs/react-native-static-server)
 
 Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
@@ -14,7 +14,12 @@ and [old][Old Architecture] RN architectures.
 <table>
   <tr>
     <td width="141px">
-      <img alt="Luna4 Enterprises Inc." width="141" height="70" src=".README/logo-luna4.png">
+      <img
+        alt="Luna4 Enterprises Inc."
+        width="141"
+        height="70"
+        src="https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-luna4.png"
+      >
     </td>
     <td>
       <strong>Luna4 Enterprises Inc.</strong> &mdash; The support for Windows
@@ -24,12 +29,13 @@ and [old][Old Architecture] RN architectures.
   </tr>
 </table>
 
-[![Sponsor](.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
+[![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [example app]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
 [Expo]: https://expo.dev
+[OLD-README.md]: https://github.com/birdofpreyru/react-native-static-server/blob/master/OLD-README.md
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [react-native-fs]: https://www.npmjs.com/package/react-native-fs
 [React Native]: https://reactnative.dev
@@ -42,7 +48,7 @@ and [old][Old Architecture] RN architectures.
 - [Project History and Roadmap](#project-history-and-roadmap)
   - [Notable Versions of the Library]
   - [Roadmap]
-- [Documentation for Older Library Versions (v0.6, v0.5)](./OLD-README.md)
+- [Documentation for Older Library Versions (v0.6, v0.5)][OLD-README.md]
 - [Migration from Older Versions (v0.6, v0.5) to v0.7](#migration-from-older-versions-v06-v05-to-v07)
 
 ## Getting Started
@@ -760,7 +766,7 @@ the top priority, to the least priority):
   and was not tested with RN v0.69+.
 
 ## Documentation for Older Library Versions (v0.6, v0.5)
-See [OLD-README.md](./OLD-README.md)
+See [OLD-README.md]
 
 ## Migration from Older Versions (v0.6, v0.5) to v0.7
 
