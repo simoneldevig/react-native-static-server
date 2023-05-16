@@ -94,7 +94,7 @@ class StaticServer {
   _port: number;
 
   _state: STATES = STATES.INACTIVE;
-  _stateChangeEmitter = new Emitter();
+  _stateChangeEmitter = new Emitter<[STATES, string, Error | undefined]>();
 
   // TODO: It will be better to use UUID, but I believe "uuid" library
   // I would use won't work in RN without additional workarounds applied
