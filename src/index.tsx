@@ -286,6 +286,7 @@ class StaticServer {
       if (!this._port) {
         this._port = await ReactNativeStaticServer.getOpenPort();
       }
+      this._origin = `http://${this._hostname}:${this._port}`;
 
       await this._removeConfigFile();
       this._configPath = await newStandardConfigFile({
@@ -302,7 +303,7 @@ class StaticServer {
         this._configPath,
         this._errorLog ? ERROR_LOG_FILE : '',
       );
-      this._origin = `http://${this._hostname}:${this._port}`;
+
       this._setState(STATES.ACTIVE);
       this._removeConfigFile();
       return this._origin;
