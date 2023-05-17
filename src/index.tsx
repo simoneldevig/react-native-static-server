@@ -29,6 +29,12 @@ const servers: { [id: string]: StaticServer } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(ReactNativeStaticServer);
 
+export type StateListener = (
+  newState: STATES,
+  details: string,
+  error?: Error,
+) => void;
+
 nativeEventEmitter.addListener(
   'RNStaticServer',
   ({ serverId, event, details }) => {
@@ -192,9 +198,7 @@ class StaticServer {
     this._fileDir = fileDir;
   }
 
-  addStateListener(
-    listener: (newState: STATES, details: string, error?: Error) => void,
-  ) {
+  addStateListener(listener: StateListener) {
     return this._stateChangeEmitter.addListener(listener);
   }
 
@@ -241,6 +245,22 @@ class StaticServer {
       default:
         throw Error(`Server is in unstable state ${this._state}`);
     }
+  }
+
+  /**
+   * Removes all state listeners connected to this server instance.
+   */
+  removeAllStateListeners() {
+    this._stateChangeEmitter.removeAllListeners();
+  }
+
+  /**
+   * Removes given state listener, if it is connected to this server instance;
+   * or does nothing if the listener is not connected to it.
+   * @param listener
+   */
+  removeStateListener(listener: StateListener) {
+    this._stateChangeEmitter.removeListener(listener);
   }
 
   /**

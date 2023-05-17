@@ -124,7 +124,7 @@
     }
   },
   "dependencies": {
-    "@dr.pogodin/js-utils": "^0.0.4",
+    "@dr.pogodin/js-utils": "^0.0.5",
     "react-native-fs": "^2.20.0"
   }
 }

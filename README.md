@@ -311,6 +311,10 @@ outside platform-specific sub-folders.
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
+  - [.removeAllStateListeners()] &mdash; Removes all state listeners from this
+    server instance.
+  - [.removeStateListener()] &mdash; Removes specified state listener from this
+    server instance.
   - [.start()] &mdash; Launches the server.
   - [.stop()] &mdash; Stops the server.
   - [.errorLog] &mdash; Holds `errorLog` configuration.
@@ -443,6 +447,21 @@ each time the server state changes, with the following arguments:
 
 This method returns "unsubscribe" function, call it to remove added
 listener from the server instance.
+
+#### .removeAllStateListeners()
+[.removeAllStateListeners()]: #removeallstatelisteners
+```ts
+server.removeAllStateListeners()
+```
+Removes all state listeners connected to the server instance.
+
+#### .removeStateListener()
+[.removeStateListener()]: #removestatelistener
+```ts
+server.removeStateListener(listener: StateListener)
+```
+Removes given state `listener` if it is connected to the server instance;
+does nothing otherwise.
 
 #### .start()
 [.start()]: #start
