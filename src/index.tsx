@@ -29,6 +29,12 @@ const servers: { [id: string]: StaticServer } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(ReactNativeStaticServer);
 
+export type StateListener = (
+  newState: STATES,
+  details: string,
+  error?: Error,
+) => void;
+
 nativeEventEmitter.addListener(
   'RNStaticServer',
   ({ serverId, event, details }) => {
@@ -94,7 +100,7 @@ class StaticServer {
   _port: number;
 
   _state: STATES = STATES.INACTIVE;
-  _stateChangeEmitter = new Emitter();
+  _stateChangeEmitter = new Emitter<[STATES, string, Error | undefined]>();
 
   // TODO: It will be better to use UUID, but I believe "uuid" library
   // I would use won't work in RN without additional workarounds applied
@@ -192,9 +198,7 @@ class StaticServer {
     this._fileDir = fileDir;
   }
 
-  addStateListener(
-    listener: (newState: STATES, details: string, error?: Error) => void,
-  ) {
+  addStateListener(listener: StateListener) {
     return this._stateChangeEmitter.addListener(listener);
   }
 
@@ -244,6 +248,22 @@ class StaticServer {
   }
 
   /**
+   * Removes all state listeners connected to this server instance.
+   */
+  removeAllStateListeners() {
+    this._stateChangeEmitter.removeAllListeners();
+  }
+
+  /**
+   * Removes given state listener, if it is connected to this server instance;
+   * or does nothing if the listener is not connected to it.
+   * @param listener
+   */
+  removeStateListener(listener: StateListener) {
+    this._stateChangeEmitter.removeListener(listener);
+  }
+
+  /**
    * @param {string} [details] Optional. If provided, it will be added
    * to the STARTING message emitted to the server state change listeners.
    * @returns {Promise<string>}
@@ -266,6 +286,7 @@ class StaticServer {
       if (!this._port) {
         this._port = await ReactNativeStaticServer.getOpenPort();
       }
+      this._origin = `http://${this._hostname}:${this._port}`;
 
       await this._removeConfigFile();
       this._configPath = await newStandardConfigFile({
@@ -282,7 +303,7 @@ class StaticServer {
         this._configPath,
         this._errorLog ? ERROR_LOG_FILE : '',
       );
-      this._origin = `http://${this._hostname}:${this._port}`;
+
       this._setState(STATES.ACTIVE);
       this._removeConfigFile();
       return this._origin;

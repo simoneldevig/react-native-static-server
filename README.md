@@ -10,6 +10,8 @@ Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalys
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
+[![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
+
 ### Sponsored By:
 <table>
   <tr>
@@ -28,8 +30,6 @@ and [old][Old Architecture] RN architectures.
     </td>
   </tr>
 </table>
-
-[![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
@@ -55,16 +55,28 @@ and [old][Old Architecture] RN architectures.
 [Getting Started]: #getting-started
 
 [CMake]: https://cmake.org
+[Homebrew]: https://brew.sh
 
 **Note:** _In addition to these instructions, have a look at
 [the example project][example app] included into the library repository._
 
 - [CMake] is required on the build host.
-  - On **MacOS** you may get it by installing [Homebrew](https://brew.sh),
+  - On **MacOS** you may get it by installing [Homebrew],
     then executing
     ```shell
     $ brew install cmake
     ```
+    **IMPORTANT:** The proper [Homebrew] installation on new M1 Mac machines
+    requires to manually add `eval "$(/opt/homebrew/bin/brew shellenv)"'`
+    command to your `.zshrc` or `.bashrc`. This will ensure that the folder
+    `/opt/homebrew/bin`, where [Homebrew] installs packages on M1 Mac, is added
+    to your `PATH`. Without it `cmake` and `pkg-config` installed via [Homebrew]
+    will not be visible to the XCode build environment, thus failing the build
+    step of this library.
+
+    For details read: https://earthly.dev/blog/homebrew-on-m1,
+    and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
+
   - On **Ubuntu** you may get it by executing
     ```shell
     $ sudo apt-get update && sudo apt-get install cmake
@@ -311,6 +323,10 @@ outside platform-specific sub-folders.
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
+  - [.removeAllStateListeners()] &mdash; Removes all state listeners from this
+    server instance.
+  - [.removeStateListener()] &mdash; Removes specified state listener from this
+    server instance.
   - [.start()] &mdash; Launches the server.
   - [.stop()] &mdash; Stops the server.
   - [.errorLog] &mdash; Holds `errorLog` configuration.
@@ -443,6 +459,21 @@ each time the server state changes, with the following arguments:
 
 This method returns "unsubscribe" function, call it to remove added
 listener from the server instance.
+
+#### .removeAllStateListeners()
+[.removeAllStateListeners()]: #removeallstatelisteners
+```ts
+server.removeAllStateListeners()
+```
+Removes all state listeners connected to the server instance.
+
+#### .removeStateListener()
+[.removeStateListener()]: #removestatelistener
+```ts
+server.removeStateListener(listener: StateListener)
+```
+Removes given state `listener` if it is connected to the server instance;
+does nothing otherwise.
 
 #### .start()
 [.start()]: #start
