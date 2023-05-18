@@ -55,16 +55,28 @@ and [old][Old Architecture] RN architectures.
 [Getting Started]: #getting-started
 
 [CMake]: https://cmake.org
+[Homebrew]: https://brew.sh
 
 **Note:** _In addition to these instructions, have a look at
 [the example project][example app] included into the library repository._
 
 - [CMake] is required on the build host.
-  - On **MacOS** you may get it by installing [Homebrew](https://brew.sh),
+  - On **MacOS** you may get it by installing [Homebrew],
     then executing
     ```shell
     $ brew install cmake
     ```
+    **IMPORTANT:** The proper [Homebrew] installation on new M1 Mac machines
+    requires to manually add `eval "$(/opt/homebrew/bin/brew shellenv)"'`
+    command to your `.zshrc` or `.bashrc`. This will ensure that the folder
+    `/opt/homebrew/bin`, where [Homebrew] installs packages on M1 Mac, is added
+    to your `PATH`. Without it `cmake` and `pkg-config` installed via [Homebrew]
+    will not be visible to the XCode build environment, thus failing the build
+    step of this library.
+
+    For details read: https://earthly.dev/blog/homebrew-on-m1,
+    and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
+
   - On **Ubuntu** you may get it by executing
     ```shell
     $ sudo apt-get update && sudo apt-get install cmake
