@@ -9,6 +9,7 @@ void onLaunchedCallback() {
 extern "C" {
   int lighttpd_launch(
     const char * config_path,
+    const char * module_path,
     const char * errlog_path,
     void (*cb)()
   );
@@ -52,6 +53,7 @@ extern "C" {
     activeServer = self;
     int res = lighttpd_launch(
       [self->configPath cStringUsingEncoding:NSASCIIStringEncoding],
+      nil,
       [self->errlogPath cStringUsingEncoding:NSASCIIStringEncoding],
       onLaunchedCallback
     );
