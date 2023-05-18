@@ -10,6 +10,8 @@ Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalys
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
+[![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
+
 ### Sponsored By:
 <table>
   <tr>
@@ -28,8 +30,6 @@ and [old][Old Architecture] RN architectures.
     </td>
   </tr>
 </table>
-
-[![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.png)](https://github.com/sponsors/birdofpreyru)
 
 <!-- links -->
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
