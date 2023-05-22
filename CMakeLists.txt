@@ -113,7 +113,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPCRE2_CODE_UNIT_WIDTH=8 -I${CMAKE_BINARY_D
 add_subdirectory(lighttpd1.4)
 
 file(WRITE ${CMAKE_BINARY_DIR}/lighttpd1.4/build/plugin-static.h
-  PLUGIN_INIT(mod_indexfile)\n
   PLUGIN_INIT(mod_dirlisting)\n
+  PLUGIN_INIT(mod_h2)\n
+  PLUGIN_INIT(mod_indexfile)\n
   PLUGIN_INIT(mod_staticfile)\n
 )
