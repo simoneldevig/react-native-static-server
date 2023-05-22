@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
     :name => 'Build native dependencies',
     :execution_position => :before_compile,
     :output_files => [
-      # TODO: Below is the list of all build products generated from PRCE2,
+      # Note: Below is the list of all build products generated from PRCE2,
       # Lighttpd, and this library, as of now; the commented out modules are
       # not currently used by our library.
       '${BUILT_PRODUCTS_DIR}/liblighttpd.a',
