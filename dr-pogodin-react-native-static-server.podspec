@@ -53,7 +53,7 @@ Pod::Spec.new do |s|
     CMD
   }
 
-  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_dirlisting"
+  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_dirlisting -lmod_h2"
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
