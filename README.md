@@ -61,18 +61,20 @@ and [old][Old Architecture] RN architectures.
 [the example project][example app] included into the library repository._
 
 - [CMake] is required on the build host.
-  - On **MacOS** you may get it by installing [Homebrew],
-    then executing
+  - On **MacOS**, the `pkg-config` dependency is also needed. You can install both via [Homebrew],
+    by executing:
     ```shell
-    $ brew install cmake
+    $ brew install cmake pkg-config
     ```
-    **IMPORTANT:** The proper [Homebrew] installation on new M1 Mac machines
-    requires to manually add `eval "$(/opt/homebrew/bin/brew shellenv)"'`
-    command to your `.zshrc` or `.bashrc`. This will ensure that the folder
-    `/opt/homebrew/bin`, where [Homebrew] installs packages on M1 Mac, is added
-    to your `PATH`. Without it `cmake` and `pkg-config` installed via [Homebrew]
-    will not be visible to the XCode build environment, thus failing the build
-    step of this library.
+    **IMPORTANT:** [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
+    command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
+    it might not work for sessions inside of other apps, such as XCode, therefore you might need to
+    manually create symbolic links:
+
+    ```shell
+    $ sudo ln -s $(which cmake) /usr/local/bin/cmake
+    $ sudo ln -s $(which pkg-config) /usr/local/bin/pkg-config
+    ```
 
     For details read: https://earthly.dev/blog/homebrew-on-m1,
     and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
