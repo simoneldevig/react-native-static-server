@@ -102,6 +102,7 @@ export default function App() {
         // between state names and corresponding numeric values.
         console.log(
           `Server #${serverId}.\n`,
+          `Origin: ${server?.origin}`,
           `New state: "${STATES[newState]}".\n`,
           `Details: "${details}".`,
         );

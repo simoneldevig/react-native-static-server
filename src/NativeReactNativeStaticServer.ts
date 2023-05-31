@@ -19,8 +19,8 @@ export interface Spec extends TurboModule {
   // local IP address and a random open port (thus a bit less native code
   // to maintain ourselves in this library).
   getLocalIpAddress(): Promise<string>;
-  getOpenPort(): Promise<number>;
 
+  getOpenPort(address: string): Promise<number>;
   stop(): Promise<void>;
 }
 

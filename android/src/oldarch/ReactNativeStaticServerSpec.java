@@ -22,6 +22,6 @@ abstract class ReactNativeStaticServerSpec extends ReactContextBaseJavaModule {
     double id, String configPath, String errlogPath, Promise promise);
 
   public abstract void getLocalIpAddress(Promise promise);
-  public abstract void getOpenPort(Promise promise);
+  public abstract void getOpenPort(String address, Promise promise);
   public abstract void stop(Promise promise);
 }

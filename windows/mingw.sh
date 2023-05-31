@@ -21,7 +21,7 @@ MSYS2_PATH="/ucrt64"
 
 cmake $ROOT_FOLDER -B $BUILD_FOLDER -G Ninja \
   -DBUILD_LIBRARY=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build $BUILD_FOLDER --target mod_dirlisting lighttpd
+cmake --build $BUILD_FOLDER --target mod_dirlisting mod_h2 lighttpd
 
 mkdir -p $OUTPUT_FOLDER
 cd $BUILD_FOLDER/lighttpd1.4/build

@@ -78,7 +78,7 @@ public class ReactNativeStaticServerModule
           }
         }
       }
-      promise.resolve("localhost");
+      promise.resolve("127.0.0.1");
     } catch (Exception e) {
       Errors.FAIL_GET_LOCAL_IP_ADDRESS.reject(promise);
     }
@@ -135,9 +135,10 @@ public class ReactNativeStaticServerModule
   }
 
   @ReactMethod
-  public void getOpenPort(Promise promise) {
+  public void getOpenPort(String address, Promise promise) {
     try {
-      ServerSocket socket = new ServerSocket(0);
+      ServerSocket socket = new ServerSocket(
+        0, 0, InetAddress.getByName(address));
       int port = socket.getLocalPort();
       socket.close();
       promise.resolve(port);

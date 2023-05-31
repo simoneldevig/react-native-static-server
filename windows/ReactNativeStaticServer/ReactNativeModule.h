@@ -37,7 +37,7 @@ struct ReactNativeModule
     void getLocalIpAddress(React::ReactPromise<React::JSValue>&& result) noexcept;
 
     REACT_METHOD(getOpenPort)
-    void getOpenPort(React::ReactPromise<React::JSValue>&& result) noexcept;
+    void getOpenPort(std::string address, React::ReactPromise<React::JSValue>&& result) noexcept;
 
     REACT_METHOD(start)
     void start(double id,

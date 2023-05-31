@@ -66,13 +66,17 @@ void ReactNativeModule::getLocalIpAddress(React::ReactPromise<React::JSValue>&& 
     RNException("Failed to get a non-local IP address").reject(result);
 }
 
-void ReactNativeModule::getOpenPort(React::ReactPromise<React::JSValue>&& result) noexcept {
+void ReactNativeModule::getOpenPort(
+    std::string address,
+    React::ReactPromise<React::JSValue>&& result
+) noexcept {
     try {
         auto socket = winrt::Windows::Networking::Sockets::StreamSocketListener();
         // TODO: This will fail if nor InternetClientServer neither PrivateNetworkClientServer
         // capability is granted to the app. The error messaging should be improved, to make it
         // clear to the library consumer why the failure happened.
-        if (socket.BindServiceNameAsync(L"").wait_for(5s) != AsyncStatus::Completed) {
+        winrt::Windows::Networking::HostName hostname(winrt::to_hstring(address));
+        if (socket.BindEndpointAsync(hostname, L"").wait_for(5s) != AsyncStatus::Completed) {
             return RNException("Binding time out").reject(result);
         }
         double port = std::stod(winrt::to_string(socket.Information().LocalPort()));

@@ -29,6 +29,8 @@ const servers: { [id: string]: StaticServer } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(ReactNativeStaticServer);
 
+const LOOPBACK_ADDRESS = '127.0.0.1';
+
 export type StateListener = (
   newState: STATES,
   details: string,
@@ -167,7 +169,7 @@ class StaticServer {
   constructor({
     errorLog = false,
     fileDir,
-    hostname = 'localhost',
+    hostname,
 
     /* DEPRECATED */ nonLocal = false,
 
@@ -186,7 +188,7 @@ class StaticServer {
     if (errorLog) this._errorLog = errorLog === true ? {} : errorLog;
 
     this._nonLocal = nonLocal;
-    this._hostname = nonLocal && hostname === 'localhost' ? '' : hostname;
+    this._hostname = hostname || (nonLocal ? '' : LOOPBACK_ADDRESS);
 
     this._port = port;
     this._stopInBackground = stopInBackground;
@@ -284,7 +286,7 @@ class StaticServer {
         this._hostname = await ReactNativeStaticServer.getLocalIpAddress();
       }
       if (!this._port) {
-        this._port = await ReactNativeStaticServer.getOpenPort();
+        this._port = await ReactNativeStaticServer.getOpenPort(this._hostname);
       }
       this._origin = `http://${this._hostname}:${this._port}`;
 

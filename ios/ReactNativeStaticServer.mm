@@ -60,8 +60,8 @@ RCT_REMAP_METHOD(getLocalIpAddress,
         temp_addr = temp_addr->ifa_next;
       }
     }
-    NSLog(@"Could not find IP address, falling back to localhost.");
-    resolve(@"localhost");
+    NSLog(@"Could not find IP address, falling back to '127.0.0.1'.");
+    resolve(@"127.0.0.1");
   }
   @catch (NSException *e) {
     [[RNException from:e] reject:reject];
@@ -161,6 +161,7 @@ RCT_REMAP_METHOD(stop,
 }
 
 RCT_REMAP_METHOD(getOpenPort,
+  address:(NSString*) address
   getOpenPort:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
@@ -174,10 +175,11 @@ RCT_REMAP_METHOD(getOpenPort,
     struct sockaddr_in serv_addr;
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    // INADDR_ANY is used to specify that the socket should be bound
-    // to any available network interface.
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = 0;
+    if (!inet_aton([address cStringUsingEncoding:NSUTF8StringEncoding], &(serv_addr.sin_addr))) {
+      [[RNException name:@"Invalid address format"] reject:reject];
+      return;
+    }
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
       [[RNException name:@"Error binding socket"] reject:reject];

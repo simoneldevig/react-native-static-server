@@ -44,7 +44,7 @@ struct ReactNativeStaticServerSpec : winrt::Microsoft::ReactNative::TurboModuleS
       Method<void(double) noexcept>{1, L"removeListeners"},
       Method<void(double, std::string, std::string, Promise<::React::JSValue>) noexcept>{2, L"start"},
       Method<void(Promise<::React::JSValue>) noexcept>{3, L"getLocalIpAddress"},
-      Method<void(Promise<::React::JSValue>) noexcept>{4, L"getOpenPort"},
+      Method<void(std::string, Promise<::React::JSValue>) noexcept>{4, L"getOpenPort"},
       Method<void(Promise<::React::JSValue>) noexcept>{5, L"stop"},
   };
 
@@ -82,8 +82,8 @@ struct ReactNativeStaticServerSpec : winrt::Microsoft::ReactNative::TurboModuleS
     REACT_SHOW_METHOD_SPEC_ERRORS(
           4,
           "getOpenPort",
-          "    REACT_METHOD(getOpenPort) void getOpenPort(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
-          "    REACT_METHOD(getOpenPort) static void getOpenPort(::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
+          "    REACT_METHOD(getOpenPort) void getOpenPort(std::string address, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n"
+          "    REACT_METHOD(getOpenPort) static void getOpenPort(std::string address, ::React::ReactPromise<::React::JSValue> &&result) noexcept { /* implementation */ }\n");
     REACT_SHOW_METHOD_SPEC_ERRORS(
           5,
           "stop",

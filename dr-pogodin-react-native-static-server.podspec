@@ -23,12 +23,31 @@ Pod::Spec.new do |s|
   s.script_phase = {
     :name => 'Build native dependencies',
     :execution_position => :before_compile,
-    # TODO: This should be re-added, but maybe different sets of files.
-    #:output_files => [
-    #  '${BUILT_PRODUCTS_DIR}/libpcre2-8.a',
-    #  '${BUILT_PRODUCTS_DIR}/iblighttpd.a'
-      # It also depends on compiled module files!
-    #],
+    :output_files => [
+      # Note: Below is the list of all build products generated from PRCE2,
+      # Lighttpd, and this library, as of now; the commented out modules are
+      # not currently used by our library.
+      '${BUILT_PRODUCTS_DIR}/liblighttpd.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_accesslog.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_ajp13.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_auth.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_authn_file.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_cgi.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_deflate.a',
+      '${BUILT_PRODUCTS_DIR}/libmod_dirlisting.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_extforward.a',
+      '${BUILT_PRODUCTS_DIR}/libmod_h2.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_proxy.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_rrdtool.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_sockproxy.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_ssi.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_status.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_userdir.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_vhostdb.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_webdav.a',
+      # '${BUILT_PRODUCTS_DIR}/libmod_wstunnel.a',
+      '${BUILT_PRODUCTS_DIR}/libpcre2-8.a'
+    ],
     :script => <<-CMD
       set -e
 
@@ -53,7 +72,7 @@ Pod::Spec.new do |s|
     CMD
   }
 
-  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_dirlisting"
+  $otherLibToolFlags = "-llighttpd -lpcre2-8 -lmod_dirlisting -lmod_h2"
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
