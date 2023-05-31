@@ -18,8 +18,8 @@ and [old][Old Architecture] RN architectures.
     <td width="141px">
       <img
         alt="Luna4 Enterprises Inc."
-        width="141"
-        height="70"
+        width="100%"
+        height="auto"
         src="https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-luna4.png"
       >
     </td>
