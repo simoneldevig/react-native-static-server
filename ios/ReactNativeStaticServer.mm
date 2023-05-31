@@ -60,8 +60,8 @@ RCT_REMAP_METHOD(getLocalIpAddress,
         temp_addr = temp_addr->ifa_next;
       }
     }
-    NSLog(@"Could not find IP address, falling back to localhost.");
-    resolve(@"localhost");
+    NSLog(@"Could not find IP address, falling back to '127.0.0.1'.");
+    resolve(@"127.0.0.1");
   }
   @catch (NSException *e) {
     [[RNException from:e] reject:reject];
@@ -161,9 +161,11 @@ RCT_REMAP_METHOD(stop,
 }
 
 RCT_REMAP_METHOD(getOpenPort,
+  address:(NSString * address)
   getOpenPort:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
+  // TODO: It should select the port at the specified network address.
   @try {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {

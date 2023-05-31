@@ -395,9 +395,9 @@ within `options` argument:
 
 - `hostname` &mdash; **string** &mdash; Optional. Sets the address for server
   to bind to.
-  - By default, if `nonLocal` option is **false**, `hostname` is set equal
-    "`localhost`" &mdash; the server binds to the localhost (127.0.0.1)
-    loopback address, and it is accessible only from within the host app.
+  - By default, when `nonLocal` option is **false**, `hostname` is set equal
+    "`127.0.0.1`" &mdash; the server binds to the loopback address,
+    and it is accessible only from within the host app.
   - If `nonLocal` option is **true**, and `hostname` was not given, it is
     initialized with empty string, and later assigned to a library-selected
     non-local IP address, at the first launch of the server.
@@ -409,11 +409,12 @@ within `options` argument:
   appropriate non-local address._
 
 - `nonLocal` &mdash; **boolean** &mdash; Optional. By default, if `hostname`
-  option was not provided, the server starts at the "`localhost`" address,
-  and it is only accessible within the host app. With this flag set **true**
-  the server will be started on an IP adress also accessible from outside the app.
+  option was not provided, the server starts at the "`127.0.0.1`" (loopback)
+  address, and it is only accessible within the host app.
+  With this flag set **true** the server will be started on an IP address
+  also accessible from outside the app.
 
-  _NOTE: When `hostname` option is set to a value different from "`localhost`",
+  _NOTE: When `hostname` option is provided,
   the `nonLocal` option is ignored. The plan is to deprecate `nonLocal` option
   in future, in favour of special `hostname` values supporting the current
   `nonLocal` functionality._
@@ -555,12 +556,13 @@ on target device from which static assets are served by the server.
 ```ts
 server.hostname: string;
 ```
-Readonly property. It holds hostname used by the server. If server instance
-was constructed without `nonLocal` option (default), the `.hostname` property
-will equal "`localhost`" from the beginning. Otherwise, it will be empty string
-till the first launch of server instance, after which it will be equal to IP
-address automatically selected for the server. This IP address won't change
-upon subsequent re-starts of the server.
+Readonly property. It holds the hostname used by the server. If no `hostname`
+value was provided to the server's [constructor()], this property will be:
+- Without `nonLocal` option it will be equal `127.0.0.1` (the loopback address)
+  from the very beginning;
+- Otherwise, it will be an empty string until the first launch of the server
+  instance, after which it will become equal to the IP address selected by
+  the server automatically, and won't change upon subsequent server re-starts.
 
 #### .id
 [.id]: #id
@@ -816,7 +818,7 @@ See [OLD-README.md]
     what folder is served by default).
   - `nonLocal` option replaces the old `localOnly`  option, with the opposite
     meaning and default behavior. Now, by default the server is started on
-    "`localhost`" and is only accessible from within the app. Setting `nonLocal`
+    "`127.0.0.1`" (the loopback address) and is only accessible from within the app. Setting `nonLocal`
     flag will start it on an automatically assigned IP, accessible from outside
     the app as well. This is the opposite to behavior in previous versions, and
     it feels more secure (prevents exposing server outside the app due to
