@@ -161,11 +161,10 @@ RCT_REMAP_METHOD(stop,
 }
 
 RCT_REMAP_METHOD(getOpenPort,
-  address:(NSString * address)
+  address:(NSString*) address
   getOpenPort:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
 ) {
-  // TODO: It should select the port at the specified network address.
   @try {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -176,10 +175,11 @@ RCT_REMAP_METHOD(getOpenPort,
     struct sockaddr_in serv_addr;
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    // INADDR_ANY is used to specify that the socket should be bound
-    // to any available network interface.
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = 0;
+    if (!inet_aton([address cStringUsingEncoding:NSUTF8StringEncoding], &(serv_addr.sin_addr))) {
+      [[RNException name:@"Invalid address format"] reject:reject];
+      return;
+    }
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
       [[RNException name:@"Error binding socket"] reject:reject];
