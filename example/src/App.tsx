@@ -174,7 +174,14 @@ export default function App() {
             return load;
           }}
           ref={webView}
-          source={{ uri: origin }}
+          // NOTE: RN WebView requires source object to be provided with either
+          // its `html` or `uri` field defined. Passing an empty string into
+          // `uri` is a bad idea - on some systems, e.g. Mac Catalyst, it will
+          // cause the app to open the app's resources folder in a new Finder
+          // window - as we rather want to show a blank page until the server
+          // is up and running, we should thus prefer to define an empty `html`
+          // field in such case.
+          source={origin ? { uri: origin } : { html: '' }}
         />
       </View>
     </SafeAreaView>
