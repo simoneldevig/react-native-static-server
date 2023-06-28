@@ -15,6 +15,7 @@ def isNewArchitectureEnabled() {
 
 apply plugin: "com.android.library"
 
+
 def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
 
 if (isNewArchitectureEnabled()) {
