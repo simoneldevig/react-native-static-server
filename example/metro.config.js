@@ -7,7 +7,11 @@
 const fs = require('fs');
 const path = require('path');
 const escape = require('escape-string-regexp');
+
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+
 const exclusionList = require('metro-config/src/defaults/exclusionList');
+
 const pak = require('../package.json');
 
 const root = path.resolve(__dirname, '..');
@@ -24,7 +28,7 @@ const rnwPath = fs.realpathSync(
   path.resolve(require.resolve('react-native-windows/package.json'), '..'),
 );
 
-module.exports = {
+module.exports = mergeConfig(getDefaultConfig(), {
   projectRoot: __dirname,
   watchFolders: [root],
 
@@ -81,4 +85,4 @@ module.exports = {
       },
     }),
   },
-};
+});
