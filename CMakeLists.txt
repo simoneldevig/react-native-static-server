@@ -110,6 +110,20 @@ endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPCRE2_CODE_UNIT_WIDTH=8 -I${CMAKE_BINARY_DIR}/sysroot/include -L${CMAKE_BINARY_DIR}/sysroot/lib")
 
+# To find PCRE2 Lighttpd first of all tries to use pkg_check_modules().
+# It seems that on Linux it ends up relying on pkg-config utility of the host
+# system, which find the host's version of PCRE2. With CMake 3.18.1 it was fine,
+# as it used to output the linker flag for PCRE2 just as "-lpcre2-8",
+# and just above we set the correct -L flag with the path of PCRE2
+# cross-compiled for Android. However, with CMake 3.22.1 the CMake's default
+# output is "-L/usr/lib/x86_64-linux-gnu;-lpcre2-8", which ends up forcing
+# Lighttpd to try linking against the host's PCRE2, which fails. The flag set
+# below instructs pkg-config to not include -L flag into outputs,
+# thus restoring the correct linking. However, it is not the best fix,
+# I guess.
+# TODO: Find a better fix.
+set(PKG_CONFIG_ARGN --libs-only-l)
+
 add_subdirectory(lighttpd1.4)
 
 file(WRITE ${CMAKE_BINARY_DIR}/lighttpd1.4/build/plugin-static.h
