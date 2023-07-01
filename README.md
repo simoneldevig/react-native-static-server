@@ -86,9 +86,11 @@ and [old][Old Architecture] RN architectures.
 
 - Install the package:
   ```shell
-  $ npm install --save @dr.pogodin/react-native-static-server
+  $ npm install --save @dr.pogodin/react-native-static-server \
+      react-native-fs react-native-device-info
   ```
-  **Note:** _In case you prefer to install this library from its source code
+  **Notes:**
+  - _In case you prefer to install this library from its source code
   (i.e. directly from its GitHub repo, or a local folder), mind that it depends
   on several Git sub-modules, which should be clonned and checked out by this
   command in the library's codebase root:
@@ -96,6 +98,10 @@ and [old][Old Architecture] RN architectures.
   the library have correct versions of the code from these sub-modules bundled
   into the package, thus no need to clone and check them out after installation
   from NPM._
+  - _Installation of `react-native-fs` and `react-native-device-info` into
+    the host codebase is required because on iOS, for some reason, these
+    libraries do not link correctly when they are only mentioned as
+    the library's dependencies, and not directly as the host app dependencies._
 
 - For **Android**:
   - In the `build.gradle` file set `minSdkVersion` equal `28`
