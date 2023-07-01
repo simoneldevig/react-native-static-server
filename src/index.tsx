@@ -18,10 +18,11 @@ import {
 
 import { SIGNALS, STATES } from './constants';
 import ReactNativeStaticServer from './ReactNativeStaticServer';
+import { resolveAssetsPath } from './utils';
 
 export { ERROR_LOG_FILE, UPLOADS_DIR, WORK_DIR } from './config';
 
-export { STATES };
+export { STATES, resolveAssetsPath };
 
 // ID-to-StaticServer map for all potentially active server instances,
 // used to route native events back to JS server objects.
@@ -57,22 +58,6 @@ nativeEventEmitter.addListener(
     }
   },
 );
-
-/**
- * Returns `true` if given path is absolute, `false` otherwise.
- * @param {string} path
- * @return {boolean}
- */
-function isAbsolutePath(path: string): boolean {
-  if (!path) return false;
-
-  if (Platform.OS === 'windows') {
-    return !!path.match(/^[a-zA-Z]:\\/);
-  }
-
-  // This should do for Android and iOS.
-  return path.startsWith('/') || path.startsWith('file:///');
-}
 
 // TODO: The idea for later implementation is to allow users to provide their
 // own lighttpd config files with completely custom configuration. To do so,
@@ -194,10 +179,7 @@ class StaticServer {
     this._stopInBackground = stopInBackground;
 
     if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
-    else if (!isAbsolutePath(fileDir)) {
-      fileDir = `${RNFS.DocumentDirectoryPath}/${fileDir}`;
-    }
-    this._fileDir = fileDir;
+    this._fileDir = resolveAssetsPath(fileDir);
   }
 
   addStateListener(listener: StateListener) {
