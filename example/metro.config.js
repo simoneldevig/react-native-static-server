@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const escape = require('escape-string-regexp');
 
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
 const exclusionList = require('metro-config/src/defaults/exclusionList');
 
