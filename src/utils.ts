@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
-import { getDeviceType } from 'react-native-device-info';
 import RNFS from 'react-native-fs';
+
+import { IS_MAC_CATALYST } from './constants';
 
 type PLATFORM = 'ANDROID' | 'IOS' | 'MACOS' | 'WINDOWS';
 
@@ -9,7 +10,7 @@ function getPlatform(): PLATFORM {
     case 'android':
       return 'ANDROID';
     case 'ios':
-      return getDeviceType() === 'Desktop' ? 'MACOS' : 'IOS';
+      return IS_MAC_CATALYST ? 'MACOS' : 'IOS';
     default:
       throw Error('Unsupported platform');
   }

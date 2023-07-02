@@ -86,11 +86,9 @@ and [old][Old Architecture] RN architectures.
 
 - Install the package:
   ```shell
-  $ npm install --save @dr.pogodin/react-native-static-server \
-      react-native-fs react-native-device-info
+  $ npm install --save @dr.pogodin/react-native-static-server
   ```
-  **Notes:**
-  - _In case you prefer to install this library from its source code
+  **Note:** _In case you prefer to install this library from its source code
   (i.e. directly from its GitHub repo, or a local folder), mind that it depends
   on several Git sub-modules, which should be clonned and checked out by this
   command in the library's codebase root:
@@ -98,10 +96,6 @@ and [old][Old Architecture] RN architectures.
   the library have correct versions of the code from these sub-modules bundled
   into the package, thus no need to clone and check them out after installation
   from NPM._
-  - _Installation of `react-native-fs` and `react-native-device-info` into
-    the host codebase is required because on iOS, for some reason, these
-    libraries do not link correctly when they are only mentioned as
-    the library's dependencies, and not directly as the host app dependencies._
 
 - For **Android**:
   - In the `build.gradle` file set `minSdkVersion` equal `28`
@@ -384,7 +378,8 @@ within `options` argument:
 - `fileDir` &mdash; **string** &mdash; The root path on target device from where
   static assets should be served. Relative paths (those not starting with `/`,
   neither `file:///`) are automatically prepended by the platform-dependent
-  base path (document or main bundle directory); however, empty `fileDir` value
+  base path (document directory on Android, or main bundle directory on other
+  platforms); however, empty `fileDir` value
   is forbidden &mdash; if you really want to serve all content from the base
   directory, provide it its absolute path explicitly.
 
@@ -675,7 +670,8 @@ import {resolveAssetsPath} from '@dr.pogodin/react-native-static-server';
 resolveAssetsPath(path: string): string;
 ```
 If given `path` is relative, it returns the corresponding absolute path,
-resolved relative to the platform-specific base location for bundled assets;
+resolved relative to the platform-specific base location (document folder
+on Android; or main bundle folder on other platforms) for bundled assets;
 otherwise, it just returns given absolute `path` as is. 
 
 In other words, it exposes the same path resolution logic used by [Server]'s
