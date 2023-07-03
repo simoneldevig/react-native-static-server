@@ -10,6 +10,9 @@ Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalys
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
+**BEWARE:** _The Windows support is broken in the version v0.8.0, rely on
+the library version v0.7.13 instead, for now._
+
 [![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
 
 ### Sponsored By:
