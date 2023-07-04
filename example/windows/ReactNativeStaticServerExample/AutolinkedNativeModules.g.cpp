@@ -6,9 +6,6 @@
 // Includes from @dr.pogodin/react-native-static-server
 #include <winrt/ReactNativeStaticServer.h>
 
-// Includes from react-native-device-info
-#include <winrt/RNDeviceInfoCPP.h>
-
 // Includes from react-native-webview
 #include <winrt/ReactNativeWebView.h>
 
@@ -19,8 +16,6 @@ void RegisterAutolinkedNativeModulePackages(winrt::Windows::Foundation::Collecti
 { 
     // IReactPackageProviders from @dr.pogodin/react-native-static-server
     packageProviders.Append(winrt::ReactNativeStaticServer::ReactPackageProvider());
-    // IReactPackageProviders from react-native-device-info
-    packageProviders.Append(winrt::RNDeviceInfoCPP::ReactPackageProvider());
     // IReactPackageProviders from react-native-webview
     packageProviders.Append(winrt::ReactNativeWebView::ReactPackageProvider());
 }

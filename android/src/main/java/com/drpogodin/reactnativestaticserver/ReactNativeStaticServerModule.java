@@ -54,6 +54,7 @@ public class ReactNativeStaticServerModule
     final Map<String,Object> constants = new HashMap<>();
 
     constants.put("CRASHED", Server.CRASHED);
+    constants.put("IS_MAC_CATALYST", false);
     constants.put("LAUNCHED", Server.LAUNCHED);
     constants.put("TERMINATED", Server.TERMINATED);
 

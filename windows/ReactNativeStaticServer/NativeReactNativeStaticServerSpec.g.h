@@ -29,6 +29,8 @@ REACT_STRUCT(ReactNativeStaticServerSpec_Constants)
 struct ReactNativeStaticServerSpec_Constants {
     REACT_FIELD(CRASHED)
     std::string CRASHED;
+    REACT_FIELD(IS_MAC_CATALYST)
+    bool IS_MAC_CATALYST;
     REACT_FIELD(LAUNCHED)
     std::string LAUNCHED;
     REACT_FIELD(TERMINATED)

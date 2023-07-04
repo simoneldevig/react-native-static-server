@@ -10,6 +10,9 @@ Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalys
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
+**BEWARE:** _The Windows support is broken in the version v0.8.0, rely on
+the library version v0.7.13 instead, for now._
+
 [![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
 
 ### Sponsored By:
@@ -345,6 +348,7 @@ outside platform-specific sub-folders.
   (Android-specific).
 - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
   server instance, if any.
+- [resolveAssetsPath()] &mdash; Resolves relative paths for bundled assets.
 - [ERROR_LOG_FILE] &mdash; Location of the error log file.
 - [STATES] &mdash; Enumerates possible states of [Server] instance.
 - [UPLOADS_DIR] &mdash; Location for uploads.
@@ -376,9 +380,11 @@ within `options` argument:
 
 - `fileDir` &mdash; **string** &mdash; The root path on target device from where
   static assets should be served. Relative paths (those not starting with `/`,
-  neither `file:///`) will be automatically prepended by the _document directory_
-  path; however, empty `fileDir` value is forbidden: if you really want to serve
-  entire documents directory of the app, provide its absolute path explicitly.
+  neither `file:///`) are automatically prepended by the platform-dependent
+  base path (document directory on Android, or main bundle directory on other
+  platforms); however, empty `fileDir` value
+  is forbidden &mdash; if you really want to serve all content from the base
+  directory, provide it its absolute path explicitly.
 
 - `errorLog` &mdash; **boolean** | [ErrorLogOptions] &mdash; Optional.
   If set **true** (treated equivalent to `{}`) the server instance will
@@ -658,6 +664,26 @@ in the app. It does not return, however, any inactive server instance which has
 been stopped automatically because of `stopInBackground` option, when the app
 entered background, and might be automatically started in future if the app
 enters foreground again prior to an explicit [.stop()] call for that instance.
+
+### resolveAssetsPath()
+[resolveAssetsPath()]: #resolveassetspath
+```ts
+import {resolveAssetsPath} from '@dr.pogodin/react-native-static-server';
+
+resolveAssetsPath(path: string): string;
+```
+If given `path` is relative, it returns the corresponding absolute path,
+resolved relative to the platform-specific base location (document folder
+on Android; or main bundle folder on other platforms) for bundled assets;
+otherwise, it just returns given absolute `path` as is. 
+
+In other words, it exposes the same path resolution logic used by [Server]'s
+[constructor()] for its `fileDir` argument.
+
+**Arguments**
+- `path` &mdash; **string** &mdash; Absolute or relative path.
+
+Returns **string** &mdash; The corresponding absolute path.
 
 ### ERROR_LOG_FILE
 [ERROR_LOG_FILE]: #error_log_file

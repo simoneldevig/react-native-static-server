@@ -4,6 +4,7 @@ import { TurboModuleRegistry } from 'react-native';
 export interface Spec extends TurboModule {
   readonly getConstants: () => {
     CRASHED: string;
+    IS_MAC_CATALYST: boolean;
     LAUNCHED: string;
     TERMINATED: string;
   };

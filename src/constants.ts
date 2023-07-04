@@ -5,6 +5,8 @@ import ReactNativeStaticServer from './ReactNativeStaticServer';
 
 const CONSTANTS = ReactNativeStaticServer.getConstants();
 
+export const IS_MAC_CATALYST = CONSTANTS.IS_MAC_CATALYST;
+
 export const SIGNALS = {
   CRASHED: CONSTANTS.CRASHED,
   LAUNCHED: CONSTANTS.LAUNCHED,

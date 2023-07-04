@@ -26,6 +26,7 @@ RCT_EXPORT_MODULE();
 - (NSDictionary*) constantsToExport {
   return @{
     @"CRASHED": CRASHED,
+    @"IS_MAC_CATALYST": @(TARGET_OS_MACCATALYST),
     @"LAUNCHED": LAUNCHED,
     @"TERMINATED": TERMINATED
   };
