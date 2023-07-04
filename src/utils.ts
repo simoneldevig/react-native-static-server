@@ -11,8 +11,10 @@ function getPlatform(): PLATFORM {
       return 'ANDROID';
     case 'ios':
       return IS_MAC_CATALYST ? 'MACOS' : 'IOS';
+    case 'windows':
+      return 'WINDOWS';
     default:
-      throw Error('Unsupported platform');
+      throw Error(`Unsupported platform ${Platform.OS}`);
   }
 }
 

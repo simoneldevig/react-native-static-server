@@ -84,5 +84,7 @@ module.exports = mergeConfig(getDefaultConfig(), {
         inlineRequires: true,
       },
     }),
+    // This fixes the 'missing-asset-registry-path` error (see https://github.com/microsoft/react-native-windows/issues/11437)
+    assetRegistryPath: 'react-native/Libraries/Image/AssetRegistry',
   },
 });

@@ -31,6 +31,7 @@ void OnSignal(std::string signal, std::string details) {
 ReactNativeStaticServerSpec_Constants ReactNativeModule::GetConstants() noexcept {
     ReactNativeStaticServerSpec_Constants res;
     res.CRASHED = CRASHED;
+    res.IS_MAC_CATALYST = false;
     res.LAUNCHED = LAUNCHED;
     res.TERMINATED = TERMINATED;
     return res;
