@@ -157,7 +157,7 @@ the library version v0.7.13 instead, for now._
 - Create and run a server instance:
 
   ```jsx
-  import { useEffect } from 'react';
+  import { useEffect, useState } from 'react';
   import { Text, View } from 'react-native';
   import Server from '@dr.pogodin/react-native-static-server';
 
