@@ -157,7 +157,7 @@ the library version v0.7.13 instead, for now._
 - Create and run a server instance:
 
   ```jsx
-  import { useEffect } from 'react';
+  import { useEffect, useState } from 'react';
   import { Text, View } from 'react-native';
   import Server from '@dr.pogodin/react-native-static-server';
 
@@ -785,7 +785,7 @@ customer._
 These are future development aims, ordered by their current priority (from
 the top priority, to the least priority):
 
-- Support of custom configurartion of HTTP server, and inclusion of
+- Support of custom configuration of HTTP server, and inclusion of
   additional [Lighttpd] plugins (only three plugins for serving static
   assets are included now by default on all platforms).
 - Support of [Expo].
