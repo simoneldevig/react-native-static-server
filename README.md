@@ -61,6 +61,11 @@ and [old][Old Architecture] RN architectures.
 [the example project][example app] included into the library repository._
 
 - [CMake] is required on the build host.
+
+  - When building for **Android**, [CMake] should be installed as a part of your
+    _Android SDK_ (open _SDK Manager_, and look for [CMake] within
+    the _SDK Tools_ tab).
+
   - On **MacOS**, the `pkg-config` dependency is also needed. You can install both via [Homebrew],
     by executing:
     ```shell
@@ -78,11 +83,6 @@ and [old][Old Architecture] RN architectures.
 
     For details read: https://earthly.dev/blog/homebrew-on-m1,
     and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
-
-  - On **Ubuntu** you may get it by executing
-    ```shell
-    $ sudo apt-get update && sudo apt-get install cmake
-    ```
 
 - Install the package:
   ```shell
