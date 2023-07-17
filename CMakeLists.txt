@@ -63,7 +63,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
 endif()
 
 execute_process(
-  COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/pcre2
+  COMMAND ${CMAKE_COMMAND} ${CMAKE_CURRENT_SOURCE_DIR}/pcre2
     -B ${CMAKE_BINARY_DIR}/pcre2
     -DCMAKE_BUILD_TYPE=Release
     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/sysroot
@@ -78,7 +78,7 @@ execute_process(
 )
 
 execute_process(
-  COMMAND cmake --build ${CMAKE_BINARY_DIR}/pcre2
+  COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/pcre2
     --config Release
     ${PCRE2_TARGET}
 )
@@ -92,7 +92,7 @@ if(
   # as of now.
   AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin"
 )
-  execute_process(COMMAND cmake --install ${CMAKE_BINARY_DIR}/pcre2)
+  execute_process(COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}/pcre2)
 endif()
 
 # Copies shared PCRE2 library into the folder from where Gradle automatically
