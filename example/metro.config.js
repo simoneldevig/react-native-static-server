@@ -20,10 +20,6 @@ const modules = Object.keys({
   ...pak.peerDependencies,
 });
 
-const rnPath = fs.realpathSync(
-  path.resolve(require.resolve('react-native/package.json'), '..'),
-);
-
 const rnwPath = fs.realpathSync(
   path.resolve(require.resolve('react-native-windows/package.json'), '..'),
 );
