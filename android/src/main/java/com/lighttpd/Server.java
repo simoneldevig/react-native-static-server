@@ -86,13 +86,17 @@ public class Server extends Thread {
       if (res != 0) {
         throw new Exception("Native server exited with status " + res);
       }
+
+      // NOTE: It MUST BE set "null" prior to sending out TERMINATED or CRASHED
+      // signals.
+      activeServer = null;
+
       Log.i(LOGTAG, "Server terminated gracefully");
       signalConsumer.accept(TERMINATED, null);
     } catch (Exception error) {
+      activeServer = null;
       Log.e(LOGTAG, "Server crashed", error);
       signalConsumer.accept(CRASHED, error.getMessage());
-    } finally {
-      activeServer = null;
     }
   }
 }

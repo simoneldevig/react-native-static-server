@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.util.concurrent.Semaphore;
 import java.util.Enumeration;
 import java.util.function.BiConsumer;
 
@@ -27,6 +28,15 @@ import java.util.Map;
 public class ReactNativeStaticServerModule
   extends ReactNativeStaticServerSpec implements LifecycleEventListener
 {
+  // This semaphore is used to atomize server start-up and shut-down operations.
+  // It is acquired in the very beginning of start() and stop() methods; and it
+  // is normally released on the first subsequent signal from the server, at
+  // the same moment the pendingPromise for those start() and stop() is resolved.
+  // In edge cases, when start() or stop() is aborted due to failed runtime
+  // invariant checks, this semaphore is released at those abort points, which
+  // are in all cases prior to assigning the pendingPromise value.
+  private static Semaphore sem = new Semaphore(1, true);
+
   // The currently active server instance. We assume only single server instance
   // can be active at any time, thus a simple field should be enought for now.
   // If we arrive to having possibility of multiple servers running in
@@ -94,13 +104,23 @@ public class ReactNativeStaticServerModule
   ) {
     Log.i(LOGTAG, "Starting...");
 
+    try {
+      sem.acquire();
+    } catch (Exception e) {
+      Errors.INTERNAL_ERROR.log(e)
+        .reject(promise, "Failed to acquire a semaphore");
+      return;
+    }
+
     if (server != null) {
       Errors.ANOTHER_INSTANCE_IS_ACTIVE.log().reject(promise);
+      sem.release();
       return;
     }
 
     if (pendingPromise != null) {
       Errors.INTERNAL_ERROR.log().reject(promise, "Unexpected pending promise");
+      sem.release();
       return;
     }
 
@@ -123,11 +143,11 @@ public class ReactNativeStaticServerModule
             event.putString("details", details);
             emitter.emit("RNStaticServer", event);
           } else {
-            Promise p = pendingPromise;
-            pendingPromise = null;
             if (signal == Server.CRASHED) {
-              Errors.SERVER_CRASHED.reject(p, details);
-            } else p.resolve(details);
+              Errors.SERVER_CRASHED.reject(pendingPromise, details);
+            } else pendingPromise.resolve(details);
+            pendingPromise = null;
+            sem.release();
           }
         }
       }
@@ -150,20 +170,25 @@ public class ReactNativeStaticServerModule
 
   @ReactMethod
   public void stop(Promise promise) {
+    Log.i(LOGTAG, "stop() triggered");
+
     try {
-      Log.i(LOGTAG, "stop() triggered.");
-
-      if (pendingPromise != null) {
-        Errors.INTERNAL_ERROR
-          .reject(pendingPromise, "Unexpected pending promise");
-        return;
-      }
-
-      pendingPromise = promise;
-      server.interrupt();
+      sem.acquire();
     } catch (Exception e) {
-      Errors.STOP_FAILURE.log(e).reject(promise);
+      Errors.INTERNAL_ERROR.log(e)
+        .reject(promise, "Failed to acquire a semaphore");
+      return;
     }
+
+    if (pendingPromise != null) {
+      Errors.INTERNAL_ERROR
+        .reject(pendingPromise, "Unexpected pending promise");
+      sem.release();
+      return;
+    }
+
+    pendingPromise = promise;
+    server.interrupt();
   }
 
   @ReactMethod
