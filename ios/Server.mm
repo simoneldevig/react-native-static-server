@@ -58,15 +58,16 @@ extern "C" {
       onLaunchedCallback
     );
     if (res) [NSException raise:@"Server exited with error" format:@"%d", res];
+
+    activeServer = NULL;
+
     NSLog(@"Server terminated gracefully");
     self.signalConsumer(TERMINATED, nil);
   }
   @catch (NSException *error) {
+    activeServer = NULL;
     NSLog(@"Server crashed %@", error.name);
     self.signalConsumer(CRASHED, error.name);
-  }
-  @finally {
-    activeServer = NULL;
   }
 }
 
