@@ -76,12 +76,13 @@ void Server::launch() {
                 if (res) {
                     throw new std::exception("Ligttpd exited with status " + res);
                 }
+                Server::activeServer = NULL;
                 this->_signalConsumer(TERMINATED, "");
             }
             catch (...) {
+                Server::activeServer = NULL;
                 this->_signalConsumer(CRASHED, "");
             }
-            Server::activeServer = NULL;
         }
     );
 }

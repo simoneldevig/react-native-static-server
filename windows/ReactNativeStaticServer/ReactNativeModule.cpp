@@ -2,6 +2,9 @@
 #include "ReactNativeModule.h"
 #include <ppltasks.h>
 
+#include <condition_variable>
+#include <mutex>
+
 #include "Errors.h"
 #include "Server.h"
 
@@ -14,17 +17,36 @@ ReactNativeModule* mod;
 React::ReactPromise<::React::JSValue>* pendingResult;
 Server *server;
 
+// There is no semaphore in C++ STL prior to C++20,
+// thus we have to make it ourselves.
+boolean sem = true;
+std::mutex sem_guard;
+std::condition_variable sem_cv;
+
+void lock_sem() {
+  std::unique_lock lk(sem_guard);
+  sem_cv.wait(lk, [] { return sem; });
+  sem = false;
+}
+
+void unlock_sem() {
+  std::lock_guard lk(sem_guard);
+  if (sem) throw std::exception("Internal synchronization error");
+  sem = true;
+  sem_cv.notify_one();
+}
+
 void OnSignal(std::string signal, std::string details) {
     if (signal == CRASHED || signal == TERMINATED) {
         delete server;
         server = NULL;
     }
     if (pendingResult) {
-        auto result = pendingResult;
+        if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
+        else pendingResult->Resolve(NULL);
+        delete pendingResult;
         pendingResult = NULL;
-        if (signal == CRASHED) RNException("Server crashed").reject(*result);
-        else result->Resolve(NULL);
-        delete result;
+        unlock_sem();
     } else mod->sendEvent(signal, details);
 }
 
@@ -105,8 +127,20 @@ void ReactNativeModule::start(
     std::string errlogPath,
     React::ReactPromise<::React::JSValue>&& result
 ) noexcept {
-    if (server) return RNException("Another server instance is active").reject(result);
-    if (pendingResult) return RNException("Internal error").reject(result);
+    lock_sem();
+
+    if (server) {
+      RNException("Another server instance is active").reject(result);
+      unlock_sem();
+      return;
+    };
+
+    if (pendingResult) {
+      RNException("Internal error").reject(result);
+      unlock_sem();
+      return;
+    }
+
     mod = this;
     activeServerId = id;
     pendingResult = new React::ReactPromise<React::JSValue>(result);
@@ -116,16 +150,26 @@ void ReactNativeModule::start(
 
 void ReactNativeModule::stop(React::ReactPromise<React::JSValue>&& result) noexcept {
     try {
+        lock_sem();
+
         // The synchronization in JS layer is supposed to ensure this native
         // .stop() is never called before any previous pendingResult is settled
         // and cleaned up.
-        if (pendingResult) return RNException("Internal error").reject(result);
+        if (pendingResult) {
+          unlock_sem();
+          RNException("Internal error").reject(result);
+          return;
+        }
 
         // This means either the server has crashed at the same time we were
         // about to ask it to gracefully shutdown, or there is some error in
         // JS layer, which is not supposed to call this native .stop() unless
         // an active server instance exists.
-        if (!server) return RNException("No active server").reject(result);
+        if (!server) {
+          RNException("No active server").reject(result);
+          unlock_sem();
+          return;
+        }
 
         pendingResult = new React::ReactPromise<React::JSValue>(result);
         server->shutdown();
