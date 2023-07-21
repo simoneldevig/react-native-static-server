@@ -6,6 +6,7 @@
 #include <net/if.h>
 
 static NSString * const EVENT_NAME = @"RNStaticServer";
+static dispatch_semaphore_t sem = dispatch_semaphore_create(1);
 
 @implementation ReactNativeStaticServer {
     Server *server;
@@ -17,9 +18,12 @@ RCT_EXPORT_MODULE();
   return [super init];
 }
 
-- (void)dealloc {
+- (void)invalidate
+{
+  [super invalidate];
   if (self->server) {
-    [self->server cancel];
+    [self stop:^void(id){}
+      rejecter:^void(NSString *a,NSString *b, NSError *c){}];
   }
 }
 
@@ -84,9 +88,12 @@ RCT_REMAP_METHOD(start,
 ) {
     NSLog(@"Starting the server...");
 
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
     if (self->server) {
       auto e = [[RNException name:@"Another server instance is active"] log];
       [e reject:reject];
+      dispatch_semaphore_signal(sem);
       return;
     }
 
@@ -94,6 +101,7 @@ RCT_REMAP_METHOD(start,
       auto e = [[RNException name:@"Internal error"
                           details:@"Non-expected pending promise"] log];
       [e reject:reject];
+      dispatch_semaphore_signal(sem);
       return;
     }
 
@@ -113,14 +121,13 @@ RCT_REMAP_METHOD(start,
           }
         ];
       } else {
-        auto resolve = pendingResolve;
-        auto reject = pendingReject;
-        pendingResolve = nil;
-        pendingReject = nil;
         if (signal == CRASHED) {
           [[RNException name:@"Server crashed" details:details]
-           reject:reject];
-        } else resolve(details);
+           reject:pendingReject];
+        } else pendingResolve(details);
+        pendingResolve = nil;
+        pendingReject = nil;
+        dispatch_semaphore_signal(sem);
       }
     };
 
@@ -145,10 +152,13 @@ RCT_REMAP_METHOD(stop,
     if (self->server) {
       NSLog(@"Stopping...");
 
+      dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
       if (pendingResolve != nil || pendingReject != nil) {
         auto e = [[RNException name:@"Internal error"
                             details:@"Unexpected pending promise"] log];
         [e reject:reject];
+        dispatch_semaphore_signal(sem);
         return;
       }
 

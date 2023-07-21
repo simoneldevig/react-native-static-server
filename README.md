@@ -10,9 +10,6 @@ Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalys
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
-**BEWARE:** _The Windows support is broken in the version v0.8.0, rely on
-the library version v0.7.13 instead, for now._
-
 [![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
 
 ### Sponsored By:
@@ -64,6 +61,11 @@ the library version v0.7.13 instead, for now._
 [the example project][example app] included into the library repository._
 
 - [CMake] is required on the build host.
+
+  - When building for **Android**, [CMake] should be installed as a part of your
+    _Android SDK_ (open _SDK Manager_, and look for [CMake] within
+    the _SDK Tools_ tab).
+
   - On **MacOS**, the `pkg-config` dependency is also needed. You can install both via [Homebrew],
     by executing:
     ```shell
@@ -81,11 +83,6 @@ the library version v0.7.13 instead, for now._
 
     For details read: https://earthly.dev/blog/homebrew-on-m1,
     and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
-
-  - On **Ubuntu** you may get it by executing
-    ```shell
-    $ sudo apt-get update && sudo apt-get install cmake
-    ```
 
 - Install the package:
   ```shell
