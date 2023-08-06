@@ -6,7 +6,13 @@ import {
   Platform,
 } from 'react-native';
 
-import RNFS from 'react-native-fs';
+import {
+  copyFileAssets,
+  DocumentDirectoryPath,
+  mkdir,
+  readDirAssets,
+  unlink,
+} from '@dr.pogodin/react-native-fs';
 
 import { Emitter, Semaphore } from '@dr.pogodin/js-utils';
 
@@ -209,7 +215,7 @@ class StaticServer {
       this._configPath = undefined;
 
       try {
-        await RNFS.unlink(p);
+        await unlink(p);
       } catch {
         // IGNORE
       }
@@ -375,18 +381,18 @@ export default StaticServer;
  * @return {Promise} Resolves once unpacking is completed.
  */
 export async function extractBundledAssets(
-  into = RNFS.DocumentDirectoryPath,
+  into = DocumentDirectoryPath,
   from = '',
 ) {
   if (Platform.OS !== 'android') return;
 
-  await RNFS.mkdir(into);
-  const assets = await RNFS.readDirAssets(from);
+  await mkdir(into);
+  const assets = await readDirAssets(from);
   for (let i = 0; i < assets.length; ++i) {
     const asset = assets[i]!;
     const target = `${into}/${asset.name}`;
     if (asset.isDirectory()) await extractBundledAssets(target, asset.path);
-    else await RNFS.copyFileAssets(asset.path, target);
+    else await copyFileAssets(asset.path, target);
   }
 }
 

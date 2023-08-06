@@ -1,12 +1,16 @@
 // Encapsulates the standard Lighttpd configuration for the library.
 
-import RNFS from 'react-native-fs';
+import {
+  mkdir,
+  TemporaryDirectoryPath,
+  writeFile,
+} from '@dr.pogodin/react-native-fs';
 
 /**
  * Filesystem location where the library will keep its working files (configs,
  * logs, uploads) for the app.
  */
-export const WORK_DIR = `${RNFS.TemporaryDirectoryPath}/__rn-static-server__`;
+export const WORK_DIR = `${TemporaryDirectoryPath}/__rn-static-server__`;
 
 /**
  * Filesystem location for the error log file.
@@ -185,9 +189,9 @@ export async function newStandardConfigFile(
 ): Promise<string> {
   // NOTE: Lighttpd exits with error right away if the specified uploads
   // directory does not exist.
-  await RNFS.mkdir(UPLOADS_DIR);
+  await mkdir(UPLOADS_DIR);
 
   const configFile = `${WORK_DIR}/config-${Date.now()}.txt`;
-  await RNFS.writeFile(configFile, standardConfig(options), 'utf8');
+  await writeFile(configFile, standardConfig(options), 'utf8');
   return configFile;
 }
