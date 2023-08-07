@@ -742,14 +742,12 @@ The type of `errorLog` option of the Server's [constructor()]. It describes an
 object with the following optional boolean flags; each of them enables
 the similarly named
 [Lighttpd debug option](https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables):
-- `conditionCacheHandling` &mdash; **boolean** &mdash; Optional.
 - `conditionHandling` &mdash; **boolean** &mdash; Optional.
 - `fileNotFound` &mdash; **boolean** &mdash; Optional.
 - `requestHandling` &mdash; **boolean** &mdash; Optional.
 - `requestHeader` &mdash; **boolean** &mdash; Optional.
 - `requestHeaderOnError` &mdash; **boolean** &mdash; Optional.
 - `responseHeader` &mdash; **boolean** &mdash; Optional.
-- `sslNoise` &mdash; **boolean** &mdash; Optional.
 - `timeouts` &mdash; **boolean** &mdash; Optional.
 
 Without any flag set the server instance will still output very basic state
