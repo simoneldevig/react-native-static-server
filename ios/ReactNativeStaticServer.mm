@@ -69,7 +69,7 @@ RCT_REMAP_METHOD(getLocalIpAddress,
     resolve(@"127.0.0.1");
   }
   @catch (NSException *e) {
-    [[RNException from:e] reject:reject];
+    [[RNSSException from:e] reject:reject];
   }
   @finally {
     freeifaddrs(interfaces);
@@ -91,14 +91,14 @@ RCT_REMAP_METHOD(start,
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
     if (self->server) {
-      auto e = [[RNException name:@"Another server instance is active"] log];
+      auto e = [[RNSSException name:@"Another server instance is active"] log];
       [e reject:reject];
       dispatch_semaphore_signal(sem);
       return;
     }
 
     if (pendingResolve != nil || pendingReject != nil) {
-      auto e = [[RNException name:@"Internal error"
+      auto e = [[RNSSException name:@"Internal error"
                           details:@"Non-expected pending promise"] log];
       [e reject:reject];
       dispatch_semaphore_signal(sem);
@@ -122,7 +122,7 @@ RCT_REMAP_METHOD(start,
         ];
       } else {
         if (signal == CRASHED) {
-          [[RNException name:@"Server crashed" details:details]
+          [[RNSSException name:@"Server crashed" details:details]
            reject:pendingReject];
         } else pendingResolve(details);
         pendingResolve = nil;
@@ -155,7 +155,7 @@ RCT_REMAP_METHOD(stop,
       dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
       if (pendingResolve != nil || pendingReject != nil) {
-        auto e = [[RNException name:@"Internal error"
+        auto e = [[RNSSException name:@"Internal error"
                             details:@"Unexpected pending promise"] log];
         [e reject:reject];
         dispatch_semaphore_signal(sem);
@@ -167,7 +167,7 @@ RCT_REMAP_METHOD(stop,
       [self->server cancel];
     }
   } catch (NSException *e) {
-    [[RNException from:e] reject:reject];
+    [[RNSSException from:e] reject:reject];
   }
 }
 
@@ -179,7 +179,7 @@ RCT_REMAP_METHOD(getOpenPort,
   @try {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
-      [[RNException name:@"Error creating socket"] reject:reject];
+      [[RNSSException name:@"Error creating socket"] reject:reject];
       return;
     }
 
@@ -188,18 +188,18 @@ RCT_REMAP_METHOD(getOpenPort,
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = 0;
     if (!inet_aton([address cStringUsingEncoding:NSUTF8StringEncoding], &(serv_addr.sin_addr))) {
-      [[RNException name:@"Invalid address format"] reject:reject];
+      [[RNSSException name:@"Invalid address format"] reject:reject];
       return;
     }
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-      [[RNException name:@"Error binding socket"] reject:reject];
+      [[RNSSException name:@"Error binding socket"] reject:reject];
       return;
     }
 
     socklen_t len = sizeof(serv_addr);
     if (getsockname(sockfd, (struct sockaddr *) &serv_addr, &len) < 0) {
-      [[RNException name:@"Error getting socket name"] reject:reject];
+      [[RNSSException name:@"Error getting socket name"] reject:reject];
       return;
     }
     int port = ntohs(serv_addr.sin_port);
@@ -208,7 +208,7 @@ RCT_REMAP_METHOD(getOpenPort,
     resolve(@(port));
   }
   @catch (NSException *e) {
-    [[RNException from:e] reject:reject];
+    [[RNSSException from:e] reject:reject];
   }
 }
 

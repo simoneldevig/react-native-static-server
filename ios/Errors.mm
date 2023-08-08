@@ -2,7 +2,7 @@
 
 static NSString * const ERROR_DOMAIN = @"RNStaticServer";
 
-@implementation RNException;
+@implementation RNSSException;
 
 - (id) initWithName:(NSString*)name details:(NSString*)details
 {
@@ -11,7 +11,7 @@ static NSString * const ERROR_DOMAIN = @"RNStaticServer";
 }
 
 /**
- * Creates a new NSError object based on this RNException
+ * Creates a new NSError object based on this RNSSException
  */
 - (NSError*) error
 {
@@ -22,7 +22,7 @@ static NSString * const ERROR_DOMAIN = @"RNStaticServer";
   ];
 }
 
-- (RNException*) log
+- (RNSSException*) log
 {
   NSLog(@"%@: %@", self.name, self.reason);
   return self;
@@ -33,23 +33,23 @@ static NSString * const ERROR_DOMAIN = @"RNStaticServer";
   reject(self.name, self.reason, [self error]);
 }
 
-+ (RNException*) from: (NSException*)exception
++ (RNSSException*) from: (NSException*)exception
 {
-  return [[RNException alloc]
+  return [[RNSSException alloc]
           initWithName: exception.name
           reason: exception.reason
           userInfo: exception.userInfo
   ];
 }
 
-+ (RNException*) name: (NSString*)name
++ (RNSSException*) name: (NSString*)name
 {
-  return [[RNException alloc] initWithName:name details:nil];
+  return [[RNSSException alloc] initWithName:name details:nil];
 }
 
-+ (RNException*) name: (NSString*)name details:(NSString*)details
++ (RNSSException*) name: (NSString*)name details:(NSString*)details
 {
-  return [[RNException alloc] initWithName:name details:details];
+  return [[RNSSException alloc] initWithName:name details:details];
 }
 
 @end;

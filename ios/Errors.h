@@ -10,14 +10,14 @@
 
 #import <React/RCTBridgeModule.h>
 
-@interface RNException : NSException
+@interface RNSSException : NSException
 - (id) initWithName: (NSString*)name details: (NSString*)details;
 - (NSError*) error;
-- (RNException*) log;
+- (RNSSException*) log;
 - (void) reject:(RCTPromiseRejectBlock)reject;
-+ (RNException*) from: (NSException*)exception;
-+ (RNException*) name: (NSString*)name;
-+ (RNException*) name: (NSString*)name details: (NSString*)details;
++ (RNSSException*) from: (NSException*)exception;
++ (RNSSException*) name: (NSString*)name;
++ (RNSSException*) name: (NSString*)name details: (NSString*)details;
 
 @property(readonly) NSInteger code;
 @end

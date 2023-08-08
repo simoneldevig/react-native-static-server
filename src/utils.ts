@@ -1,5 +1,9 @@
 import { Platform } from 'react-native';
-import RNFS from 'react-native-fs';
+
+import {
+  DocumentDirectoryPath,
+  MainBundlePath,
+} from '@dr.pogodin/react-native-fs';
 
 import { IS_MAC_CATALYST } from './constants';
 
@@ -21,10 +25,10 @@ function getPlatform(): PLATFORM {
 const PLATFORM: PLATFORM = getPlatform();
 
 const BASE_ASSET_DIRS: { [key in typeof PLATFORM]: string } = {
-  ANDROID: RNFS.DocumentDirectoryPath,
-  IOS: RNFS.MainBundlePath,
-  MACOS: `${RNFS.MainBundlePath}/Contents/Resources`,
-  WINDOWS: RNFS.MainBundlePath,
+  ANDROID: DocumentDirectoryPath,
+  IOS: MainBundlePath || '',
+  MACOS: `${MainBundlePath}/Contents/Resources`,
+  WINDOWS: MainBundlePath || '',
 };
 
 const BASE_ASSET_DIR = BASE_ASSET_DIRS[PLATFORM];

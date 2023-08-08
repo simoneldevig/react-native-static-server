@@ -32,19 +32,23 @@ and [old][Old Architecture] RN architectures.
 </table>
 
 <!-- links -->
+[@dr.pogodin/react-native-fs]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [example app]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
 [Expo]: https://expo.dev
 [OLD-README.md]: https://github.com/birdofpreyru/react-native-static-server/blob/master/OLD-README.md
+[getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
+[MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [react-native-fs]: https://www.npmjs.com/package/react-native-fs
 [React Native]: https://reactnative.dev
+[TemporaryDirectoryPath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#temporarydirectorypath
 
 ## Content
 
 - [Getting Started](#getting-started)
   - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
-- [Reference](#reference)
+- [API Reference](#api-reference)
 - [Project History and Roadmap](#project-history-and-roadmap)
   - [Notable Versions of the Library]
   - [Roadmap]
@@ -125,24 +129,16 @@ and [old][Old Architecture] RN architectures.
   - If you bundle inside your app the assets to serve by the server,
     keep in mind that in Mac Catalyst build they'll end up in a different
     path, compared to the regular iOS bundle (see [example app]): \
-    iOS: `${RNFS.MainBundlePath}/webroot`; \
-    Mac Catalyst: `${RNFS.MainBundlePath}/Content/Resources/webroot`.
+    iOS: "[MainBundlePath]`/webroot`"; \
+    Mac Catalyst: "[MainBundlePath]`/Content/Resources/webroot`".
 
-    Also keep in mind that `Platform.OS` value equals `iOS` both for the normal
+    Also keep in mind that `Platform.OS` value equals "`iOS`" both for the normal
     iOS and for the Mac Catalyst builds, and you should use different methods
-    to distinguish them; for example relying on `getDeviceType()` method of
+    to distinguish them; for example relying on [getDeviceType()] method of
     [react-native-device-info] library, which returns 'Desktop' in case of
     Catalyst build.
 
 - For **Windows**:
-  - Out of the box, the current version of [react-native-fs] library (v2.20.0),
-    we depend upon, is broken on Windows. For now, it can be worked around by
-    picking up
-    [RNFSManager.h](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/windows/ReactNativeStaticServerExample/RNFSManager.h) and
-    [RNFSManager.cpp](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/windows/ReactNativeStaticServerExample/RNFSManager.cpp) files
-    from the example app, and including them into the host app codebase,
-    the same way as the example app does.
-
   - Add _Internet (Client & Server)_, _Internet (Client)_,
     and _Private Networks (Client & Server)_ capabilities to your app.
 
@@ -250,11 +246,16 @@ outside platform-specific sub-folders.
     ```jsx
     // TODO: To be updated, see a better code inside the example app.
 
-    import RNFS from 'react-native-fs';
+    import {
+      DocumentDirectoryPath,
+      exists,
+      unlink,
+    } from '@dr.pogodin/react-native-fs';
+
     import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
 
     async function prepareAssets() {
-      const targetWebrootPathOnDevice = `${RNFS.DocumentDirectoryPath}/webroot`;
+      const targetWebrootPathOnDevice = `${DocumentDirectoryPath}/webroot`;
 
       // It is use-case specific, but in general if target webroot path exists
       // on the device, probably these assets have been extracted in a previous
@@ -262,7 +263,7 @@ outside platform-specific sub-folders.
       // locations these extracted files won't be delected automatically on
       // the apps's update, thus you'll need to check it and act accordingly,
       // which is abstracted as needsOverwrite() function in the condition.
-      const alreadyExtracted = await RNFS.exists(targetWebrootPathOnDevice);
+      const alreadyExtracted = await exists(targetWebrootPathOnDevice);
 
       // TODO: Give an example of needsOverwrite(), relying on app version
       // stored in local files. Maybe we should provide with the library
@@ -274,7 +275,7 @@ outside platform-specific sub-folders.
         // TODO: Careful here, as on platforms different from Android we do not
         // need to extract assets, we also should not remove them, thus we need
         // a guard when entering this clean-up / re-extract block.
-        if (alreadyExtracted) await RNFS.unlink(targetWebrootPathOnDevice);
+        if (alreadyExtracted) await unlink(targetWebrootPathOnDevice);
 
         // This function is a noop on other platforms than Android, thus no need
         // to guard against the platform.
@@ -321,7 +322,7 @@ outside platform-specific sub-folders.
     </Target>
     ```
 
-## Reference
+## API Reference
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
   - [.addStateListener()] &mdash; Adds state listener to the server instance.
@@ -728,9 +729,9 @@ import {WORK_DIR} from '@dr.pogodin/react-native-static-server';
 ```
 Constant **string**. It holds the filesystem location where all server instances
 within an app keep their working files (configs, logs, uploads). The actual
-value is "**RNFS.TemporaryDirectoryPath**`/__rn-static-server__`",
-where **RNFS.TemporaryDirectoryPath** is the temporary directory path for
-the app as reported by the [react-native-fs] library.
+value is "[TemporaryDirectoryPath]`/__rn-static-server__`",
+where [TemporaryDirectoryPath] is the temporary directory path for
+the app as reported by the [@dr.pogodin/react-native-fs] library.
 
 ### ErrorLogOptions
 [ErrorLogOptions]: #errorlogoptions
@@ -741,14 +742,12 @@ The type of `errorLog` option of the Server's [constructor()]. It describes an
 object with the following optional boolean flags; each of them enables
 the similarly named
 [Lighttpd debug option](https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables):
-- `conditionCacheHandling` &mdash; **boolean** &mdash; Optional.
 - `conditionHandling` &mdash; **boolean** &mdash; Optional.
 - `fileNotFound` &mdash; **boolean** &mdash; Optional.
 - `requestHandling` &mdash; **boolean** &mdash; Optional.
 - `requestHeader` &mdash; **boolean** &mdash; Optional.
 - `requestHeaderOnError` &mdash; **boolean** &mdash; Optional.
 - `responseHeader` &mdash; **boolean** &mdash; Optional.
-- `sslNoise` &mdash; **boolean** &mdash; Optional.
 - `timeouts` &mdash; **boolean** &mdash; Optional.
 
 Without any flag set the server instance will still output very basic state

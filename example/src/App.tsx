@@ -15,13 +15,7 @@ import {
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-// TODO: rn-fs does not work on Windows out of the box,
-// which is a know issue with a known workaround:
-// https://github.com/microsoft/react-native-windows/issues/2829
-// The workaround has been applied to this example app for now,
-// but it would be nice to figure out why it has not been fixed
-// in rn-fs itself?
-import RNFS from 'react-native-fs';
+import { readFile, readFileAssets, unlink } from '@dr.pogodin/react-native-fs';
 
 import { WebView } from 'react-native-webview';
 
@@ -62,12 +56,12 @@ export default function App() {
       if (Platform.OS === 'android') {
         let extract = true;
         try {
-          const versionD = await RNFS.readFile(`${fileDir}/version`, 'utf8');
-          const versionA = await RNFS.readFileAssets('webroot/version', 'utf8');
+          const versionD = await readFile(`${fileDir}/version`, 'utf8');
+          const versionA = await readFileAssets('webroot/version', 'utf8');
           if (versionA === versionD) {
             extract = false;
           } else {
-            await RNFS.unlink(fileDir);
+            await unlink(fileDir);
           }
         } catch {
           // A legit error happens here if assets have not been extracted
