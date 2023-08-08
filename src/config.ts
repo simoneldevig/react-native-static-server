@@ -27,12 +27,6 @@ export const UPLOADS_DIR = `${WORK_DIR}/uploads`;
  * https://redmine.lighttpd.net/projects/lighttpd/wiki/DebugVariables
  */
 export type ErrorLogOptions = {
-  // "debug.log-condition-cache-handling" is not a Lighttpd config directive.
-  // See: https://github.com/birdofpreyru/react-native-static-server/issues/59#issuecomment-1646752111
-  // TODO: Remove it from the code, once double-checked with @gstrauss why it is
-  // mentioned in Lighttpd Wiki then?
-  // conditionCacheHandling?: boolean;
-
   conditionHandling?: boolean;
   fileNotFound?: boolean;
   requestHandling?: boolean;
@@ -72,10 +66,6 @@ function errorLogConfig(errorLogOptions?: ErrorLogOptions): string {
     const enable = (op: string) => {
       res.push(`debug.log-${op} = "enable"`);
     };
-
-    // See the comment ealier in the file.
-    // if (ops.conditionCacheHandling) enable('condition-cache-handling');
-
     if (ops.conditionHandling) enable('condition-handling');
     if (ops.fileNotFound) enable('file-not-found');
     if (ops.requestHandling) enable('request-handling');
