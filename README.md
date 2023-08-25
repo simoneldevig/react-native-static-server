@@ -88,9 +88,9 @@ and [old][Old Architecture] RN architectures.
     For details read: https://earthly.dev/blog/homebrew-on-m1,
     and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
 
-- Install the package:
+- Install the package and its peer dependencies:
   ```shell
-  $ npm install --save @dr.pogodin/react-native-static-server
+  npx install-peerdeps @dr.pogodin/react-native-static-server
   ```
   **Note:** _In case you prefer to install this library from its source code
   (i.e. directly from its GitHub repo, or a local folder), mind that it depends
