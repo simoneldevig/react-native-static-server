@@ -126,9 +126,17 @@ set(PKG_CONFIG_ARGN --libs-only-l)
 
 add_subdirectory(lighttpd1.4)
 
-file(WRITE ${CMAKE_BINARY_DIR}/lighttpd1.4/build/plugin-static.h
+set(PLUGIN_STATIC
   PLUGIN_INIT(mod_dirlisting)\n
   PLUGIN_INIT(mod_h2)\n
   PLUGIN_INIT(mod_indexfile)\n
   PLUGIN_INIT(mod_staticfile)\n
+)
+
+if(WITH_MOD_WEBDAV)
+  set(PLUGIN_STATIC "${PLUGIN_STATIC}PLUGIN_INIT(mod_webdav)\n")
+endif()
+
+file(WRITE ${CMAKE_BINARY_DIR}/lighttpd1.4/build/plugin-static.h
+  ${PLUGIN_STATIC}
 )

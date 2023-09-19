@@ -39,15 +39,18 @@ and [old][Old Architecture] RN architectures.
 [OLD-README.md]: https://github.com/birdofpreyru/react-native-static-server/blob/master/OLD-README.md
 [getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
 [MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
+[mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [react-native-fs]: https://www.npmjs.com/package/react-native-fs
 [React Native]: https://reactnative.dev
 [TemporaryDirectoryPath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#temporarydirectorypath
+[WebDAV]: https://en.wikipedia.org/wiki/WebDAV
 
 ## Content
 
 - [Getting Started](#getting-started)
   - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
+  - [Enabling WebDAV module]
 - [API Reference](#api-reference)
 - [Project History and Roadmap](#project-history-and-roadmap)
   - [Notable Versions of the Library]
@@ -322,6 +325,39 @@ outside platform-specific sub-folders.
     </Target>
     ```
 
+### Enabling WebDAV Module
+[Enabling WebDAV module]: #enabling-webdav-module
+
+[Lighttpd]'s optional module [mod_webdav] provides [WebDAV] &mdash; a set of
+HTTP extensions that provides a framework allowing to create, change, and move
+documents on a server &mdash; essentially an easy way to enable `POST`, `PUT`,
+_etc._ functionality for selected routes.
+
+**BEWARE:** _As of now, I only need it for implementing a local testing of
+network functionality inside [@dr.pogodin/react-native-fs] library, thus for
+development needs only, and I have not put efforts to build it with all features
+(support of props and locks), and have not looked much into what configuration
+is needed for its safe and flexible production use._
+
+To enable [mod_webdav] in the library you need (1) configure your host RN app
+to build Lighttpd with [mod_webdav] included; (2) opt-in to use it for selected
+routes when you create [Server] instance inside your TypeScript code.
+
+1.  **Android**: Edit `android/gradle.properties` file of your app, adding
+    this flag in there:
+    ```gradle
+    ReactNativeStaticServer_webdav = true
+    ```
+
+    **iOS**: _TO BE FIGURED OUT_
+
+    **macOS (Catalyst)**: _TO BE FIGURED OUT_
+
+    **Windows**: _TO BE FIGURED OUT_
+
+2.  Use `webdav` option of [Server]'s [constructor()] to enable [WebDAV] for
+    selected routes of the created server instance.
+
 ## API Reference
 - [Server] &mdash; Represents a server instance.
   - [constructor()] &mdash; Creates a new [Server] instance.
@@ -446,6 +482,21 @@ within `options` argument:
   to the server state listeners (see [.addStateListener()]) will have their
   `details` values set equal "_App entered background_",
    and "_App entered foreground_" strings.
+
+- `webdav` &mdash; **string[]** &mdash; Optional. Enables [WebDAV] for specified
+  server routes. To use this option, first read [Enabling WebDAV module]. Each
+  string inside provided `webdav` array is expected to be a Perl-style regular
+  expression for the route(s) on which [WebDAV] should be enabled. For example,
+  to enable [WebDAV] for `/dav` directory and everything below it, you should
+  give `webdav = ["^/dav($|/)"]`, which will add the following configuration
+  to the internal [Lighttpd] config of the server:
+  ```perl
+  $HTTP["url"] =~ "^/dav($|/)" {
+    webdav.activate = "enable"
+  }
+  ```
+  As of now, we don't yet support more advanced features and configurations for
+  [mod_webdav].
 
 #### .addStateListener()
 [.addStateListener()]: #addstatelistener

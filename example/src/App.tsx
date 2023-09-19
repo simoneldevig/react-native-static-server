@@ -44,7 +44,36 @@ export default function App() {
     // In our example, `server` is reset to null when the component is unmount,
     // thus signalling that server init sequence below should be aborted, if it
     // is still underway.
-    let server: null | Server = new Server({ fileDir, stopInBackground: true });
+    let server: null | Server = new Server({
+      fileDir,
+
+      // Note: Inside Android emulator the IP address 10.0.2.15 corresponds
+      // to the emulated device network or ethernet interface, which can be
+      // connected to from the host machine, following instructions at:
+      // https://developer.android.com/studio/run/emulator-networking#consoleredir
+      hostname: '10.0.2.15', // Android emulator ethernet interface.
+      // hostname: '127.0.0.1', // This is just the local loopback address.
+
+      // The fixed port is just more convenient for library development &
+      // testing.
+      port: 3000,
+
+      stopInBackground: true,
+
+      // These settings enable all available debug options for Lighttpd core,
+      // to facilitate library development & testing with the example app.
+      errorLog: {
+        conditionHandling: true,
+        fileNotFound: true,
+        requestHandling: true,
+        requestHeader: true,
+        requestHeaderOnError: true,
+        responseHeader: true,
+        timeouts: true,
+      },
+
+      webdav: ['^/dav($|/)', '^/davos($|/)'],
+    });
     const serverId = server.id;
 
     (async () => {

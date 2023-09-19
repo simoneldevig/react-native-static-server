@@ -112,6 +112,8 @@ class StaticServer {
   // requests to start / stop the server won't result in a corrupt state.
   _sem = new Semaphore(true);
 
+  _webdav: string[] | undefined;
+
   get errorLog(): false | ErrorLogOptions {
     return this._errorLog || false;
   }
@@ -166,6 +168,7 @@ class StaticServer {
 
     port = 0,
     stopInBackground = false,
+    webdav,
   }: {
     errorLog?: boolean | ErrorLogOptions;
     fileDir: string;
@@ -175,6 +178,8 @@ class StaticServer {
 
     port?: number;
     stopInBackground?: boolean;
+
+    webdav?: string[];
   }) {
     if (errorLog) this._errorLog = errorLog === true ? {} : errorLog;
 
@@ -186,6 +191,8 @@ class StaticServer {
 
     if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
     this._fileDir = resolveAssetsPath(fileDir);
+
+    this._webdav = webdav;
   }
 
   addStateListener(listener: StateListener) {
@@ -284,6 +291,7 @@ class StaticServer {
         fileDir: this._fileDir,
         hostname: this._hostname,
         port: this._port,
+        webdav: this._webdav,
       });
 
       // Native implementations of .start() method must resolve only once

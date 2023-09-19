@@ -51,6 +51,7 @@ export type StandardConfigOptions = {
   fileDir: string;
   hostname: string;
   port: number;
+  webdav?: string[];
 };
 
 /**
@@ -93,13 +94,31 @@ function standardConfig({
   fileDir,
   hostname,
   port,
+  webdav,
 }: StandardConfigOptions) {
+  const modules: string[] = [];
+  if (webdav) modules.push('mod_webdav');
+  const modulesString: string = modules.length
+    ? `server.modules += ( "${modules.join('", "')}")`
+    : '';
+
+  let webdavConfig = '';
+  if (webdav) {
+    for (let i = 0; i < webdav.length; ++i) {
+      webdavConfig += `$HTTP["url"] =~ "${webdav[i]}" { webdav.activate = "enable" }`;
+    }
+  }
+
   return `server.document-root = "${fileDir}"
   server.bind = "${hostname}"
   server.upload-dirs = ( "${UPLOADS_DIR}" )
   server.port = ${port}
   ${errorLogConfig(errorLog)}
   index-file.names += ("index.xhtml", "index.html", "index.htm", "default.htm", "index.php")
+
+  ${modulesString}
+  ${webdavConfig}
+
   mimetype.assign = (
     # These are default types from https://redmine.lighttpd.net/projects/lighttpd/wiki/Mimetype_assignDetails
 

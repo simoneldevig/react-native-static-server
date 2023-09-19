@@ -39,7 +39,11 @@ android {
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     externalNativeBuild {
       cmake {
-        arguments "-DWITH_ANDROID_NDK_SYSLOG_INTERCEPT=ON", "-DWITH_JAVA_NATIVE_INTERFACE=ON", "-DBUILD_STATIC=ON"
+        arguments "-DWITH_ANDROID_NDK_SYSLOG_INTERCEPT=ON", "-DWITH_JAVA_NATIVE_INTERFACE=ON", "-DBUILD_STATIC=ON",
+          // TODO: I guess, there should be a more elegant way to append
+          // arguments here based on flags set in project Gradle properties,
+          // but for now this will do.
+          (project.properties["ReactNativeStaticServer_webdav"] ? "-DWITH_MOD_WEBDAV=ON" : "-DWITH_MOD_WEBDAV=OFF")
         targets "lighttpd"
       }
     }
