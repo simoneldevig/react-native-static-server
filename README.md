@@ -370,7 +370,9 @@ routes when you create [Server] instance inside your TypeScript code.
 
     **macOS (Catalyst)**: The same as for iOS.
 
-    **Windows**: _TO BE FIGURED OUT_
+    **Windows**: Does not require a special setup &mdash; the pre-compiled DLL
+    for [WebDAV] module is always packed with the library, and loaded if opted
+    for by [Server]'s [constructor()].
 
 2.  Use `webdav` option of [Server]'s [constructor()] to enable [WebDAV] for
     selected routes of the created server instance.

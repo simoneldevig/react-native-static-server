@@ -40,5 +40,8 @@
     <CopyFileToFolders Include="lighttpd\libpcre2-8.dll">
       <Filter>Lighttpd</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="lighttpd\mod_webdav.dll">
+      <Filter>Lighttpd</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
