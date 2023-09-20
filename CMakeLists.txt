@@ -1,5 +1,5 @@
 project(rn-static-server C)
-cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 
 # This prevents CMake from complaining that INSTALL(..) directives in
 # Lighttpd CMakeLists.txt miss BUNDLE DESTINATION.
@@ -69,12 +69,8 @@ execute_process(
     -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/sysroot
     -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
     ${EXTRA_BUILD_ARGS}
-
-  # TODO: This is a handy option, but requires CMake >= 3.15
-  # COMMAND_ECHO STDOUT
-
-  # TODO: This is a useful argument, but requires CMake >= 3.19
-  # COMMAND_ERROR_IS_FATAL ANY
+  COMMAND_ECHO STDOUT
+  COMMAND_ERROR_IS_FATAL ANY
 )
 
 execute_process(
