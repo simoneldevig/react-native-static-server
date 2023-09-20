@@ -252,13 +252,14 @@ outside platform-specific sub-folders.
     import {
       DocumentDirectoryPath,
       exists,
+      resolveAssetsPath,
       unlink,
     } from '@dr.pogodin/react-native-fs';
 
     import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
 
     async function prepareAssets() {
-      const targetWebrootPathOnDevice = `${DocumentDirectoryPath}/webroot`;
+      const targetWebrootPathOnDevice = resolveAssetsPath('webroot');
 
       // It is use-case specific, but in general if target webroot path exists
       // on the device, probably these assets have been extracted in a previous
@@ -291,14 +292,28 @@ outside platform-specific sub-folders.
     ```
 
 - **iOS**
-  - Open you project's workspace in XCode. In the &laquo;_Project
-    Navigator_&raquo; panel right-click on the project name and select
-    &laquo;_Add Files to "YOUR-PROJECT-NAME"..._&raquo; (alternatively,
-    you can find this option in the XCode head menu under _Files >
-    Add Files to "YOUR-PROJECT-NAME"..._). In the opened menu uncheck
-    &laquo;_Copy items if needed_&raquo;, then select our `webroot` folder,
-    and press &laquo;_Add_&raquo; button to add "webroot" assets
-    to the project target.
+  - Open you project's workspace in XCode.
+
+  - In the &laquo;_Project Navigator_&raquo; panel right-click on the project
+    name and select &laquo;_Add Files to "YOUR-PROJECT-NAME"..._&raquo;
+    (alternatively, you can find this option in the XCode head menu under _Files
+    &gt; Add Files to "YOUR-PROJECT-NAME"..._).
+
+  - In the opened menu do:
+    - Uncheck &laquo;_Copy items if needed_&raquo;;
+    - Select &laquo;_Create folder references_&raquo;
+      for &laquo;_Added folders_&raquo; switch;
+    - Select our `webroot` folder within the file system view;
+    - Press &laquo;_Add_&raquo; button to add "webroot" assets
+      to the project target.
+
+    Here is how the dialog & options look, just before pressing
+    &laquo;_Add_&raquo; button, when adding `assets/webroot` folder
+    to the Xcode project of our [Example App].
+    ![Dialog screenshot](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/ios-bundling-webroot-folder.png)
+
+  - The absolute path of `webroot` folder on the device, when added this way,
+    can be obtained as [`resolveAssetsPath('webroot')`][resolveAssetsPath()].
 
 - **Mac Catalyst**
   - The bundling for iOS explained above also bundles assets for Mac Catalyst;
@@ -418,7 +433,7 @@ within `options` argument:
   static assets should be served. Relative paths (those not starting with `/`,
   neither `file:///`) are automatically prepended by the platform-dependent
   base path (document directory on Android, or main bundle directory on other
-  platforms); however, empty `fileDir` value
+  platforms; see [resolveAssetsPath()]); however, empty `fileDir` value
   is forbidden &mdash; if you really want to serve all content from the base
   directory, provide it its absolute path explicitly.
 
@@ -729,7 +744,7 @@ on Android; or main bundle folder on other platforms) for bundled assets;
 otherwise, it just returns given absolute `path` as is. 
 
 In other words, it exposes the same path resolution logic used by [Server]'s
-[constructor()] for its `fileDir` argument.
+[constructor()] for relative values of its `fileDir` argument.
 
 **Arguments**
 - `path` &mdash; **string** &mdash; Absolute or relative path.
