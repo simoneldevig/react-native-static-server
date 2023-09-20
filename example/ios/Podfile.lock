@@ -18,7 +18,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - dr-pogodin-react-native-static-server (0.8.3):
+  - dr-pogodin-react-native-static-server (0.8.4):
     - hermes-engine
     - RCT-Folly (= 2021.07.22.00)
     - RCTRequired
@@ -964,7 +964,7 @@ PODS:
   - React-jsinspector (0.72.4)
   - React-logger (0.72.4):
     - glog
-  - react-native-webview (13.3.1):
+  - react-native-webview (13.6.0):
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
@@ -1290,7 +1290,7 @@ SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   dr-pogodin-react-native-fs: bb2051cf55bd125d705d5fa227439e091ac91bf1
-  dr-pogodin-react-native-static-server: 464fd513aad1a316f287964bbe67c53e3ad11222
+  dr-pogodin-react-native-static-server: 9b41fc942e30cbc71a9668028bff222b7e88bb00
   FBLazyVector: 5d4a3b7f411219a45a6d952f77d2c0a6c9989da5
   Flipper: 6edb735e6c3e332975d1b17956bcc584eccf5818
   Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
@@ -1323,7 +1323,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: c7f826e40fa9cab5d37cab6130b1af237332b594
   React-jsinspector: aaed4cf551c4a1c98092436518c2d267b13a673f
   React-logger: da1ebe05ae06eb6db4b162202faeafac4b435e77
-  react-native-webview: 64e9f6ec5585ae97936747e129da1280f347c1c0
+  react-native-webview: b40b30b3e0f0af534209c4c9f56f72b8c111e831
   React-NativeModulesApple: edb5ace14f73f4969df6e7b1f3e41bef0012740f
   React-perflogger: 496a1a3dc6737f964107cb3ddae7f9e265ddda58
   React-RCTActionSheet: 02904b932b50e680f4e26e7a686b33ebf7ef3c00

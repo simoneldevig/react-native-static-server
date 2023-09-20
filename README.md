@@ -349,9 +349,11 @@ routes when you create [Server] instance inside your TypeScript code.
     ReactNativeStaticServer_webdav = true
     ```
 
-    **iOS**: _TO BE FIGURED OUT_
+    **iOS**: Use environment variable `RN_STATIC_SERVER_WEBDAV=1` when
+    installing or updating the pods (_i.e._ when doing `pod install` or
+    `pod update`).
 
-    **macOS (Catalyst)**: _TO BE FIGURED OUT_
+    **macOS (Catalyst)**: The same as for iOS.
 
     **Windows**: _TO BE FIGURED OUT_
 

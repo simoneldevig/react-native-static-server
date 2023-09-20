@@ -51,8 +51,8 @@ export default function App() {
       // to the emulated device network or ethernet interface, which can be
       // connected to from the host machine, following instructions at:
       // https://developer.android.com/studio/run/emulator-networking#consoleredir
-      hostname: '10.0.2.15', // Android emulator ethernet interface.
-      // hostname: '127.0.0.1', // This is just the local loopback address.
+      // hostname: '10.0.2.15', // Android emulator ethernet interface.
+      hostname: '127.0.0.1', // This is just the local loopback address.
 
       // The fixed port is just more convenient for library development &
       // testing.
@@ -72,7 +72,10 @@ export default function App() {
         timeouts: true,
       },
 
-      webdav: ['^/dav($|/)', '^/davos($|/)'],
+      // This is to enable WebDAV for /dav... routes. To use, you should also
+      // opt-in for building the library with WebDAV support enabled
+      // (see README for details).
+      // webdav: ['^/dav($|/)'],
     });
     const serverId = server.id;
 
