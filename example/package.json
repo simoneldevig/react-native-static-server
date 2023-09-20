@@ -24,7 +24,7 @@
     "@react-native/metro-config": "^0.72.11",
     "@types/metro-config": "^0.76.3",
     "babel-plugin-module-resolver": "^5.0.0",
-    "metro-config": "^0.79.0",
+    "metro-config": "^0.79.1",
     "metro-react-native-babel-preset": "0.77.0"
   },
   "engines": {
