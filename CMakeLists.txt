@@ -129,6 +129,10 @@ set(PLUGIN_STATIC
   PLUGIN_INIT(mod_staticfile)\n
 )
 
+if(WITH_MOD_ALIAS)
+  set(PLUGIN_STATIC "${PLUGIN_STATIC}PLUGIN_INIT(mod_alias)\n")
+endif()
+
 if(WITH_MOD_WEBDAV)
   set(PLUGIN_STATIC "${PLUGIN_STATIC}PLUGIN_INIT(mod_webdav)\n")
 endif()

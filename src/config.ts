@@ -48,10 +48,11 @@ export type ErrorLogOptions = {
  */
 export type StandardConfigOptions = {
   errorLog?: ErrorLogOptions;
+  extraConfig: string;
   fileDir: string;
   hostname: string;
   port: number;
-  webdav?: string[];
+  webdav?: string[]; // DEPRECATED
 };
 
 /**
@@ -91,19 +92,15 @@ function errorLogConfig(errorLogOptions?: ErrorLogOptions): string {
  */
 function standardConfig({
   errorLog,
+  extraConfig,
   fileDir,
   hostname,
   port,
-  webdav,
+  webdav, // DEPRECATED
 }: StandardConfigOptions) {
-  const modules: string[] = [];
-  if (webdav) modules.push('mod_webdav');
-  const modulesString: string = modules.length
-    ? `server.modules += ( "${modules.join('", "')}")`
-    : '';
-
   let webdavConfig = '';
   if (webdav) {
+    webdavConfig += 'server.modules += ("mod_webdav")';
     for (let i = 0; i < webdav.length; ++i) {
       webdavConfig += `$HTTP["url"] =~ "${webdav[i]}" { webdav.activate = "enable" }`;
     }
@@ -116,8 +113,8 @@ function standardConfig({
   ${errorLogConfig(errorLog)}
   index-file.names += ("index.xhtml", "index.html", "index.htm", "default.htm", "index.php")
 
-  ${modulesString}
-  ${webdavConfig}`;
+  ${webdavConfig}
+  ${extraConfig}`;
 }
 
 /**

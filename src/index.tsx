@@ -83,6 +83,7 @@ class StaticServer {
   _appStateSub?: NativeEventSubscription;
   _configPath?: string;
   _errorLog?: ErrorLogOptions;
+  _extraConfig: string;
   _fileDir: string;
   _hostname = '';
 
@@ -161,6 +162,7 @@ class StaticServer {
    */
   constructor({
     errorLog = false,
+    extraConfig = '',
     fileDir,
     hostname,
 
@@ -168,8 +170,10 @@ class StaticServer {
 
     port = 0,
     stopInBackground = false,
-    webdav,
+
+    /* DEPRECATED */ webdav,
   }: {
+    extraConfig?: string;
     errorLog?: boolean | ErrorLogOptions;
     fileDir: string;
     hostname?: string;
@@ -179,9 +183,11 @@ class StaticServer {
     port?: number;
     stopInBackground?: boolean;
 
-    webdav?: string[];
+    /* DEPRECATED */ webdav?: string[];
   }) {
     if (errorLog) this._errorLog = errorLog === true ? {} : errorLog;
+
+    this._extraConfig = extraConfig;
 
     this._nonLocal = nonLocal;
     this._hostname = hostname || (nonLocal ? '' : LOOPBACK_ADDRESS);
@@ -288,6 +294,7 @@ class StaticServer {
       await this._removeConfigFile();
       this._configPath = await newStandardConfigFile({
         errorLog: this._errorLog,
+        extraConfig: this._extraConfig,
         fileDir: this._fileDir,
         hostname: this._hostname,
         port: this._port,
