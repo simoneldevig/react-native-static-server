@@ -345,36 +345,16 @@ outside platform-specific sub-folders.
 ### Enabling Alias Module
 [Enabling Alias module]: #enabling-alias-module
 
-[Lighttpd]'s optional module [mod_alias] is used to specify a special document
-root for a given url-subset. To enable it:
+[Lighttpd] module [mod_alias] is used to specify a special document
+root for a given url-subset. To enable it just use `extraConfig` option of
+[Server] [constructor()] to load and configure it, for example:
 
-1.  **Android**: Edit `android/gradle.properties` file of your app, adding
-    this flag:
-    ```gradle
-    ReactNativeStaticServer_alias = true
-    ```
-
-    **iOS**: Use environment variable `RN_STATIC_SERVER_ALIAS=1` when
-    installing or updating the pods (_i.e._ when doing `pod install` or
-    `pod update`).
-
-    **macOS (Catalyst)**: The same as for iOS.
-
-    **Windows**: Does not require a special setup &mdash; the pre-compiled DLL
-    for [mod_alias] is always packed with the library, and loaded if opted
-    by [Server]'s [constructor()].
-
-2.  Use `extraConfig` option of [Server] [constructor()] to load and configure
-    [mod_alias], for example:
-    ```ts
-    extraConfig: `
-      server.modules += ("mod_alias")
-      alias.url = ("/sample/url" => "/special/root/path")
-    `,
-    ```
-    With this configuration incoming request `GET /sample/url/file` will be
-    routed to the `/special/root/path/file`, rather than the `FILE_DIR/sample/url/file`,
-    where `FILE_DIR` is the value you provided to the [Server]'s `fileDir` option.
+```ts
+  extraConfig: `
+    server.modules += ("mod_alias")
+    alias.url = ("/sample/url" => "/special/root/path")
+  `,
+```
 
 ### Enabling WebDAV Module
 [Enabling WebDAV module]: #enabling-webdav-module

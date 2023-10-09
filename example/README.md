@@ -29,7 +29,7 @@ to prepare and run the example:
   - `npm run android`
 - On **iOS**:
   - ```sh
-    cd ios && RCT_NEW_ARCH_ENABLED=1 RN_STATIC_SERVER_ALIAS=1 pod install
+    cd ios && RCT_NEW_ARCH_ENABLED=1 pod install
     ```
     Here `RCT_NEW_ARCH_ENABLED=1` is optional, omit it to build for the old RN
     architecture.

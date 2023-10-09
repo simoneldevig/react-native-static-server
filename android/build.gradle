@@ -43,7 +43,6 @@ android {
           // TODO: I guess, there should be a more elegant way to append
           // arguments here based on flags set in project Gradle properties,
           // but for now this will do.
-          (project.properties["ReactNativeStaticServer_alias"] ? "-DWITH_MOD_ALIAS=ON" : "-DWITH_MOD_ALIAS=OFF"),
           (project.properties["ReactNativeStaticServer_webdav"] ? "-DWITH_MOD_WEBDAV=ON" : "-DWITH_MOD_WEBDAV=OFF")
         targets "lighttpd"
       }

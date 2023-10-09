@@ -32,12 +32,6 @@ $outputFiles = [
   '${BUILT_PRODUCTS_DIR}/libpcre2-8.a'
 ]
 
-if ENV['RN_STATIC_SERVER_ALIAS'] == '1' then
-  $extraCMakeArgs += " -DWITH_MOD_ALIAS=ON"
-  $libToolFlags += " -lmod_alias"
-  $outputFiles.append('${BUILD_PRODUCTS_DIR}/libmod_alias.a')
-end
-
 if ENV['RN_STATIC_SERVER_WEBDAV'] == '1' then
   $extraCMakeArgs += " -DWITH_MOD_WEBDAV=ON"
   $libToolFlags += " -lmod_webdav"
