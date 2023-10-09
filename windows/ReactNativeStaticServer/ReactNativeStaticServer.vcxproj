@@ -109,8 +109,8 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="codegen\NativeReactNativeStaticServerSpec.g.h" />
     <ClInclude Include="Errors.h" />
-    <ClInclude Include="NativeReactNativeStaticServerSpec.g.h" />
     <ClInclude Include="ReactPackageProvider.h">
       <DependentUpon>ReactPackageProvider.idl</DependentUpon>
     </ClInclude>

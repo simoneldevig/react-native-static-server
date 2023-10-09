@@ -12,5 +12,12 @@ public:
 	RNException(std::string && message);
 
 	virtual const char* what();
-	void reject(ReactPromise<React::JSValue>& promise);
+
+  template <typename T>
+	void reject(ReactPromise<T>& promise);
 };
+
+template<typename T>
+void RNException::reject(ReactPromise<T>& promise) {
+  promise.Reject(*this);
+}
