@@ -14,7 +14,7 @@ using namespace winrt::Windows::Networking::Connectivity;
 
 double activeServerId;
 ReactNativeModule* mod;
-React::ReactPromise<::React::JSValue>* pendingResult;
+React::ReactPromise<std::string>* pendingResult;
 Server *server;
 
 // There is no semaphore in C++ STL prior to C++20,
@@ -43,7 +43,7 @@ void OnSignal(std::string signal, std::string details) {
     }
     if (pendingResult) {
         if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
-        else pendingResult->Resolve(NULL);
+        else pendingResult->Resolve(details);
         delete pendingResult;
         pendingResult = NULL;
         unlock_sem();
@@ -59,7 +59,7 @@ ReactNativeStaticServerSpec_Constants ReactNativeModule::GetConstants() noexcept
     return res;
 }
 
-void ReactNativeModule::getLocalIpAddress(React::ReactPromise<React::JSValue>&& result) noexcept {
+void ReactNativeModule::getLocalIpAddress(React::ReactPromise<std::string>&& result) noexcept {
     try {
         auto hosts = NetworkInformation::GetHostNames();
         for (winrt::Windows::Networking::HostName host: hosts) {
@@ -91,7 +91,7 @@ void ReactNativeModule::getLocalIpAddress(React::ReactPromise<React::JSValue>&& 
 
 void ReactNativeModule::getOpenPort(
     std::string address,
-    React::ReactPromise<React::JSValue>&& result
+    React::ReactPromise<double>&& result
 ) noexcept {
     try {
         auto socket = winrt::Windows::Networking::Sockets::StreamSocketListener();
@@ -125,7 +125,7 @@ void ReactNativeModule::start(
     double id,
     std::string configPath,
     std::string errlogPath,
-    React::ReactPromise<::React::JSValue>&& result
+    React::ReactPromise<std::string>&& result
 ) noexcept {
     lock_sem();
 
@@ -143,12 +143,12 @@ void ReactNativeModule::start(
 
     mod = this;
     activeServerId = id;
-    pendingResult = new React::ReactPromise<React::JSValue>(result);
+    pendingResult = new React::ReactPromise<std::string>(result);
     server = new Server(configPath, errlogPath, OnSignal);
     server->launch();
 }
 
-void ReactNativeModule::stop(React::ReactPromise<React::JSValue>&& result) noexcept {
+void ReactNativeModule::stop(React::ReactPromise<std::string>&& result) noexcept {
     try {
         lock_sem();
 
@@ -171,7 +171,7 @@ void ReactNativeModule::stop(React::ReactPromise<React::JSValue>&& result) noexc
           return;
         }
 
-        pendingResult = new React::ReactPromise<React::JSValue>(result);
+        pendingResult = new React::ReactPromise<std::string>(result);
         server->shutdown();
 
         // The OnSignal() handler will dispose the server once TERMINATED,

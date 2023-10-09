@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "NativeReactNativeStaticServerSpec.g.h"
+#include "codegen/NativeReactNativeStaticServerSpec.g.h"
 
 #include "JSValue.h"
 #include "NativeModules.h"
@@ -34,19 +34,19 @@ struct ReactNativeModule
     void sendEvent(std::string signal, std::string details);
 
     REACT_METHOD(getLocalIpAddress)
-    void getLocalIpAddress(React::ReactPromise<React::JSValue>&& result) noexcept;
+    void getLocalIpAddress(React::ReactPromise<std::string>&& result) noexcept;
 
     REACT_METHOD(getOpenPort)
-    void getOpenPort(std::string address, React::ReactPromise<React::JSValue>&& result) noexcept;
+    void getOpenPort(std::string address, React::ReactPromise<double>&& result) noexcept;
 
     REACT_METHOD(start)
     void start(double id,
         std::string configPath,
         std::string errlogPath,
-        React::ReactPromise<::React::JSValue>&& result) noexcept;
+        React::ReactPromise<std::string>&& result) noexcept;
 
     REACT_METHOD(stop)
-    void stop(React::ReactPromise<React::JSValue>&& result) noexcept;
+    void stop(React::ReactPromise<std::string>&& result) noexcept;
 };
 
 } // namespace winrt::ReactNativeStaticServer

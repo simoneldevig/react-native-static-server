@@ -9,7 +9,3 @@ RNException::RNException(std::string && message) {
 const char* RNException::what() {
 	return this->Message.c_str();
 }
-
-void RNException::reject(ReactPromise<React::JSValue>& promise) {
-	promise.Reject(*this);
-}

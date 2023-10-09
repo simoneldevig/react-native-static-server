@@ -76,6 +76,13 @@ export default function App() {
       // opt-in for building the library with WebDAV support enabled
       // (see README for details).
       // webdav: ['^/dav($|/)'],
+
+      extraConfig: `
+        server.modules += ("mod_alias")
+        alias.url = (
+          "/some/path" => "${fileDir}"
+        )
+      `,
     });
     const serverId = server.id;
 
@@ -196,6 +203,11 @@ export default function App() {
           // is up and running, we should thus prefer to define an empty `html`
           // field in such case.
           source={origin ? { uri: origin } : { html: '' }}
+        />
+      </View>
+      <View style={styles.webview}>
+        <WebView
+          source={origin ? { uri: `${origin}/some/path` } : { html: '' }}
         />
       </View>
     </SafeAreaView>

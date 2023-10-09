@@ -22,7 +22,7 @@ export interface Spec extends TurboModule {
   getLocalIpAddress(): Promise<string>;
 
   getOpenPort(address: string): Promise<number>;
-  stop(): Promise<void>;
+  stop(): Promise<string>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>(

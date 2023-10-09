@@ -123,6 +123,7 @@ set(PKG_CONFIG_ARGN --libs-only-l)
 add_subdirectory(lighttpd1.4)
 
 set(PLUGIN_STATIC
+  PLUGIN_INIT(mod_alias)\n
   PLUGIN_INIT(mod_dirlisting)\n
   PLUGIN_INIT(mod_h2)\n
   PLUGIN_INIT(mod_indexfile)\n
