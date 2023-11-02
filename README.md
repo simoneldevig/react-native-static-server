@@ -6,7 +6,7 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 [![Dr. Pogodin Studio](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-dr-pogodin-studio.svg)](https://dr.pogodin.studio/docs/react-native-static-server)
 
-Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
+Embedded HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
