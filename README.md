@@ -6,7 +6,7 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 [![Dr. Pogodin Studio](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-dr-pogodin-studio.svg)](https://dr.pogodin.studio/docs/react-native-static-server)
 
-Embed HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
+Embedded HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
 
@@ -109,10 +109,20 @@ and [old][Old Architecture] RN architectures.
 - For **Android**:
   - In the `build.gradle` file set `minSdkVersion` equal `28`
     ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
-    released in August 2018), or larger.
-
+    released in August 2018), or larger. \
     **Note:** _Support of older SDKs is technically possible, but it is not
     a priority now._
+
+  - Android SDK 28 and above
+    [forbids Cleartext / Plaintext HTTP](https://developer.android.com/privacy-and-security/risks/cleartext)
+    by default. Thus, to access locally running server over HTTP from within
+    your app, you should either allow all uses of HTTP in your app by adding
+    `android:usesCleartextTraffic="true"` attribute to `<application>` element
+    in the `AndroidManifest.xml`
+    ([see how it is done in the example app](https://github.com/birdofpreyru/react-native-static-server/blob/master/example/android/app/src/main/AndroidManifest.xml));
+    or alternatively you should use
+    [network security configuration](https://developer.android.com/privacy-and-security/security-config)
+    to permit cleartext HTTP for selected domains only.
 
 - For **iOS**:
   - After installing the package, enter `ios` folder of the app's codebase

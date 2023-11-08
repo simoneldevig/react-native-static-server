@@ -39,13 +39,17 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
 # Mac Catalyst build is the only scenario we have where the target system name
 # is Darwin.
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  set(PCRE2_TARGET --target pcre2-8-static)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -target x86_64-apple-ios-macabi")
   set(
     EXTRA_BUILD_ARGS
     -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
     -DCMAKE_OSX_ARCHITECTURES=${ESCAPED_ARCHS}
   )
+  # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
+  # we don't really use them anyway, but we need them build for the install
+  # command below to work.
+  set(EXTRA_INSTALL_ARGS "--;CODE_SIGNING_ALLOWED=NO")
+
 elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
   set(
     EXTRA_BUILD_ARGS
@@ -55,7 +59,10 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
     -DCMAKE_IOS_INSTALL_COMBINED=${CMAKE_IOS_INSTALL_COMBINED}
     -GXcode
   )
-  set(PCRE2_TARGET --target pcre2-8-static)
+  # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
+  # we don't really use them anyway, but we need them build for the install
+  # command below to work.
+  set(EXTRA_INSTALL_ARGS "--;CODE_SIGNING_ALLOWED=NO")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
@@ -75,21 +82,10 @@ execute_process(
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/pcre2
-    --config Release
-    ${PCRE2_TARGET}
+    --config Release ${EXTRA_INSTALL_ARGS}
 )
 
-if(
-  NOT CMAKE_SYSTEM_NAME MATCHES "iOS"
-
-  # TODO: We wanna say "and not Mac Catalyst build", for which the current
-  # condition is not specific enough, but will do for now, as Mac Catalyst
-  # build is the only scenario we gonna have Darwin as the target platform
-  # as of now.
-  AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin"
-)
-  execute_process(COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}/pcre2)
-endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}/pcre2)
 
 # Copies shared PCRE2 library into the folder from where Gradle automatically
 # will bundle it in the host app package.
@@ -104,21 +100,18 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPCRE2_CODE_UNIT_WIDTH=8 -I${CMAKE_BINARY_DIR}/sysroot/include -L${CMAKE_BINARY_DIR}/sysroot/lib")
-
-# To find PCRE2 Lighttpd first of all tries to use pkg_check_modules().
-# It seems that on Linux it ends up relying on pkg-config utility of the host
-# system, which find the host's version of PCRE2. With CMake 3.18.1 it was fine,
-# as it used to output the linker flag for PCRE2 just as "-lpcre2-8",
-# and just above we set the correct -L flag with the path of PCRE2
-# cross-compiled for Android. However, with CMake 3.22.1 the CMake's default
-# output is "-L/usr/lib/x86_64-linux-gnu;-lpcre2-8", which ends up forcing
-# Lighttpd to try linking against the host's PCRE2, which fails. The flag set
-# below instructs pkg-config to not include -L flag into outputs,
-# thus restoring the correct linking. However, it is not the best fix,
-# I guess.
-# TODO: Find a better fix.
-set(PKG_CONFIG_ARGN --libs-only-l)
+# Above we have build & installed a local version of PCRE2 library, now we want
+# to enforce Lighttpd build to see and use it (rather than any system-wide
+# installation of another PCRE2 version). On Ubuntu / macOS it can be done
+# by setting CMAKE_PREFIX_PATH; somehow it has no effect in Msys2 / UCRT64
+# builds for Windows (beyond by current understanding), but there setting
+# the PKG_CONFIG_PATH environment variable, which is picked up by pkg-config
+# does the trick.
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  set(ENV{PKG_CONFIG_PATH} "${CMAKE_BINARY_DIR}/sysroot/lib/pkgconfig")
+else()
+  set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
+endif()
 
 add_subdirectory(lighttpd1.4)
 
