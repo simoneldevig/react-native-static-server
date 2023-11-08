@@ -48,7 +48,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
   # we don't really use them anyway, but we need them build for the install
   # command below to work.
-  set(EXTRA_INSTALL_ARGS "-- CODE_SIGNING_ALLOWED=NO")
+  set(EXTRA_INSTALL_ARGS "--;CODE_SIGNING_ALLOWED=NO")
 
 elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
   set(
@@ -62,7 +62,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
   # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
   # we don't really use them anyway, but we need them build for the install
   # command below to work.
-  set(EXTRA_INSTALL_ARGS "-- CODE_SIGNING_ALLOWED=NO")
+  set(EXTRA_INSTALL_ARGS "--;CODE_SIGNING_ALLOWED=NO")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
@@ -103,14 +103,15 @@ endif()
 # Above we have build & installed a local version of PCRE2 library, now we want
 # to enforce Lighttpd build to see and use it (rather than any system-wide
 # installation of another PCRE2 version). On Ubuntu / macOS it can be done
-# by setting
-#
-# set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
-#
-# however when building for Windows inside Msys2 / UCRT64 this just has
-# no effect for reasons beyond my understanding. Setting PKG_CONFIG_PATH
-# environment variable to the folder with PCRE2 .pc file works though.
-set(ENV{PKG_CONFIG_PATH} "${CMAKE_BINARY_DIR}/sysroot/lib/pkgconfig")
+# by setting CMAKE_PREFIX_PATH; somehow it has no effect in Msys2 / UCRT64
+# builds for Windows (beyond by current understanding), but there setting
+# the PKG_CONFIG_PATH environment variable, which is picked up by pkg-config
+# does the trick.
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  set(ENV{PKG_CONFIG_PATH} "${CMAKE_BINARY_DIR}/sysroot/lib/pkgconfig")
+else()
+  set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
+endif()
 
 add_subdirectory(lighttpd1.4)
 
