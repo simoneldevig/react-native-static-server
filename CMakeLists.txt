@@ -100,13 +100,17 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
 
-# These enforce pkg_check_modules(), find_program(), etc. in Lighttpd CMake
-# config to look for local build of PCRE2 in the location it was installed to.
-set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
-
-# TODO: Not sure now, whether this is needed, or already covered by the variable
-# above.
-set(CMAKE_FIND_ROOT_PATH "${CMAKE_BINARY_DIR}/sysroot")
+# Above we have build & installed a local version of PCRE2 library, now we want
+# to enforce Lighttpd build to see and use it (rather than any system-wide
+# installation of another PCRE2 version). On Ubuntu / macOS it can be done
+# by setting
+#
+# set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
+#
+# however when building for Windows inside Msys2 / UCRT64 this just has
+# no effect for reasons beyond my understanding. Setting PKG_CONFIG_PATH
+# environment variable to the folder with PCRE2 .pc file works though.
+set(ENV{PKG_CONFIG_PATH} "${CMAKE_BINARY_DIR}/sysroot/lib/pkgconfig")
 
 add_subdirectory(lighttpd1.4)
 

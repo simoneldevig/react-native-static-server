@@ -35,6 +35,14 @@ void LoadLighttpdDll() {
         // an UWP app by this library, so failure to locate and load them is
         // a fatal crash, meaning there is something wrong with our library,
         // and we terminate the app in such case.
+        //
+        // NOTE: The next few lines retrieve the failure cause, but don't forward it anywhere,
+        // for now they can be seen in debugger.
+        DWORD errcode = GetLastError();
+        LPSTR errmsg = nullptr;
+        FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+          NULL, errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)& errmsg, 0, NULL);
+
         terminate();
     }
 }
