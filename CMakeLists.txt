@@ -45,6 +45,11 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
     -DCMAKE_OSX_ARCHITECTURES=${ESCAPED_ARCHS}
   )
+  # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
+  # we don't really use them anyway, but we need them build for the install
+  # command below to work.
+  set(EXTRA_INSTALL_ARGS "-- CODE_SIGNING_ALLOWED=NO")
+
 elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
   set(
     EXTRA_BUILD_ARGS
@@ -54,6 +59,10 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS")
     -DCMAKE_IOS_INSTALL_COMBINED=${CMAKE_IOS_INSTALL_COMBINED}
     -GXcode
   )
+  # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
+  # we don't really use them anyway, but we need them build for the install
+  # command below to work.
+  set(EXTRA_INSTALL_ARGS "-- CODE_SIGNING_ALLOWED=NO")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
@@ -73,12 +82,7 @@ execute_process(
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/pcre2
-    --config Release
-
-    # This allows to not sign compiled PCRE2 executables for iOS / macOS builds,
-    # we don't really use them anyway, but we need them build for the install
-    # command below to work.
-    -- CODE_SIGNING_ALLOWED=NO
+    --config Release ${EXTRA_INSTALL_ARGS}
 )
 
 execute_process(COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}/pcre2)
