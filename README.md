@@ -51,7 +51,7 @@ and [old][Old Architecture] RN architectures.
 ## Content
 
 - [Getting Started](#getting-started)
-  - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
+  - [Bundling-in Server Assets Into an App Statically]
   - [Enabling Alias module]
   - [Enabling Rewrite module]
   - [Enabling WebDAV module]
@@ -221,6 +221,7 @@ and [old][Old Architecture] RN architectures.
   ```
 
 ### Bundling-in Server Assets Into an App Statically
+[Bundling-in Server Assets Into an App Statically]: #bundling-in-server-assets-into-an-app-statically
 
 The assets to be served by the server may come to the target device in different
 ways, for example, they may be generated during the app's runtime, or downloaded
@@ -396,6 +397,15 @@ documents on a server &mdash; essentially an easy way to enable `POST`, `PUT`,
 _etc._ functionality for selected routes.
 
 **BEWARE:** _As of now, props and locks are not supported._
+
+**BEWARE:** _If you have set up the server to serve static assets bundled into
+the app, the chances are your server works with a readonly location on most
+platforms (in the case of Android it is anyway necessary to unpack bundled
+assets to the regular filesystem, thus there the server might be serving
+from a writeable location already). The easiest way around it is to use
+[mod_alias][Enabling Alias module] to point URLs configured for [mod_webdav]
+to a writeable filesystem location, different from that of the served static
+assets._
 
 To enable [mod_webdav] in the library you need (1) configure your host RN app
 to build Lighttpd with [mod_webdav] included; (2) opt-in to use it for selected
