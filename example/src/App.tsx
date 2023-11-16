@@ -78,10 +78,11 @@ export default function App() {
       // webdav: ['^/dav($|/)'],
 
       extraConfig: `
-        server.modules += ("mod_alias")
+        server.modules += ("mod_alias", "mod_rewrite")
         alias.url = (
           "/some/path" => "${fileDir}"
         )
+        url.rewrite-once = ( "/bad/path/(.*)" => "/$1" )
       `,
     });
     const serverId = server.id;
@@ -202,7 +203,11 @@ export default function App() {
           // window - as we rather want to show a blank page until the server
           // is up and running, we should thus prefer to define an empty `html`
           // field in such case.
-          source={origin ? { uri: origin } : { html: '' }}
+          // NOTE: Now it is setting `source` to a `/bad/path` endpoint of
+          // the origin, to test the path rewrite with mod_rewrite...
+          // TODO: Need to rework the example app later, to have tests of different
+          // modules on different screens.
+          source={origin ? { uri: `${origin}/bad/path/` } : { html: '' }}
         />
       </View>
       <View style={styles.webview}>

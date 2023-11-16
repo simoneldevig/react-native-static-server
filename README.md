@@ -40,6 +40,7 @@ and [old][Old Architecture] RN architectures.
 [getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
 [MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
 [mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
+[mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
 [mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [react-native-fs]: https://www.npmjs.com/package/react-native-fs
@@ -52,6 +53,7 @@ and [old][Old Architecture] RN architectures.
 - [Getting Started](#getting-started)
   - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
   - [Enabling Alias module]
+  - [Enabling Rewrite module]
   - [Enabling WebDAV module]
 - [API Reference](#api-reference)
 - [Project History and Roadmap](#project-history-and-roadmap)
@@ -360,10 +362,29 @@ root for a given url-subset. To enable it just use `extraConfig` option of
 [Server] [constructor()] to load and configure it, for example:
 
 ```ts
-  extraConfig: `
-    server.modules += ("mod_alias")
-    alias.url = ("/sample/url" => "/special/root/path")
-  `,
+extraConfig: `
+  server.modules += ("mod_alias")
+  alias.url = ("/sample/url" => "/special/root/path")
+`,
+```
+
+### Enabling Rewrite Module
+[Enabling Rewrite module]: #enabling-rewrite-module
+
+[Lighttpd]'s module [mod_rewrite] can be used for interal redirects,
+URL rewrites by the server. To enable it just use `extraConfig` option of
+[Server] [constructor()] to load and configure it, for example:
+
+```ts
+extraConfig: `
+  server.modules += ("mod_rewrite")
+  url.rewrite-once = ("/some/path/(.*)" => "/$1")
+`,
+
+// With such configuration, for example, a request
+// GET "/some/path/file"
+// will be redirected to
+// GET "/file"
 ```
 
 ### Enabling WebDAV Module
