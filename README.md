@@ -31,6 +31,8 @@ and [old][Old Architecture] RN architectures.
   </tr>
 </table>
 
+[![Logo](https://avatars.githubusercontent.com/u/71085569?s=36)](https://github.com/Lumentric)
+
 <!-- links -->
 [@dr.pogodin/react-native-fs]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
