@@ -40,6 +40,7 @@ and [old][Old Architecture] RN architectures.
 [getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
 [MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
 [mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
+[mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
 [mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [react-native-fs]: https://www.npmjs.com/package/react-native-fs
@@ -50,8 +51,9 @@ and [old][Old Architecture] RN architectures.
 ## Content
 
 - [Getting Started](#getting-started)
-  - [Bundling-in Server Assets Into an App Statically](#bundling-in-server-assets-into-an-app-statically)
+  - [Bundling-in Server Assets Into an App Statically]
   - [Enabling Alias module]
+  - [Enabling Rewrite module]
   - [Enabling WebDAV module]
 - [API Reference](#api-reference)
 - [Project History and Roadmap](#project-history-and-roadmap)
@@ -219,6 +221,7 @@ and [old][Old Architecture] RN architectures.
   ```
 
 ### Bundling-in Server Assets Into an App Statically
+[Bundling-in Server Assets Into an App Statically]: #bundling-in-server-assets-into-an-app-statically
 
 The assets to be served by the server may come to the target device in different
 ways, for example, they may be generated during the app's runtime, or downloaded
@@ -360,10 +363,29 @@ root for a given url-subset. To enable it just use `extraConfig` option of
 [Server] [constructor()] to load and configure it, for example:
 
 ```ts
-  extraConfig: `
-    server.modules += ("mod_alias")
-    alias.url = ("/sample/url" => "/special/root/path")
-  `,
+extraConfig: `
+  server.modules += ("mod_alias")
+  alias.url = ("/sample/url" => "/special/root/path")
+`,
+```
+
+### Enabling Rewrite Module
+[Enabling Rewrite module]: #enabling-rewrite-module
+
+[Lighttpd]'s module [mod_rewrite] can be used for interal redirects,
+URL rewrites by the server. To enable it just use `extraConfig` option of
+[Server] [constructor()] to load and configure it, for example:
+
+```ts
+extraConfig: `
+  server.modules += ("mod_rewrite")
+  url.rewrite-once = ("/some/path/(.*)" => "/$1")
+`,
+
+// With such configuration, for example, a request
+// GET "/some/path/file"
+// will be redirected to
+// GET "/file"
 ```
 
 ### Enabling WebDAV Module
@@ -375,6 +397,15 @@ documents on a server &mdash; essentially an easy way to enable `POST`, `PUT`,
 _etc._ functionality for selected routes.
 
 **BEWARE:** _As of now, props and locks are not supported._
+
+**BEWARE:** _If you have set up the server to serve static assets bundled into
+the app, the chances are your server works with a readonly location on most
+platforms (in the case of Android it is anyway necessary to unpack bundled
+assets to the regular filesystem, thus there the server might be serving
+from a writeable location already). The easiest way around it is to use
+[mod_alias][Enabling Alias module] to point URLs configured for [mod_webdav]
+to a writeable filesystem location, different from that of the served static
+assets._
 
 To enable [mod_webdav] in the library you need (1) configure your host RN app
 to build Lighttpd with [mod_webdav] included; (2) opt-in to use it for selected

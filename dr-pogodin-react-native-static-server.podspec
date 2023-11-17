@@ -60,10 +60,17 @@ Pod::Spec.new do |s|
     :script => <<-CMD
       set -e
 
+      if [[ ${CONFIGURATION} == "Debug" ]]
+      then
+        LIGHTTPD_CONFIG="Debug"
+      else
+        LIGHTTPD_CONFIG="Release"
+      fi
+
       if [[ ${PLATFORM_FAMILY_NAME} == "iOS" ]]
       then
         EXTRA_CONFIG_ARGS="-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=${IPHONEOS_DEPLOYMENT_TARGET} -DCMAKE_SYSTEM_NAME=iOS -GXcode"
-        BUILD_OUTPUT_FOLDER_LIGHTTPD="/${CONFIGURATION}${EFFECTIVE_PLATFORM_NAME}"
+        BUILD_OUTPUT_FOLDER_LIGHTTPD="/${LIGHTTPD_CONFIG}${EFFECTIVE_PLATFORM_NAME}"
         BUILD_OUTPUT_FOLDER_PCRE2="/Release${EFFECTIVE_PLATFORM_NAME}"
       else
         # This assumes Mac Catalyst build.
@@ -73,7 +80,7 @@ Pod::Spec.new do |s|
       cmake ${PODS_TARGET_SRCROOT} -B ${TARGET_TEMP_DIR} \
         -DBUILD_STATIC=1 -DBUILD_LIBRARY=1 ${EXTRA_CONFIG_ARGS} #{$extraCMakeArgs}
 
-      cmake --build ${TARGET_TEMP_DIR} --config ${CONFIGURATION} --target lighttpd
+      cmake --build ${TARGET_TEMP_DIR} --config ${LIGHTTPD_CONFIG} --target lighttpd
 
       cp  ${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}/*.a \
           ${TARGET_TEMP_DIR}/pcre2${BUILD_OUTPUT_FOLDER_PCRE2}/*.a \
