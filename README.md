@@ -6,6 +6,15 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 [![Dr. Pogodin Studio](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-dr-pogodin-studio.svg)](https://dr.pogodin.studio/docs/react-native-static-server)
 
+<!-- Misc links -->
+[GCDWebServer]: https://github.com/swisspol/GCDWebServer
+[NanoHttpd]: https://github.com/NanoHttpd/nanohttpd
+[Lighttpd]: https://www.lighttpd.net
+[New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
+[Old Architecture]: https://reactnative.dev/docs/native-modules-intro
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[React Native]: https://reactnative.dev
+
 Embedded HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
 and [old][Old Architecture] RN architectures.
@@ -58,11 +67,35 @@ and [old][Old Architecture] RN architectures.
   - [Enabling Rewrite module]
   - [Enabling WebDAV module]
 - [API Reference](#api-reference)
-- [Project History and Roadmap](#project-history-and-roadmap)
-  - [Notable Versions of the Library]
-  - [Roadmap]
-- [Documentation for Older Library Versions (v0.6, v0.5)][OLD-README.md]
-- [Migration from Older Versions (v0.6, v0.5) to v0.7](#migration-from-older-versions-v06-v05-to-v07)
+  - [Server] &mdash; Represents a server instance.
+    - [constructor()] &mdash; Creates a new [Server] instance.
+    - [.addStateListener()] &mdash; Adds state listener to the server instance.
+    - [.removeAllStateListeners()] &mdash; Removes all state listeners from this
+      server instance.
+    - [.removeStateListener()] &mdash; Removes specified state listener from this
+      server instance.
+    - [.start()] &mdash; Launches the server.
+    - [.stop()] &mdash; Stops the server.
+    - [.errorLog] &mdash; Holds `errorLog` configuration.
+    - [.fileDir] &mdash; Holds absolute path to static assets on target device.
+    - [.hostname] &mdash; Holds the hostname used by server.
+    - [.id] &mdash; Hold unique ID of the server instance.
+    - [.nonLocal] &mdash; Holds `nonLocal` value provided to [constructor()].
+    - [.origin] &mdash; Holds server origin.
+    - [.port] &mdash; Holds the port used by server.
+    - [.state] &mdash; Holds the current server state.
+    - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
+      [constructor()].
+  - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
+    (Android-specific).
+  - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+    server instance, if any.
+  - [resolveAssetsPath()] &mdash; Resolves relative paths for bundled assets.
+  - [ERROR_LOG_FILE] &mdash; Location of the error log file.
+  - [STATES] &mdash; Enumerates possible states of [Server] instance.
+  - [UPLOADS_DIR] &mdash; Location for uploads.
+  - [WORK_DIR] &mdash; Location of the working files.
+  - [ErrorLogOptions] &mdash; Options for error logging.
 
 ## Getting Started
 [Getting Started]: #getting-started
@@ -70,8 +103,20 @@ and [old][Old Architecture] RN architectures.
 [CMake]: https://cmake.org
 [Homebrew]: https://brew.sh
 
-**Note:** _In addition to these instructions, have a look at
-[the example project][example app] included into the library repository._
+- **Note:**
+
+  - This library's repository includes [Example App][example app].
+    Have a look, try to build it, in addition to following the instructions
+    below.
+
+  - The following host / build platforms are not currently supported officially,
+    and they won't be unless the support is provided or sponsored by somebody:
+    - Building for Android target on Windows host
+      ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3A%22Windows+-%3E+Android%22)).
+      Prefer building for Android on macOS or Ubuntu host.
+    - [Expo] ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AExpo)).
+    - [tvOS](https://developer.apple.com/tvos) ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AtvOS)).
+
 
 - [CMake] is required on the build host.
 
@@ -441,36 +486,6 @@ routes when you create [Server] instance, using `extraConfig` option.
     ```
 
 ## API Reference
-- [Server] &mdash; Represents a server instance.
-  - [constructor()] &mdash; Creates a new [Server] instance.
-  - [.addStateListener()] &mdash; Adds state listener to the server instance.
-  - [.removeAllStateListeners()] &mdash; Removes all state listeners from this
-    server instance.
-  - [.removeStateListener()] &mdash; Removes specified state listener from this
-    server instance.
-  - [.start()] &mdash; Launches the server.
-  - [.stop()] &mdash; Stops the server.
-  - [.errorLog] &mdash; Holds `errorLog` configuration.
-  - [.fileDir] &mdash; Holds absolute path to static assets on target device.
-  - [.hostname] &mdash; Holds the hostname used by server.
-  - [.id] &mdash; Hold unique ID of the server instance.
-  - [.nonLocal] &mdash; Holds `nonLocal` value provided to [constructor()].
-  - [.origin] &mdash; Holds server origin.
-  - [.port] &mdash; Holds the port used by server.
-  - [.state] &mdash; Holds the current server state.
-  - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
-    [constructor()].
-- [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
-  (Android-specific).
-- [getActiveServer()] &mdash; Gets currently active, starting, or stopping
-  server instance, if any.
-- [resolveAssetsPath()] &mdash; Resolves relative paths for bundled assets.
-- [ERROR_LOG_FILE] &mdash; Location of the error log file.
-- [STATES] &mdash; Enumerates possible states of [Server] instance.
-- [UPLOADS_DIR] &mdash; Location for uploads.
-- [WORK_DIR] &mdash; Location of the working files.
-- [ErrorLogOptions] &mdash; Options for error logging.
-
 ### Server
 [Server]: #server
 ```js
@@ -880,113 +895,3 @@ the similarly named
 
 Without any flag set the server instance will still output very basic state
 and error messages into the log file.
-
-## Project History and Roadmap
-
-[GCDWebServer]: https://github.com/swisspol/GCDWebServer
-[NanoHttpd]: https://github.com/NanoHttpd/nanohttpd
-[Lighttpd]: https://www.lighttpd.net
-[New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
-[Old Architecture]: https://reactnative.dev/docs/native-modules-intro
-[React Native]: https://reactnative.dev
-
-This project started as a fork of the original
-[`react-native-static-server`](https://www.npmjs.com/package/react-native-static-server)
-library, abandoned by its creators.
-It is published to NPM as
-[@dr.pogodin/react-native-static-server](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server),
-and it aims to provide a well-maintained embed HTTP server for React Native (RN)
-applications.
-
-### Roadmap
-[Roadmap]: #roadmap
-
-**NOTE:** _With an appropriate financial contribution you can influence
-the roadmap&nbsp;&mdash; the aims, priorities, and timelines for this
-library&nbsp;&mdash; everything can be adjusted for the needs of a paying
-customer._
-
-These are future development aims, ordered by their current priority (from
-the top priority, to the least priority):
-
-- Support of custom configuration of HTTP server, and inclusion of
-  additional [Lighttpd] plugins (only three plugins for serving static
-  assets are included now by default on all platforms).
-- Support of [Expo].
-- Better documentation (migration of the documentation
-  to a [Docusaurus](https://docusaurus.io) website.
-
-### Notable Versions of the Library
-[Notable Versions of the Library]: #notable-versions-of-the-library
-[Releases Page on GitHub]: https://github.com/birdofpreyru/react-native-static-server/releases
-
-- See [Releases Page on GitHub] for details on latest library versions,
-  which did not deserve a special mention here.
-
-- **v0.7.0** &mdash; The new version of the library. Reworked API,
-  powered by [Lighttpd] v1.4.69 and latest [React Native] v0.71.2
-  on both Android and iOS, supports both [new][New Architecture]
-  and [old][Old Architecture] RN Architectures.
-
-- **v0.6.0-alpha.8** &mdash; The aim for **v0.6** release was
-  to refactor the library to support React Native's [New Architecture],
-  while keeping backward compatibility with RN's [Old Architecture],
-  and the original library API. The aim was mostly achieved as of
-  v0.6.0-alpha.8, but as development focus shifted into v0.7 development,
-  the v0.6 was effectively abandoned.
-
-  As of the latest alpha v0.6 version, the status was:
-  - The code refactoring was completed.
-  - **Android**: relied on [NanoHttpd], tested with React Native v0.70.0 for
-    both RN's [old][Old Architecture] and [new][New Architecture] architectures.
-  - **iOS**: relied on [GCDWebServer], tested with React Native v0.70.0 for
-    RN's [Old Architecture]. \
-    **NOT TESTED** with RN's [New Architecture], it likely required minor fixes
-    to support it.
-
-- **v0.5.5** &mdash; The latest version of the original library, patched
-  to work with React Native v0.67&ndash;0.68, and with all dependencies
-  updated (as of May 17, 2022). Relies on [NanoHttpd] on Android,
-  and [GCDWebServer] on iOS; only supports RN's [Old Architecture],
-  and was not tested with RN v0.69+.
-
-## Documentation for Older Library Versions (v0.6, v0.5)
-See [OLD-README.md]
-
-## Migration from Older Versions (v0.6, v0.5) to v0.7
-
-- On **Android** it now requires `minSdkVersion` to be set in equal 28 or larger
-  (in `build.gradle` file). Also, now it is not supported to start more than one
-  server instance a time (previously started server instance, if any, must be
-  stopped before starting another one).
-
-- [Server]'s [constructor()] signature was changed, as well as default behavior:
-  - [constructor()] now accepts a single required argument: an object holding
-    all available server options:
-  - `fileDir` option replaces old `root` argument, and now it MUST BE
-    a non-empty string (to prevent any mistakes due to wrong assumptions
-    what folder is served by default).
-  - `nonLocal` option replaces the old `localOnly`  option, with the opposite
-    meaning and default behavior. Now, by default the server is started on
-    "`127.0.0.1`" (the loopback address) and is only accessible from within the app. Setting `nonLocal`
-    flag will start it on an automatically assigned IP, accessible from outside
-    the app as well. This is the opposite to behavior in previous versions, and
-    it feels more secure (prevents exposing server outside the app due to
-    overlooking the default behavior).
-  - `stopInBackground` option replaces the old `keepAlive` option, with
-    the opposite meaning and behavior. Now, by default the server does not
-    do anything special when the app goes into background / returns to foreground.
-    Setting `stopInBackground` **true** will cause automatic stop of the server
-    each time the app enters background, with subsequent automatic server restart
-    when the app returns to foreground. This is opposite to behavior in previous
-    versions, and the rationale is: it is easy to handle the server without
-    stopping in background (in this case there is no need to watch server state
-    and synchronize possible requests with current server state), thus new
-    default behavior allows for easier server usage, while the opt-in stopping
-    of server in background allows more advanced usage scenario.
-
-- The new server implementation relies on app's temporary data folder to store
-  internal files (all within its [WORK_DIR]), don't mess with it if you do
-  anything special with the temporary folder.
-
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
