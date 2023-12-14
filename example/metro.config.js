@@ -1,17 +1,8 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
 const fs = require('fs');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const path = require('path');
 const escape = require('escape-string-regexp');
-
-const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
-
 const exclusionList = require('metro-config/src/defaults/exclusionList');
-
 const pak = require('../package.json');
 
 const root = path.resolve(__dirname, '..');
@@ -24,6 +15,12 @@ const rnwPath = fs.realpathSync(
   path.resolve(require.resolve('react-native-windows/package.json'), '..'),
 );
 
+/**
+ * Metro configuration
+ * https://facebook.github.io/metro/docs/configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
 const config = {
   watchFolders: [root],
 
