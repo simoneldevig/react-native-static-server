@@ -8,7 +8,8 @@
     "start": "react-native start",
     "windows:autolink": "react-native autolink-windows --sln \"windows\\ReactNativeStaticServerExample.sln\" --proj \"windows\\ReactNativeStaticServerExample\\ReactNativeStaticServerExample.vcxproj\"",
     "build:android": "cd android && ./gradlew assembleDebug --no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a",
-    "build:ios": "cd ios && xcodebuild -workspace ReactNativeStaticServerExample.xcworkspace -scheme ReactNativeStaticServerExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO"
+    "build:ios": "cd ios && xcodebuild -workspace ReactNativeStaticServerExample.xcworkspace -scheme ReactNativeStaticServerExample -configuration Debug -sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO",
+    "windows": "react-native run-windows"
   },
   "dependencies": {
     "@dr.pogodin/react-native-fs": "^2.22.0-alpha.0",
@@ -25,6 +26,7 @@
     "@react-native/metro-config": "^0.73.2",
     "@react-native/typescript-config": "^0.73.1",
     "babel-plugin-module-resolver": "^5.0.0",
+    "metro-config": "^0.80.1",
     "pod-install": "^0.1.0"
   },
   "engines": {
