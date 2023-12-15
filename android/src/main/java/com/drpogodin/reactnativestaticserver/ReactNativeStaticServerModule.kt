@@ -24,18 +24,18 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     // instance.
     private var server: Server? = null
     private var pendingPromise: Promise? = null
-    val typedExportedConstants: Map<String, Any>
-        get() {
-            val constants: MutableMap<String, Any> = HashMap()
-            constants["CRASHED"] = Server.CRASHED
-            constants["IS_MAC_CATALYST"] = false
-            constants["LAUNCHED"] = Server.LAUNCHED
-            constants["TERMINATED"] = Server.TERMINATED
-            return constants
-        }
+
+    override fun getTypedExportedConstants(): Map<String, Any> {
+        val constants: MutableMap<String, Any> = HashMap()
+        constants["CRASHED"] = Server.CRASHED
+        constants["IS_MAC_CATALYST"] = false
+        constants["LAUNCHED"] = Server.LAUNCHED
+        constants["TERMINATED"] = Server.TERMINATED
+        return constants
+    }
 
     @ReactMethod
-    fun getLocalIpAddress(promise: Promise) {
+    override fun getLocalIpAddress(promise: Promise) {
         try {
             val en = NetworkInterface.getNetworkInterfaces()
             while (en.hasMoreElements()) {
@@ -63,7 +63,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
   }
 
     @ReactMethod
-    fun start(
+    override fun start(
             id: Double,  // Server ID for backward communication with JS layer.
             configPath: String?,
             errlogPath: String?,
@@ -113,7 +113,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     }
 
     @ReactMethod
-    fun getOpenPort(address: String?, promise: Promise) {
+    override fun getOpenPort(address: String?, promise: Promise) {
         try {
             val socket = ServerSocket(
                     0, 0, InetAddress.getByName(address))
@@ -126,7 +126,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     }
 
     @ReactMethod
-    fun stop(promise: Promise?) {
+    override fun stop(promise: Promise?) {
         Log.i(LOGTAG, "stop() triggered")
         try {
             sem.acquire()
@@ -146,12 +146,12 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     }
 
     @ReactMethod
-    fun addListener(eventName: String?) {
+    override fun addListener(eventName: String?) {
         // NOOP
     }
 
     @ReactMethod
-    fun removeListeners(count: Double) {
+    override fun removeListeners(count: Double) {
         // NOOP
     }
 

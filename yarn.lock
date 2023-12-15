@@ -1787,6 +1787,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dr.pogodin/react-native-static-server-example@workspace:example":
+  version: 0.0.0-use.local
+  resolution: "@dr.pogodin/react-native-static-server-example@workspace:example"
+  dependencies:
+    "@babel/core": ^7.23.3
+    "@babel/preset-env": ^7.23.3
+    "@babel/runtime": ^7.23.2
+    "@dr.pogodin/react-native-fs": ^2.22.0-alpha.0
+    "@react-native/babel-preset": ^0.73.18
+    "@react-native/metro-config": ^0.73.2
+    "@react-native/typescript-config": ^0.73.1
+    babel-plugin-module-resolver: ^5.0.0
+    pod-install: ^0.1.0
+    react: 18.2.0
+    react-native: 0.73.0
+    react-native-webview: ^13.6.2
+    react-native-windows: ^0.73.2
+  languageName: unknown
+  linkType: soft
+
 "@dr.pogodin/react-native-static-server@workspace:.":
   version: 0.0.0-use.local
   resolution: "@dr.pogodin/react-native-static-server@workspace:."
@@ -3469,26 +3489,6 @@ __metadata:
   checksum: b4054078530e5fa8ede9677425deff0fce6d965f4c477ca73f8490d8a089e60b8498a15560425a1335f5ff99ecb851ed2c734b0a9a879299a5694302f212f37a
   languageName: node
   linkType: hard
-
-"ReactNativeStaticServerExample@workspace:example":
-  version: 0.0.0-use.local
-  resolution: "ReactNativeStaticServerExample@workspace:example"
-  dependencies:
-    "@babel/core": ^7.23.3
-    "@babel/preset-env": ^7.23.3
-    "@babel/runtime": ^7.23.2
-    "@dr.pogodin/react-native-fs": ^2.22.0-alpha.0
-    "@react-native/babel-preset": ^0.73.18
-    "@react-native/metro-config": ^0.73.2
-    "@react-native/typescript-config": ^0.73.1
-    babel-plugin-module-resolver: ^5.0.0
-    pod-install: ^0.1.0
-    react: 18.2.0
-    react-native: 0.73.0
-    react-native-webview: ^13.6.2
-    react-native-windows: ^0.73.2
-  languageName: unknown
-  linkType: soft
 
 "abbrev@npm:^2.0.0":
   version: 2.0.0
