@@ -113,7 +113,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     }
 
     @ReactMethod
-    override fun getOpenPort(address: String?, promise: Promise) {
+    override fun getOpenPort(address: String, promise: Promise) {
         try {
             val socket = ServerSocket(
                     0, 0, InetAddress.getByName(address))
