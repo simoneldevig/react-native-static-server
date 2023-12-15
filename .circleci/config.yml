@@ -10,15 +10,14 @@ jobs:
       - checkout
       - run: git submodule update --init --recursive
       - restore_cache:
-          key: node-modules-{{ checksum "package-lock.json" }}-{{ checksum "example/package-lock.json" }}
-      - run: npm install
-      - run: npm run bootstrap
+          key: node-modules-{{ checksum "yarn.lock" }}
+      - run: yarn install
       - save_cache:
-          key: node-modules-{{ checksum "package-lock.json" }}-{{ checksum "example/package-lock.json" }}
+          key: node-modules-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - example/node_modules
-      - run: npm test
+      - run: yarn test
       - persist_to_workspace:
           root: .
           paths:

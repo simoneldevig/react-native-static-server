@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "rootDir": ".",
     "paths": {
       "@dr.pogodin/react-native-static-server": ["./src/index"]
     },

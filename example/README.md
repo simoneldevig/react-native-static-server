@@ -10,32 +10,38 @@ selected web app links separately in the system browser app.
 **BEWARE:** _To facilitate library development needs, this example is set up
 differently from a real project &mdash; instead of consuming library code from
 a node module installed from NPM, this example consumes the library from its
-parent folder. Because of this, be sure to execute in the parent folder:_
+parent folder. Also dev setup works only with [Yarn]._
+
+To install dependencies and run the example do in the library code base root:
+`
 ```shell
-# This might be not strictly needed, but good to be consistent with
-# the usual environment of the example during library development.
-npm install
+# Installs node modules, both in the root, and in the example folder.
+yarn install
 
 # This clones and checks out the source code for PCRE2 and Lighttpd,
 # which would be already packed into the library package from NPM.
 git submodule update --init --recursive
+
+# Launches the development server.
+yarn example start
 ```
 
-With parent folder dependencies taken care of, follow the usual RN drill
-to prepare and run the example:
-- `npm install`
-- `npm start`
-- On **Android**:
-  - `npm run android`
-- On **iOS**:
-  - ```sh
-    cd ios && RCT_NEW_ARCH_ENABLED=1 pod install
+On **Android**:
+  - `yarn example android` (in the library codebase root) &mdash;
+    builds & deploys the example app.
+
+On **iOS**:
+  - Install pods:
+    ```sh
+    cd example/ios
+    RCT_NEW_ARCH_ENABLED=1 pod install
     ```
     Here `RCT_NEW_ARCH_ENABLED=1` is optional, omit it to build for the old RN
     architecture.
 
-  - Then open, build, and run the project in XCode.
+  - Then open, build, and run the example project in XCode.
 
 [@dr.pogodin/react-native-static-server]: https://www.npmjs.com/package/@dr.pogodin/react-native-static-server
 [react-native-webview]: https://www.npmjs.com/package/react-native-webview
+[Yarn]: https://yarnpkg.com/
 
