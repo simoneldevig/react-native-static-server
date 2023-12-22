@@ -89,7 +89,9 @@ and [old][Old Architecture] RN architectures.
   - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
     (Android-specific).
   - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
-    server instance, if any.
+    server instance, if any, according to the TS layer data.
+  - [getActiveServerId()] &mdash; Gets ID of the currently active, starting, or
+    stopping server instance, if any, according to the Native layer data.
   - [resolveAssetsPath()] &mdash; Resolves relative paths for bundled assets.
   - [ERROR_LOG_FILE] &mdash; Location of the error log file.
   - [STATES] &mdash; Enumerates possible states of [Server] instance.
@@ -551,6 +553,13 @@ within `options` argument:
   special `hostname` values to ask the library to automatically select
   appropriate non-local address._
 
+- `id` &mdash; **number** &mdash; Optional. Allows to enforce a specific ID,
+  used to communicate with the server instance within the Native layer, thus
+  it allows to re-connect to an existing native server instance.
+  See [getActiveServerId()] for details, and also pay attention to set
+  the correct `state` option value in this case. By default is is assigned
+  by the library.
+
 - `nonLocal` &mdash; **boolean** &mdash; Optional. By default, if `hostname`
   option was not provided, the server starts at the "`127.0.0.1`" (loopback)
   address, and it is only accessible within the host app.
@@ -564,6 +573,11 @@ within `options` argument:
 
 - `port` &mdash; **number** &mdash; Optional. The port at which to start the server.
   If 0 (default) an available port will be automatically selected.
+
+- `state` &mdash; [STATES] &mdash; Optional. Allows to enforce initial
+  server state value, which is needed when connecting to an existing
+  native server instance with help of the `id` option.
+  By default it is set to `STATES.INACTIVE`.
 
 - `stopInBackground` &mdash; **boolean** &mdash; Optional.
 
@@ -795,16 +809,42 @@ This is an Android-specific function; it does nothing on other platforms.
 
 ### getActiveServer()
 [getActiveServer()]: #getactiveserver
-```js
+```ts
 import {getActiveServer} from '@dr.pogodin/react-native-static-server';
 
-getActiveServer(): Server;
+getActiveServer(): Server | undefined;
 ```
 Returns currently active, starting, or stopping [Server] instance, if any exist
 in the app. It does not return, however, any inactive server instance which has
 been stopped automatically because of `stopInBackground` option, when the app
 entered background, and might be automatically started in future if the app
 enters foreground again prior to an explicit [.stop()] call for that instance.
+
+**NOTE:** The result of this function is based on the TypeScript layer data
+(that's why it is synchronous), in contrast to the [getActiveServerId()]
+function below, which calls into the Native layer, and returns ID of the active
+server based on that.
+
+### getActiveServerId()
+[getActiveServerId()]: #getactiveserverid
+```ts
+import {getActiveServerId} from '@dr.pogodin/react-native-static-server';
+
+getActiveServerId(): Promise<number | null>;
+```
+Returns ID of the currently active, starting, or stopping server instance,
+if any exist in the Native layer.
+
+This function is provided in response to
+[the ticket #95](https://github.com/birdofpreyru/react-native-static-server/issues/95),
+which asked to provide a way to re-connect to a server running within the Native
+layer after a reset of TypeScript RN layer. The ID returned by this function can
+be passed in into [Server] instance [constructor()] to create server instance
+communicating to the existing native layer server.
+
+**NOTE:** It is different from [getActiveServer()] function above, which
+returns the acurrently active, starting, or stopping [Server] instance based on
+TypeScript layer data.
 
 ### resolveAssetsPath()
 [resolveAssetsPath()]: #resolveassetspath

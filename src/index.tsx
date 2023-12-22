@@ -93,7 +93,7 @@ class StaticServer {
   _stopInBackground: boolean;
   _port: number;
 
-  _state: STATES = STATES.INACTIVE;
+  _state: STATES;
   _stateChangeEmitter = new Emitter<[STATES, string, Error | undefined]>();
 
   // TODO: It will be better to use UUID, but I believe "uuid" library
@@ -101,13 +101,7 @@ class StaticServer {
   // to RN setup to get around some issues with randombytes support in
   // RN JS engine. Anyway, it should be double-checked later, but using
   // timestamps as ID will do for now.
-
-  // NOTE: For some reasons RN-Windows corrupts large numbers sent
-  // as event arguments across JS / Native boundary.
-  // Everything smaller than 65535 seems to work fine, so let's just
-  // truncate these IDs for now.
-  // See: https://github.com/microsoft/react-native-windows/issues/11322
-  _id = Date.now() % 65535;
+  _id: number;
 
   // It is used to serialize state change requests, thus ensuring that parallel
   // requests to start / stop the server won't result in a corrupt state.
@@ -166,9 +160,17 @@ class StaticServer {
     fileDir,
     hostname,
 
+    // NOTE: For some reasons RN-Windows corrupts large numbers sent
+    // as event arguments across JS / Native boundary.
+    // Everything smaller than 65535 seems to work fine, so let's just
+    // truncate these IDs for now.
+    // See: https://github.com/microsoft/react-native-windows/issues/11322
+    id = Date.now() % 65535,
+
     /* DEPRECATED */ nonLocal = false,
 
     port = 0,
+    state = STATES.INACTIVE,
     stopInBackground = false,
 
     /* DEPRECATED */ webdav,
@@ -177,10 +179,12 @@ class StaticServer {
     errorLog?: boolean | ErrorLogOptions;
     fileDir: string;
     hostname?: string;
+    id?: number;
 
     /* DEPRECATED */ nonLocal?: boolean;
 
     port?: number;
+    state?: STATES;
     stopInBackground?: boolean;
 
     /* DEPRECATED */ webdav?: string[];
@@ -188,11 +192,13 @@ class StaticServer {
     if (errorLog) this._errorLog = errorLog === true ? {} : errorLog;
 
     this._extraConfig = extraConfig;
+    this._id = id;
 
     this._nonLocal = nonLocal;
     this._hostname = hostname || (nonLocal ? '' : LOOPBACK_ADDRESS);
 
     this._port = port;
+    this._state = state;
     this._stopInBackground = stopInBackground;
 
     if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
@@ -422,3 +428,5 @@ export function getActiveServer() {
       server.state !== STATES.INACTIVE && server.state !== STATES.CRASHED,
   );
 }
+
+export const getActiveServerId = ReactNativeStaticServer.getActiveServerId;

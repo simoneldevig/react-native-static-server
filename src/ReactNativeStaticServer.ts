@@ -1,5 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
+import type { Spec } from './NativeReactNativeStaticServer';
+
 const LINKING_ERROR =
   `The package '@dr.pogodin/react-native-static-server' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -24,4 +26,4 @@ const ReactNativeStaticServer = ReactNativeStaticServerModule
       },
     );
 
-export default ReactNativeStaticServer;
+export default ReactNativeStaticServer as Spec;

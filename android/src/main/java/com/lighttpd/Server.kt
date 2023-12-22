@@ -22,6 +22,7 @@ import java.util.function.BiConsumer
  * if any, has terminated or crashed before launching a new one!
  */
 class Server(
+        var id: Double,
         var configPath: String,
         var errlogPath: String,
         private val signalConsumer: BiConsumer<String, String?>
