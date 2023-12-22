@@ -65,9 +65,9 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     @ReactMethod
     override fun start(
             id: Double,  // Server ID for backward communication with JS layer.
-            configPath: String?,
-            errlogPath: String?,
-            promise: Promise?
+            configPath: String,
+            errlogPath: String,
+            promise: Promise
     ) {
         Log.i(LOGTAG, "Starting...")
         try {
