@@ -51,10 +51,13 @@ void Server::OnLaunchedCallback() {
     Server::activeServer->_signalConsumer(LAUNCHED, "");
 }
 
-Server::Server(std::string configPath,
+Server::Server(
+    double id,
+    std::string configPath,
     std::string errlogPath,
     SignalConsumer signalConsumer
 ):
+    _id(id),
     _configPath(configPath),
     _errlogPath(errlogPath),
     _signalConsumer(signalConsumer)
