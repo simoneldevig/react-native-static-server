@@ -8,9 +8,11 @@ typedef void (^SignalConsumer)(NSString * const signal, NSString * const details
 - (void) cancel;
 - (void) main;
 
-+ (Server*) serverWithConfig:(NSString*)configPath
++ (Server*) serverWithId:(NSNumber*)serverId
+    configPath:(NSString*)configPath
     errlogPath:(NSString*)errlogPath
     signalConsumer:(SignalConsumer)signalConsumer;
 
+@property (readonly) NSNumber *serverId;
 @property SignalConsumer signalConsumer;
 @end
