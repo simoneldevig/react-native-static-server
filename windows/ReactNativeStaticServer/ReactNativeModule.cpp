@@ -36,15 +36,9 @@ void unlock_sem() {
 }
 
 void OnSignal(std::string signal, std::string details) {
-    if (pendingResult) {
-        if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
-        else pendingResult->Resolve(details);
-    }
-    else {
-      // CAREFUL: sendEvent() depends on server object to get it ID,
-      // thus MUST BE called before the server instance is dropped below.
-      mod->sendEvent(signal, details);
-    }
+    // BEWARE: .sendEvent() depends on the server object to get its ID,
+    // thus MUST BE called before the object is dropped below, if it is.
+    if (!pendingResult) mod->sendEvent(signal, details);
 
     if (signal == CRASHED || signal == TERMINATED) {
       delete server;
@@ -52,6 +46,8 @@ void OnSignal(std::string signal, std::string details) {
     }
 
     if (pendingResult) {
+      if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
+      else pendingResult->Resolve(details);
       delete pendingResult;
       pendingResult = NULL;
       unlock_sem();
