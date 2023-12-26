@@ -44,7 +44,7 @@ RCT_REMAP_METHOD(getActiveServerId,
                  getActiveServerId:(RCTPromiseResolveBlock) resolve
                  rejecter:(RCTPromiseRejectBlock)reject
 ) {
-  resolve(self->server ? self->server.serverId : nil);
+  resolve(self->server ? self->server.serverId : [NSNull null]);
 }
 
 RCT_REMAP_METHOD(getLocalIpAddress,
