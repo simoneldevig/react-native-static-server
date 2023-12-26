@@ -32,7 +32,7 @@ export { STATES, resolveAssetsPath };
 
 // ID-to-StaticServer map for all potentially active server instances,
 // used to route native events back to JS server objects.
-const servers: { [id: string]: StaticServer } = {};
+const servers: { [id: string]: Set<StaticServer> } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(ReactNativeStaticServer);
 
@@ -47,14 +47,18 @@ export type StateListener = (
 nativeEventEmitter.addListener(
   'RNStaticServer',
   ({ serverId, event, details }) => {
-    const server = servers[serverId];
-    if (server) {
+    const group = servers[serverId];
+    if (group) {
       switch (event) {
         case SIGNALS.CRASHED:
           // TODO: We probably can, and should, capture the native stack trace
           // and pass it along with the error.
           const error = Error(details);
-          server._setState(STATES.CRASHED, details, error);
+
+          group.forEach((item) =>
+            item._setState(STATES.CRASHED, details, error),
+          );
+
           // TODO: Should we do here the following?
           // delete servers[this._id];
           break;
@@ -198,8 +202,23 @@ class StaticServer {
     this._hostname = hostname || (nonLocal ? '' : LOOPBACK_ADDRESS);
 
     this._port = port;
-    this._state = state;
     this._stopInBackground = stopInBackground;
+
+    this._state = state;
+
+    // NOTE: Normally, a server instance is connected to events from the native
+    // side inside its .start() call, and it is disconnected from them inside
+    // its .stop() call (or crash clean-up sequence). However, if the server is
+    // created with a claim that it is already active, we should connect it to
+    // the events rigth away here.
+    switch (state) {
+      case STATES.ACTIVE:
+      case STATES.STARTING: {
+        this._registerSelf();
+        break;
+      }
+      default:
+    }
 
     if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
     this._fileDir = resolveAssetsPath(fileDir);
@@ -238,6 +257,15 @@ class StaticServer {
       } catch {
         // IGNORE
       }
+    }
+  }
+
+  _registerSelf() {
+    let group = servers[this._id];
+    if (group) group.add(this);
+    else {
+      group = new Set([this]);
+      servers[this._id] = group;
     }
   }
 
@@ -282,7 +310,8 @@ class StaticServer {
       await this._sem.seize();
       this._stableStateGuard();
       if (this._state === STATES.ACTIVE) return this._origin!;
-      servers[this._id] = this;
+
+      this._registerSelf();
       this._setState(STATES.STARTING, details);
       this._configureAppStateHandling();
 
@@ -352,7 +381,9 @@ class StaticServer {
       this._setState(STATES.CRASHED, error.message, error);
       throw error;
     } finally {
-      delete servers[this._id];
+      const set = servers[this._id];
+      set?.delete(this);
+      if (!set?.size) delete servers[this._id];
       this._sem.setReady(true);
     }
   }
@@ -423,10 +454,11 @@ export async function extractBundledAssets(
  * @return {StaticServer|undefined}
  */
 export function getActiveServer() {
-  return Object.values(servers).find(
-    (server) =>
-      server.state !== STATES.INACTIVE && server.state !== STATES.CRASHED,
-  );
+  return Object.values(servers).find((group) => {
+    const server = group.values().next().value;
+    const state = server?.state;
+    return state !== STATES.INACTIVE && state !== STATES.CRASHED;
+  });
 }
 
 export const getActiveServerId = ReactNativeStaticServer.getActiveServerId;

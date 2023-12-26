@@ -66,6 +66,7 @@ and [old][Old Architecture] RN architectures.
   - [Enabling Alias module]
   - [Enabling Rewrite module]
   - [Enabling WebDAV module]
+  - [Connecting to an Active Server in the Native Layer]
 - [API Reference](#api-reference)
   - [Server] &mdash; Represents a server instance.
     - [constructor()] &mdash; Creates a new [Server] instance.
@@ -487,6 +488,50 @@ routes when you create [Server] instance, using `extraConfig` option.
     `,
     ```
 
+### Connecting to an Active Server in the Native Layer
+[Connecting to an Active Server in the Native Layer]: #connecting-to-an-active-server-in-the-native-layer
+
+When this library is used the regular way, the [Lighttpd] server in the native
+layer is launched when the [.start()] method of a [Server] instance is triggered
+on the JavaScript (TypeScript) side, and the native server is terminated when
+the [.stop()] method is called on the JS side. In the JS layer we hold most of
+the server-related information (`hostname`, `port`, `fileDir`, _etc._),
+and take care of the high-level server control (_i.e._ the optional
+pause / resume of the server when the app enters background / foreground).
+If JS engine is restarted (or just related JS modules are reloaded) the regular
+course of action is to explictly terminate the active server just before it,
+and to re-create, and re-launch it afterwards. If it is not done, the [Lighttpd]
+server will remain active in the native layer across the JS engine restart,
+and it won't be possible to launch a new server instance after the restart,
+as the library only supports at most one active [Lighttpd] server, and it
+throws an error if the server launch command arrives to the native layer while
+[Lighttpd] server is already active.
+
+However, in response to
+[the ticket #95](https://github.com/birdofpreyru/react-native-static-server/issues/95)
+we provide a way to reuse an active native server across JS engine restarts,
+without restarting the server. To do so you:
+- Use [getActiveServerId()] method to check whether the native server is active
+  (if so, this method resolves to a non-_null_ ID).
+- Create a new [Server] instance passing into its [constructor()] that server ID
+  as the `id` option, and [STATES]`.ACTIVE` as the `state` option. These options
+  (usually omitted when creating a regular [Server] instance) ensure that
+  the created [Server] instance is able to communicate with the already running
+  native server, and to correctly handle subsequent [.stop()] and [.start()]
+  calls. Beside these, it is up-to-you to set all other options to the values
+  you need (_i.e._ setting `id`, and `state` just &laquo;connects&raquo;
+  the newly created [Server] instance to the active native server, but it
+  does not restore any other information about the server &mdash; you should
+  restore or redefine it the way you see fit).
+
+Note, this way it is possible to create multiple [Server] instances connected
+to the same active native server. As they have the same `id`, they all will
+represent the same server, thus calling [.stop()] and [.start()] commands
+on any of them will operate the same server, and update the states of all
+these JS server instances, without triggering the error related to
+the &laquo;at most one active server a time&raquo; (though, it has not been
+carefully tested yet).
+
 ## API Reference
 ### Server
 [Server]: #server
@@ -556,9 +601,8 @@ within `options` argument:
 - `id` &mdash; **number** &mdash; Optional. Allows to enforce a specific ID,
   used to communicate with the server instance within the Native layer, thus
   it allows to re-connect to an existing native server instance.
-  See [getActiveServerId()] for details, and also pay attention to set
-  the correct `state` option value in this case. By default is is assigned
-  by the library.
+  See &laquo;[Connecting to an Active Server in the Native Layer]&raquo;
+  for details. By default, an `id` is selected by the library.
 
 - `nonLocal` &mdash; **boolean** &mdash; Optional. By default, if `hostname`
   option was not provided, the server starts at the "`127.0.0.1`" (loopback)
@@ -574,10 +618,14 @@ within `options` argument:
 - `port` &mdash; **number** &mdash; Optional. The port at which to start the server.
   If 0 (default) an available port will be automatically selected.
 
-- `state` &mdash; [STATES] &mdash; Optional. Allows to enforce initial
-  server state value, which is needed when connecting to an existing
-  native server instance with help of the `id` option.
-  By default it is set to `STATES.INACTIVE`.
+- `state` &mdash; [STATES] &mdash; Optional. Allows to enforce the initial
+  server state value, which is necessary [when connecting to an existing
+  native server instance][Connecting to an Active Server in the Native Layer].
+  Note, it only influence the logic behind subsequent [.start()] and [.stop()]
+  calls, _i.e._ the constructor does not attempt to put the server in this
+  state, nor does it check the value is consistent with the active server,
+  if any, in the native layer. By default, the state is initialized
+  to `STATES.INACTIVE`.
 
 - `stopInBackground` &mdash; **boolean** &mdash; Optional.
 
@@ -837,10 +885,10 @@ if any exist in the Native layer.
 
 This function is provided in response to
 [the ticket #95](https://github.com/birdofpreyru/react-native-static-server/issues/95),
-which asked to provide a way to re-connect to a server running within the Native
-layer after a reset of TypeScript RN layer. The ID returned by this function can
-be passed in into [Server] instance [constructor()] to create server instance
-communicating to the existing native layer server.
+to allow &laquo;[Connecting to an Active Server in the Native Layer]&raquo;.
+The ID returned by this function can be passed in into [Server] instance
+[constructor()] to create server instance communicating to the existing native
+layer server.
 
 **NOTE:** It is different from [getActiveServer()] function above, which
 returns the acurrently active, starting, or stopping [Server] instance based on
