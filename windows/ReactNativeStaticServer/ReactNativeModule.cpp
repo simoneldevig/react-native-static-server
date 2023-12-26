@@ -12,7 +12,6 @@ using namespace std::chrono_literals;
 using namespace winrt::ReactNativeStaticServer;
 using namespace winrt::Windows::Networking::Connectivity;
 
-double activeServerId;
 ReactNativeModule* mod;
 React::ReactPromise<std::string>* pendingResult;
 Server *server;
@@ -37,17 +36,22 @@ void unlock_sem() {
 }
 
 void OnSignal(std::string signal, std::string details) {
+    // BEWARE: .sendEvent() depends on the server object to get its ID,
+    // thus MUST BE called before the object is dropped below, if it is.
+    if (!pendingResult) mod->sendEvent(signal, details);
+
     if (signal == CRASHED || signal == TERMINATED) {
-        delete server;
-        server = NULL;
+      delete server;
+      server = NULL;
     }
+
     if (pendingResult) {
-        if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
-        else pendingResult->Resolve(details);
-        delete pendingResult;
-        pendingResult = NULL;
-        unlock_sem();
-    } else mod->sendEvent(signal, details);
+      if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
+      else pendingResult->Resolve(details);
+      delete pendingResult;
+      pendingResult = NULL;
+      unlock_sem();
+    }
 }
 
 ReactNativeStaticServerSpec_Constants ReactNativeModule::GetConstants() noexcept {
@@ -57,6 +61,10 @@ ReactNativeStaticServerSpec_Constants ReactNativeModule::GetConstants() noexcept
     res.LAUNCHED = LAUNCHED;
     res.TERMINATED = TERMINATED;
     return res;
+}
+
+void ReactNativeModule::getActiveServerId(React::ReactPromise<std::optional<double>>&& result) noexcept {
+  result.Resolve(server ? std::optional(server->id()) : std::nullopt);
 }
 
 void ReactNativeModule::getLocalIpAddress(React::ReactPromise<std::string>&& result) noexcept {
@@ -114,7 +122,7 @@ void ReactNativeModule::getOpenPort(
 
 void ReactNativeModule::sendEvent(std::string signal, std::string details) {
     JSValueObject obj = JSValueObject{
-            {"serverId", activeServerId},
+            {"serverId", server->id()},
             {"event", signal},
             {"details", details}
     };
@@ -142,9 +150,8 @@ void ReactNativeModule::start(
     }
 
     mod = this;
-    activeServerId = id;
     pendingResult = new React::ReactPromise<std::string>(result);
-    server = new Server(configPath, errlogPath, OnSignal);
+    server = new Server(id, configPath, errlogPath, OnSignal);
     server->launch();
 }
 

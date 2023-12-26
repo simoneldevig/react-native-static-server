@@ -35,6 +35,11 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     }
 
     @ReactMethod
+    override fun getActiveServerId(promise: Promise) {
+      promise.resolve(server?.id)
+    }
+
+    @ReactMethod
     override fun getLocalIpAddress(promise: Promise) {
         try {
             val en = NetworkInterface.getNetworkInterfaces()
@@ -65,9 +70,9 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
     @ReactMethod
     override fun start(
             id: Double,  // Server ID for backward communication with JS layer.
-            configPath: String?,
-            errlogPath: String?,
-            promise: Promise?
+            configPath: String,
+            errlogPath: String,
+            promise: Promise
     ) {
         Log.i(LOGTAG, "Starting...")
         try {
@@ -90,10 +95,8 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
         pendingPromise = promise
         val emitter: DeviceEventManagerModule.RCTDeviceEventEmitter = getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-        server = Server(
-                configPath,
-                errlogPath
-        ) { signal, details ->
+
+        server = Server(id, configPath, errlogPath) { signal, details ->
             if (signal !== Server.LAUNCHED) server = null
             if (pendingPromise == null) {
                 val event = Arguments.createMap()

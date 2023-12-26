@@ -22,11 +22,13 @@ extern "C" {
   NSString *errlogPath;
 }
 
-- (id) initWithConfig:(NSString*)configPath
-         errlogPath:(NSString*)errlogPath
+- (id) initWithServerId:(NSNumber*)serverId
+             configPath:(NSString*)configPath
+             errlogPath:(NSString*)errlogPath
          signalConsumer:(SignalConsumer)signalConsumer
 {
   self = [super init];
+  self->_serverId = serverId;
   self->configPath = configPath;
   self->errlogPath = errlogPath;
   self.signalConsumer = signalConsumer;
@@ -71,14 +73,16 @@ extern "C" {
   }
 }
 
-+ (Server*) serverWithConfig:(NSString*)configPath
-                  errlogPath:(NSString*)errlogPath
-              signalConsumer:(SignalConsumer)signalConsumer
++ (Server*) serverWithId:(NSNumber*)serverId
+              configPath:(NSString*)configPath
+              errlogPath:(NSString*)errlogPath
+          signalConsumer:(SignalConsumer)signalConsumer
 {
   return [[Server alloc]
-    initWithConfig: configPath
-        errlogPath: errlogPath
-    signalConsumer: signalConsumer];
+    initWithServerId:serverId
+          configPath:configPath
+          errlogPath:errlogPath
+      signalConsumer:signalConsumer];
 }
 
 @end

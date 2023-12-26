@@ -40,6 +40,13 @@ RCT_EXPORT_MODULE();
   return [self constantsToExport];
 }
 
+RCT_REMAP_METHOD(getActiveServerId,
+                 getActiveServerId:(RCTPromiseResolveBlock) resolve
+                 rejecter:(RCTPromiseRejectBlock)reject
+) {
+  resolve(self->server ? self->server.serverId : [NSNull null]);
+}
+
 RCT_REMAP_METHOD(getLocalIpAddress,
   getLocalIpAddress:(RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject
@@ -132,7 +139,8 @@ RCT_REMAP_METHOD(start,
     };
 
     self->server = [Server
-      serverWithConfig:configPath
+      serverWithId:serverId
+      configPath:configPath
       errlogPath:errlogPath
       signalConsumer:signalConsumer
     ];

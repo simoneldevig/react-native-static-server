@@ -11,6 +11,8 @@ export interface Spec extends TurboModule {
 
   addListener(eventName: string): void;
 
+  getActiveServerId(): Promise<number | null>;
+
   removeListeners(count: number): void;
 
   start(id: number, configPath: string, errlogPath: string): Promise<string>;

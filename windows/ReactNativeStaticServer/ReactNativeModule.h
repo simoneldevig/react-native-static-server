@@ -33,6 +33,9 @@ struct ReactNativeModule
 
     void sendEvent(std::string signal, std::string details);
 
+    REACT_METHOD(getActiveServerId)
+    void getActiveServerId(React::ReactPromise<std::optional<double>>&& result) noexcept;
+
     REACT_METHOD(getLocalIpAddress)
     void getLocalIpAddress(React::ReactPromise<std::string>&& result) noexcept;
 
