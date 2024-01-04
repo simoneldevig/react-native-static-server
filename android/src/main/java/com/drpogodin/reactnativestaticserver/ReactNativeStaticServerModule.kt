@@ -59,7 +59,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             }
             promise.resolve("127.0.0.1")
         } catch (e: Exception) {
-            Errors.FAIL_GET_LOCAL_IP_ADDRESS.reject(promise)
+            Errors.FAIL_GET_LOCAL_IP_ADDRESS().reject(promise)
         }
     }
 
@@ -78,17 +78,19 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
         try {
             sem.acquire()
         } catch (e: Exception) {
-            Errors.INTERNAL_ERROR.log(e)
+            Errors.INTERNAL_ERROR(id).log(e)
                     .reject(promise, "Failed to acquire a semaphore")
             return
         }
-        if (server != null) {
-            Errors.ANOTHER_INSTANCE_IS_ACTIVE.log().reject(promise)
+
+        val activeServerId = server?.id;
+        if (activeServerId != null) {
+            Errors.ANOTHER_INSTANCE_IS_ACTIVE(activeServerId, id).log().reject(promise)
             sem.release()
             return
         }
         if (pendingPromise != null) {
-            Errors.INTERNAL_ERROR.log().reject(promise, "Unexpected pending promise")
+            Errors.INTERNAL_ERROR(id).log().reject(promise, "Unexpected pending promise")
             sem.release()
             return
         }
@@ -106,7 +108,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
                 emitter.emit("RNStaticServer", event)
             } else {
                 if (signal === Server.CRASHED) {
-                    Errors.SERVER_CRASHED.reject(pendingPromise, details)
+                    Errors.SERVER_CRASHED(id).reject(pendingPromise, details)
                 } else pendingPromise!!.resolve(details)
                 pendingPromise = null
                 sem.release()
@@ -124,7 +126,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             socket.close()
             promise.resolve(port)
         } catch (e: Exception) {
-            Errors.FAIL_GET_OPEN_PORT.log(e).reject(promise)
+            Errors.FAIL_GET_OPEN_PORT().log(e).reject(promise)
         }
     }
 
@@ -134,12 +136,12 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
         try {
             sem.acquire()
         } catch (e: Exception) {
-            Errors.INTERNAL_ERROR.log(e)
+            Errors.INTERNAL_ERROR(server!!.id).log(e)
                     .reject(promise, "Failed to acquire a semaphore")
             return
         }
         if (pendingPromise != null) {
-            Errors.INTERNAL_ERROR
+            Errors.INTERNAL_ERROR(server!!.id)
                     .reject(pendingPromise, "Unexpected pending promise")
             sem.release()
             return
