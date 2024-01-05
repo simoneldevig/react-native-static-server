@@ -98,15 +98,16 @@ RCT_REMAP_METHOD(start,
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
     if (self->server) {
-      auto e = [[RNSSException name:@"Another server instance is active"] log];
+      NSString *name = [NSString stringWithFormat:@"Failed to launch server #%@, another server instance (#%@) is active", serverId, self->server.serverId];
+      auto e = [[RNSSException name:name] log];
       [e reject:reject];
       dispatch_semaphore_signal(sem);
       return;
     }
 
     if (pendingResolve != nil || pendingReject != nil) {
-      auto e = [[RNSSException name:@"Internal error"
-                          details:@"Non-expected pending promise"] log];
+      NSString *name = [NSString stringWithFormat:@"Internal error (server #%@)", serverId];
+      auto e = [[RNSSException name:name details:@"Non-expected pending promise"] log];
       [e reject:reject];
       dispatch_semaphore_signal(sem);
       return;
@@ -129,7 +130,8 @@ RCT_REMAP_METHOD(start,
         ];
       } else {
         if (signal == CRASHED) {
-          [[RNSSException name:@"Server crashed" details:details]
+          NSString *name = [NSString stringWithFormat:@"Server #%@ crashed", serverId];
+          [[RNSSException name:name details:details]
            reject:pendingReject];
         } else pendingResolve(details);
         pendingResolve = nil;
