@@ -588,14 +588,14 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					" ",
+					"-DRN_FABRIC_ENABLED",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
-					" ",
+					"-DRN_FABRIC_ENABLED",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -743,7 +743,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					" ",
+					"-DRN_FABRIC_ENABLED",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -751,7 +751,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
-					" ",
+					"-DRN_FABRIC_ENABLED",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -819,7 +819,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					" ",
+					"-DRN_FABRIC_ENABLED",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -827,7 +827,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
-					" ",
+					"-DRN_FABRIC_ENABLED",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
