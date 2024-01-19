@@ -409,9 +409,29 @@ class StaticServer {
     await this._stop(details);
   }
 
-  _handleAppStateChange(appState: AppStateStatus) {
-    if (appState === 'active') this.start('App entered foreground');
-    else this._stop('App entered background');
+  async _handleAppStateChange(appState: AppStateStatus) {
+    try {
+      if (appState === 'active') await this.start('App entered foreground');
+      else await this._stop('App entered background');
+    } catch (e) {
+      // If anything goes wrong within .start() or ._stop() calls, those methods
+      // will move the server into the "CRASHED" state, and they'll notify all
+      // server state listeners (see .addStateListener()) about the error, with
+      // all related details.
+      //
+      // Thus, if any state listener is connected to the server, we assume it
+      // handles possible errors, and we just silently ignore the error here
+      // (otherwise some instrumentation, like e.g. Sentry, may catch and report
+      // it as unhandled, which is confusing when the error has been handled
+      // within the listener).
+      //
+      // However, if no listeners are connected, we re-throw the error to allow
+      // the instrumentation, if any, to detect and report it as unhandled.
+      //
+      // In either case this very function is used internally, thus no way for
+      // the library consumer to directly handle its possible rejections.
+      if (!this._stateChangeEmitter.hasListeners) throw e;
+    }
   }
 }
 
