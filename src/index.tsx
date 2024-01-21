@@ -410,8 +410,9 @@ class StaticServer {
   }
 
   async _handleAppStateChange(appState: AppStateStatus) {
+    const starting = appState === 'active';
     try {
-      if (appState === 'active') await this.start('App entered foreground');
+      if (starting) await this.start('App entered foreground');
       else await this._stop('App entered background');
     } catch (e) {
       // If anything goes wrong within .start() or ._stop() calls, those methods
@@ -425,12 +426,18 @@ class StaticServer {
       // it as unhandled, which is confusing when the error has been handled
       // within the listener).
       //
-      // However, if no listeners are connected, we re-throw the error to allow
+      // However, if no listeners are connected, we throw an error to allow
       // the instrumentation, if any, to detect and report it as unhandled.
       //
       // In either case this very function is used internally, thus no way for
       // the library consumer to directly handle its possible rejections.
-      if (!this._stateChangeEmitter.hasListeners) throw e;
+      if (!this._stateChangeEmitter.hasListeners) {
+        throw Error(
+          starting
+            ? 'Server auto-start on the app going into foreground failed'
+            : 'Server auto-stop on the app going into background failed',
+        );
+      }
     }
   }
 }
