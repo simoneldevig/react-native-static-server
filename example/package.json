@@ -12,7 +12,7 @@
     "windows": "react-native run-windows"
   },
   "dependencies": {
-    "@dr.pogodin/react-native-fs": "^2.22.0-alpha.1",
+    "@dr.pogodin/react-native-fs": "^2.22.0",
     "react": "18.2.0",
     "react-native": "0.73.2",
     "react-native-webview": "^13.6.4",
