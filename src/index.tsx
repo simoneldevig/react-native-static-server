@@ -434,8 +434,8 @@ class StaticServer {
       if (!this._stateChangeEmitter.hasListeners) {
         throw Error(
           starting
-            ? 'Server auto-start on the app going into foreground failed'
-            : 'Server auto-stop on the app going into background failed',
+            ? `Server (#${this._id}) auto-start on the app going into foreground failed`
+            : `Server (#${this._id}) auto-stop on the app going into background failed`,
         );
       }
     }
