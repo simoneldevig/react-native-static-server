@@ -434,8 +434,8 @@ class StaticServer {
       if (!this._stateChangeEmitter.hasListeners) {
         throw Error(
           starting
-            ? 'Server auto-start on the app going into foreground failed'
-            : 'Server auto-stop on the app going into background failed',
+            ? `Server (#${this._id}) auto-start on the app going into foreground failed`
+            : `Server (#${this._id}) auto-stop on the app going into background failed`,
         );
       }
     }
@@ -463,6 +463,10 @@ export async function extractBundledAssets(
   into = DocumentDirectoryPath,
   from = '',
 ) {
+  console.warn(
+    'extractBundledAssets() is deprecated! See: https://github.com/birdofpreyru/react-native-static-server?tab=readme-ov-file#extractbundledassets',
+  );
+
   if (Platform.OS !== 'android') return;
 
   await mkdir(into);
