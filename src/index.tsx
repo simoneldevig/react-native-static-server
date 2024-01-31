@@ -463,6 +463,10 @@ export async function extractBundledAssets(
   into = DocumentDirectoryPath,
   from = '',
 ) {
+  console.warn(
+    'extractBundledAssets() is deprecated! See: https://github.com/birdofpreyru/react-native-static-server?tab=readme-ov-file#extractbundledassets',
+  );
+
   if (Platform.OS !== 'android') return;
 
   await mkdir(into);

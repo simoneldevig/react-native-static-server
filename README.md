@@ -1,19 +1,35 @@
 # React Native Static Server
 
+<!-- Status Badges & Important Links -->
+
 [![Latest NPM Release](https://img.shields.io/npm/v/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![NPM Downloads](https://img.shields.io/npm/dm/@dr.pogodin/react-native-static-server.svg)](https://www.npmjs.com/package/@dr.pogodin/react-native-static-server)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/birdofpreyru/react-native-static-server/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/birdofpreyru/react-native-static-server)
 [![GitHub Repo stars](https://img.shields.io/github/stars/birdofpreyru/react-native-static-server?style=social)](https://github.com/birdofpreyru/react-native-static-server)
 [![Dr. Pogodin Studio](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-dr-pogodin-studio.svg)](https://dr.pogodin.studio/docs/react-native-static-server)
 
-<!-- Misc links -->
-[GCDWebServer]: https://github.com/swisspol/GCDWebServer
-[NanoHttpd]: https://github.com/NanoHttpd/nanohttpd
+<!-- Misc references -->
+
+[@dr.pogodin/react-native-fs]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs
+[copyFileAssets()]: https://github.com/birdofpreyru/react-native-fs?tab=readme-ov-file#copyfileassets
+[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+[Example App]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
+[Expo]: https://expo.dev
+[getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
 [Lighttpd]: https://www.lighttpd.net
+[MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
+[mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
+[mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
+[mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
 [New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
 [Old Architecture]: https://reactnative.dev/docs/native-modules-intro
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [React Native]: https://reactnative.dev
+[TemporaryDirectoryPath]: https://github.com/birdofpreyru/react-native-fs?tab=readme-ov-file#temporarydirectorypath
+[WebDAV]: https://en.wikipedia.org/wiki/WebDAV
+
+<!-- The regular README content starts here -->
 
 Embedded HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
 and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
@@ -41,23 +57,6 @@ and [old][Old Architecture] RN architectures.
 </table>
 
 [![Logo](https://avatars.githubusercontent.com/u/71085569?s=36)](https://github.com/Lumentric)
-
-<!-- links -->
-[@dr.pogodin/react-native-fs]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs
-[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
-[example app]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
-[Expo]: https://expo.dev
-[OLD-README.md]: https://github.com/birdofpreyru/react-native-static-server/blob/master/OLD-README.md
-[getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
-[MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
-[mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
-[mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
-[mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
-[react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
-[react-native-fs]: https://www.npmjs.com/package/react-native-fs
-[React Native]: https://reactnative.dev
-[TemporaryDirectoryPath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#temporarydirectorypath
-[WebDAV]: https://en.wikipedia.org/wiki/WebDAV
 
 ## Content
 
@@ -87,8 +86,8 @@ and [old][Old Architecture] RN architectures.
     - [.state] &mdash; Holds the current server state.
     - [.stopInBackground] &mdash; Holds `stopInBackground` value provided to
       [constructor()].
-  - [extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
-    (Android-specific).
+  - ~~[extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
+(Android-specific).~~
   - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
     server instance, if any, according to the TS layer data.
   - [getActiveServerId()] &mdash; Gets ID of the currently active, starting, or
@@ -108,7 +107,7 @@ and [old][Old Architecture] RN architectures.
 
 - **Note:**
 
-  - This library's repository includes [Example App][example app].
+  - This library's repository includes [Example App].
     Have a look, try to build it, in addition to following the instructions
     below.
 
@@ -195,7 +194,7 @@ and [old][Old Architecture] RN architectures.
     (`com.apple.security.network.server` entitlement).
   - If you bundle inside your app the assets to serve by the server,
     keep in mind that in Mac Catalyst build they'll end up in a different
-    path, compared to the regular iOS bundle (see [example app]): \
+    path, compared to the regular iOS bundle (see [Example App]): \
     iOS: "[MainBundlePath]`/webroot`"; \
     Mac Catalyst: "[MainBundlePath]`/Content/Resources/webroot`".
 
@@ -309,21 +308,24 @@ outside platform-specific sub-folders.
   - On Android the server cannot access bundled assets as regular files, thus
     before starting the server to serve them, these assets should be extracted
     into a folder accessible to the server (_e.g._ app's document folder).
-    To facilitate it, this library provides [extractBundledAssets()] function.
-    You want to use it in this manner:
+    You can use [copyFileAssets()] function from [@dr.pogodin/react-native-fs]
+    library (v2.24.1 and above):
     ```jsx
     // TODO: To be updated, see a better code inside the example app.
 
+    import { Platform } from 'react-native';
+
     import {
+      copyFileAssets,
       DocumentDirectoryPath,
       exists,
       resolveAssetsPath,
       unlink,
     } from '@dr.pogodin/react-native-fs';
 
-    import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';
-
     async function prepareAssets() {
+      if (Platform.OS !== 'android') return;
+
       const targetWebrootPathOnDevice = resolveAssetsPath('webroot');
 
       // It is use-case specific, but in general if target webroot path exists
@@ -348,7 +350,7 @@ outside platform-specific sub-folders.
 
         // This function is a noop on other platforms than Android, thus no need
         // to guard against the platform.
-        await extractBundledAssets(targetWebrootPathOnDevice, 'webroot');
+        await copyFileAssets('webroot', targetWebrootPathOnDevice);
       }
 
       // "webroot" assets have been extracted into the target folder, which now
@@ -833,6 +835,16 @@ server.stopInBackground: boolean;
 Readonly property. It holds `stopInBackground` value provided to [constructor()].
 
 ### extractBundledAssets()
+
+**DEPRECATED!** _Use instead [copyFileAssets()] from
+the [@dr.pogodin/react-native-fs] library v2.24.1 and above &mdash;
+it does the same job in a more efficient way (it is implemented entirely
+in the native layer, thus does not incur the overhead of recurrent
+communication between the native and JS layers during the operation)._
+
+_The [extractBundledAssets()], with its original implementation, will be kept
+around for backward compatibility, but it will be removed in future!_
+
 [extractBundledAssets()]: #extractbundledassets
 ```ts
 import {extractBundledAssets} from '@dr.pogodin/react-native-static-server';

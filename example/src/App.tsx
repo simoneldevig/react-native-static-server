@@ -15,13 +15,17 @@ import {
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-import { readFile, readFileAssets, unlink } from '@dr.pogodin/react-native-fs';
+import {
+  copyFileAssets,
+  readFile,
+  readFileAssets,
+  unlink,
+} from '@dr.pogodin/react-native-fs';
 
 import { WebView } from 'react-native-webview';
 
 import Server, {
   STATES,
-  extractBundledAssets,
   resolveAssetsPath,
 } from '@dr.pogodin/react-native-static-server';
 
@@ -109,7 +113,7 @@ export default function App() {
         }
         if (extract) {
           console.log('Extracting web server assets...');
-          await extractBundledAssets(fileDir, 'webroot');
+          await copyFileAssets('webroot', fileDir);
         }
       }
 
