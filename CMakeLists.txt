@@ -121,6 +121,7 @@ set(PLUGIN_STATIC
   PLUGIN_INIT(mod_h2)\n
   PLUGIN_INIT(mod_indexfile)\n
   PLUGIN_INIT(mod_rewrite)\n
+  PLUGIN_INIT(mod_setenv)\n
   PLUGIN_INIT(mod_staticfile)\n
 )
 

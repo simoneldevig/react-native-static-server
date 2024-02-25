@@ -20,6 +20,7 @@
 [MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
 [mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
 [mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
+[mod_setenv]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_setenv
 [mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
 [New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
 [Old Architecture]: https://reactnative.dev/docs/native-modules-intro
@@ -64,6 +65,7 @@ and [old][Old Architecture] RN architectures.
   - [Bundling-in Server Assets Into an App Statically]
   - [Enabling Alias module]
   - [Enabling Rewrite module]
+  - [Enabling SetEnv module]
   - [Enabling WebDAV module]
   - [Connecting to an Active Server in the Native Layer]
 - [API Reference](#api-reference)
@@ -438,6 +440,23 @@ extraConfig: `
 // GET "/some/path/file"
 // will be redirected to
 // GET "/file"
+```
+
+### Enabling SetEnv Module
+[Enabling SetEnv module]: #enabling-setenv-module
+
+[Lighttpd]'s built-in module [mod_setenv] allows to modify request and response
+headers. To enable it just use `extraConfig` option of [Server] [constructor()]
+to load and configure it, for example:
+```ts
+extraConfig: `
+  server.modules += ("mod_setenv")
+  setenv.add-response-header = (
+    "My-Custom-Header" => "my-custom-value"
+    "Another-Custom-Header" => "another-custom-value"
+  )
+  setenv.add-request-header = ("X-Proxy" => "my.server.name")
+`,
 ```
 
 ### Enabling WebDAV Module
