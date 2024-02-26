@@ -19,6 +19,7 @@ namespace winrt::ReactNativeStaticServer {
 			SignalConsumer signalConsumer);
 
     inline double id() { return _id; }
+    inline std::string id_str() { return std::to_string(_id); }
 
 		void launch();
 		void shutdown();

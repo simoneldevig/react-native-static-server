@@ -40,13 +40,16 @@ void OnSignal(std::string signal, std::string details) {
     // thus MUST BE called before the object is dropped below, if it is.
     if (!pendingResult) mod->sendEvent(signal, details);
 
+    double id = server->id();
     if (signal == CRASHED || signal == TERMINATED) {
       delete server;
       server = NULL;
     }
 
     if (pendingResult) {
-      if (signal == CRASHED) RNException("Server crashed").reject(*pendingResult);
+      if (signal == CRASHED) {
+        RNException("Server #" + std::to_string(id) + " crashed").reject(*pendingResult);
+      }
       else pendingResult->Resolve(details);
       delete pendingResult;
       pendingResult = NULL;
@@ -138,7 +141,9 @@ void ReactNativeModule::start(
     lock_sem();
 
     if (server) {
-      RNException("Another server instance is active").reject(result);
+      RNException(
+        "Failed to launch server #" + std::to_string(id) +
+        ", another server instance (#" + server->id_str() + ") is active").reject(result);
       unlock_sem();
       return;
     };
@@ -187,6 +192,6 @@ void ReactNativeModule::stop(React::ReactPromise<std::string>&& result) noexcept
         // will catch it and report to JS layer in RN way.
     }
     catch (...) {
-        RNException("Failed to gracefully shutdown the server").reject(result);
+        RNException("Failed to gracefully shutdown the server #" + server->id_str()).reject(result);
     }
 }
