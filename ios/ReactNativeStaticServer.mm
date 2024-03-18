@@ -23,7 +23,7 @@ RCT_EXPORT_MODULE();
   [super invalidate];
   if (self->server) {
     [self stop:^void(id){}
-      rejecter:^void(NSString *a,NSString *b, NSError *c){}];
+      reject:^void(NSString *a,NSString *b, NSError *c){}];
   }
 }
 
@@ -42,14 +42,14 @@ RCT_EXPORT_MODULE();
 
 RCT_REMAP_METHOD(getActiveServerId,
                  getActiveServerId:(RCTPromiseResolveBlock) resolve
-                 rejecter:(RCTPromiseRejectBlock)reject
+                 reject:(RCTPromiseRejectBlock)reject
 ) {
   resolve(self->server ? self->server.serverId : [NSNull null]);
 }
 
 RCT_REMAP_METHOD(getLocalIpAddress,
   getLocalIpAddress:(RCTPromiseResolveBlock)resolve
-  rejecter:(RCTPromiseRejectBlock)reject
+  reject:(RCTPromiseRejectBlock)reject
 ) {
   struct ifaddrs *interfaces = NULL; // a linked list of network interfaces
   @try {
@@ -87,13 +87,15 @@ RCTPromiseResolveBlock pendingResolve = nil;
 RCTPromiseRejectBlock pendingReject = nil;
 
 RCT_REMAP_METHOD(start,
-  start:(NSNumber* _Nonnull)serverId
+  start:(double)_serverId
   configPath:(NSString*)configPath
   errlogPath:(NSString*)errlogPath
-  resolver:(RCTPromiseResolveBlock)resolve
-  rejecter:(RCTPromiseRejectBlock)reject
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
 ) {
     NSLog(@"Starting the server...");
+
+    NSNumber *serverId = [NSNumber numberWithDouble:_serverId];
 
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
@@ -156,7 +158,7 @@ RCT_REMAP_METHOD(start,
 
 RCT_REMAP_METHOD(stop,
   stop:(RCTPromiseResolveBlock)resolve
-  rejecter:(RCTPromiseRejectBlock)reject
+  reject:(RCTPromiseRejectBlock)reject
 ) {
   try {
     if (self->server) {
@@ -182,9 +184,9 @@ RCT_REMAP_METHOD(stop,
 }
 
 RCT_REMAP_METHOD(getOpenPort,
-  address:(NSString*) address
-  getOpenPort:(RCTPromiseResolveBlock)resolve
-  rejecter:(RCTPromiseRejectBlock)reject
+  getOpenPort:(NSString*) address
+  resolve:(RCTPromiseResolveBlock)resolve
+  reject:(RCTPromiseRejectBlock)reject
 ) {
   @try {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
