@@ -14,8 +14,11 @@
 [copyFileAssets()]: https://github.com/birdofpreyru/react-native-fs?tab=readme-ov-file#copyfileassets
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [Example App]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
+[Expo Example App]: https://github.com/jole141/expo-examples/tree/react-native-static-server
 [Expo]: https://expo.dev
 [getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
+[Issue#8]: https://github.com/birdofpreyru/react-native-static-server/issues/8
+[jole141]: https://github.com/jole141
 [Lighttpd]: https://www.lighttpd.net
 [MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
 [mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
@@ -118,7 +121,12 @@ and [old][Old Architecture] RN architectures.
     - Building for Android target on Windows host
       ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3A%22Windows+-%3E+Android%22)).
       Prefer building for Android on macOS or Ubuntu host.
+
     - [Expo] ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AExpo)).
+
+      Though, presumably the library in its current state already works fine
+      with [Expo] &mdash; see [Issue#8] and [Expo Example App] by [jole141].
+
     - [tvOS](https://developer.apple.com/tvos) ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AtvOS)).
 
 
@@ -184,11 +192,11 @@ and [old][Old Architecture] RN architectures.
     $ pod install
     ```
 
-- For [Expo]: \
-  _It probably works with some additional setup (see
-  [Issue#8](https://github.com/birdofpreyru/react-native-static-server/issues/8)),
-  however at the moment we don't support it officially. If anybody wants
-  to help with this, contributions to the documentation / codebase are welcome._
+- For [Expo]:
+
+  Presumably, it works with some additional setup (see [Issue#8] and
+  [Expo Example App] by [jole141]; though it is not officially supported
+  (tested) for new releases.
 
 - For **Mac Catalyst**:
   - Disable Flipper in your app's Podfile.
