@@ -2,7 +2,7 @@ PODS:
   - boost (1.83.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
-  - dr-pogodin-react-native-fs (2.24.1):
+  - dr-pogodin-react-native-fs (2.24.4):
     - glog
     - hermes-engine
     - RCT-Folly (= 2022.05.16.00)
@@ -981,7 +981,7 @@ PODS:
   - React-Mapbuffer (0.73.6):
     - glog
     - React-debug
-  - react-native-webview (13.8.1):
+  - react-native-webview (13.8.4):
     - glog
     - hermes-engine
     - RCT-Folly (= 2022.05.16.00)
@@ -1424,7 +1424,7 @@ SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
-  dr-pogodin-react-native-fs: 1dbe759b5855245c5f968aa8994d0db22041d73f
+  dr-pogodin-react-native-fs: 1104ecc47f2e717b60a67c52f981fd26885ddd56
   dr-pogodin-react-native-static-server: 4d885462b4e22d5a96335fb24b77cc0d6823ac4e
   FBLazyVector: f64d1e2ea739b4d8f7e4740cde18089cd97fe864
   Flipper: c7a0093234c4bdd456e363f2f19b2e4b27652d44
@@ -1462,7 +1462,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 4fed160d939e93a39049481f47744af246a7ac2c
   React-logger: 3eb80a977f0d9669468ef641a5e1fabbc50a09ec
   React-Mapbuffer: 84ea43c6c6232049135b1550b8c60b2faac19fab
-  react-native-webview: 95083ac8aed57e568ed309c06d5157196000bc93
+  react-native-webview: 84b5ff28cc8cfcc2bb955e9456f8d482be3ecb18
   React-nativeconfig: b4d4e9901d4cabb57be63053fd2aa6086eb3c85f
   React-NativeModulesApple: cd26e56d56350e123da0c1e3e4c76cb58a05e1ee
   React-perflogger: 5f49905de275bac07ac7ea7f575a70611fa988f2
