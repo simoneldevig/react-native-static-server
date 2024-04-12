@@ -410,7 +410,7 @@ class StaticServer {
   }
 
   async _handleAppStateChange(appState: AppStateStatus) {
-    const starting = appState === 'active';
+    const starting = appState === 'active' || appState === 'inactive';
     try {
       if (starting) await this.start('App entered foreground');
       else await this._stop('App entered background');
