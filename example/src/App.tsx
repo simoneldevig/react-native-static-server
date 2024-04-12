@@ -181,7 +181,7 @@ export default function App() {
         <WebView
           cacheMode="LOAD_NO_CACHE"
           // This way we can receive messages sent by the WebView content.
-          onMessage={(event) => {
+          onMessage={(event: any) => {
             const message = event.nativeEvent.data;
             Alert.alert('Got a message from the WebView content', message);
           }}
@@ -192,7 +192,7 @@ export default function App() {
           // there when links inside WebView are pressed. However, it is worth
           // to re-test, troubleshoot, and probably fix. It works fine both
           // Android and iOS.
-          onShouldStartLoadWithRequest={(request) => {
+          onShouldStartLoadWithRequest={(request: any) => {
             const load = request.url.startsWith(origin);
             if (!load) {
               Linking.openURL(request.url);
