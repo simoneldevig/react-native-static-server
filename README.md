@@ -132,6 +132,11 @@ and [old][Old Architecture] RN architectures.
 
 - [CMake] is required on the build host.
 
+  - **BEWARE:** [**CMake v3.30.0** breaks the library build for iOS](https://github.com/birdofpreyru/react-native-static-server/issues/111)
+    because of a regression on CMake side, and for this reason it is marked as
+    unsupported on all platforms &mdash; be sure to use a different version
+    (v3.22.1&ndash;3.29.6 at the moment of writing).
+
   - When building for **Android**, [CMake] should be installed as a part of your
     _Android SDK_ (open _SDK Manager_, and look for [CMake] within
     the _SDK Tools_ tab).
@@ -141,9 +146,6 @@ and [old][Old Architecture] RN architectures.
     ```shell
     $ brew install cmake pkg-config
     ```
-    **BEWARE:** [**CMake v3.30.0** breaks the library build](https://github.com/birdofpreyru/react-native-static-server/issues/111)
-    because of a regression on CMake side &mdash; be sure to use a different
-    version (v3.22.1&ndash;3.29.6 at the moment of writing).
 
     **IMPORTANT:** [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
     command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
