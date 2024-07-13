@@ -60,7 +60,13 @@ and [old][Old Architecture] RN architectures.
   </tr>
 </table>
 
-[![Logo](https://avatars.githubusercontent.com/u/71085569?s=36)](https://github.com/Lumentric)
+[<img width=36 src="https://avatars.githubusercontent.com/u/71085569?s=36" />](https://github.com/Lumentric)
+
+### [Contributors](https://github.com/birdofpreyru/react-native-static-server/graphs/contributors)
+[<img width=36 src="https://avatars.githubusercontent.com/u/62563469?s=36&v=4" />](https://github.com/jole141)
+[<img width=36 src="https://avatars.githubusercontent.com/u/10153413?s=36&v=4" />](https://github.com/exotexot)
+[<img width=36 src="https://avatars.githubusercontent.com/u/10667346?s=36&v=4" />](https://github.com/rafalzawadzki)
+[<img width=36 src="https://avatars.githubusercontent.com/u/20144632?s=36&v=4" />](https://github.com/birdofpreyru)
 
 ## Content
 
@@ -132,6 +138,11 @@ and [old][Old Architecture] RN architectures.
 
 - [CMake] is required on the build host.
 
+  - **BEWARE:** [**CMake v3.30.0** breaks the library build for iOS](https://github.com/birdofpreyru/react-native-static-server/issues/111)
+    because of a regression on CMake side, and for this reason it is marked as
+    unsupported on all platforms &mdash; be sure to use a different version
+    (v3.22.1&ndash;3.29.6 at the moment of writing).
+
   - When building for **Android**, [CMake] should be installed as a part of your
     _Android SDK_ (open _SDK Manager_, and look for [CMake] within
     the _SDK Tools_ tab).
@@ -141,6 +152,7 @@ and [old][Old Architecture] RN architectures.
     ```shell
     $ brew install cmake pkg-config
     ```
+
     **IMPORTANT:** [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
     command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
     it might not work for sessions inside of other apps, such as XCode, therefore you might need to

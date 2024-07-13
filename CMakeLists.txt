@@ -1,6 +1,10 @@
 project(rn-static-server C)
 cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 
+if (CMAKE_VERSION MATCHES "3.30.0")
+  message(FATAL_ERROR "CMake v3.30.0 is not supported: https://github.com/birdofpreyru/react-native-static-server/issues/111")
+endif()
+
 # This prevents CMake from complaining that INSTALL(..) directives in
 # Lighttpd CMakeLists.txt miss BUNDLE DESTINATION.
 set(CMAKE_MACOSX_BUNDLE OFF)
