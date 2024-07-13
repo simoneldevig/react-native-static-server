@@ -141,6 +141,10 @@ and [old][Old Architecture] RN architectures.
     ```shell
     $ brew install cmake pkg-config
     ```
+    **BEWARE:** [**CMake v3.30.0** breaks the library build](https://github.com/birdofpreyru/react-native-static-server/issues/111)
+    because of a regression on CMake side &mdash; be sure to use a different
+    version (v3.22.1&ndash;3.29.6 at the moment of writing).
+
     **IMPORTANT:** [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
     command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
     it might not work for sessions inside of other apps, such as XCode, therefore you might need to
