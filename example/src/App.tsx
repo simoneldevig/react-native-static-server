@@ -22,7 +22,7 @@ import {
   unlink,
 } from '@dr.pogodin/react-native-fs';
 
-import { WebView } from 'react-native-webview';
+import { WebView } from '@dr.pogodin/react-native-webview';
 
 import Server, {
   STATES,

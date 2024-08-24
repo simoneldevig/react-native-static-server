@@ -101,7 +101,10 @@
       "@react-native"
     ],
     "rules": {
-      "curly": ["error", "multi-line"],
+      "curly": [
+        "error",
+        "multi-line"
+      ],
       "react/react-in-jsx-scope": "off"
     }
   },
