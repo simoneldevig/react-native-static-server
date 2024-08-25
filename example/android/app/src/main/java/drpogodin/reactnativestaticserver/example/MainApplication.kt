@@ -1,4 +1,4 @@
-package com.reactnativestaticserverexample
+package drpogodin.reactnativestaticserver.example
 
 import android.app.Application
 import com.facebook.react.PackageList

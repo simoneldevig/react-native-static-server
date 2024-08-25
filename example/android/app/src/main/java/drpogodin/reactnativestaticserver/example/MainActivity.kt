@@ -1,4 +1,4 @@
-package com.reactnativestaticserverexample
+package drpogodin.reactnativestaticserver.example
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
