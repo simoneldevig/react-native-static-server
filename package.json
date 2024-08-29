@@ -141,7 +141,7 @@
   },
   "codegenConfig": {
     "name": "RNReactNativeStaticServerSpec",
-    "type": "all",
+    "type": "modules",
     "jsSrcsDir": "src",
     "windows": {
       "namespace": "winrt::ReactNativeStaticServer",
