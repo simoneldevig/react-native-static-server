@@ -9,7 +9,7 @@
 // Includes from @dr.pogodin/react-native-fs
 #include <winrt/ReactNativeFs.h>
 
-// Includes from react-native-webview
+// Includes from @dr.pogodin/react-native-webview
 #include <winrt/ReactNativeWebView.h>
 
 namespace winrt::Microsoft::ReactNative
@@ -21,7 +21,7 @@ void RegisterAutolinkedNativeModulePackages(winrt::Windows::Foundation::Collecti
     packageProviders.Append(winrt::ReactNativeStaticServer::ReactPackageProvider());
     // IReactPackageProviders from @dr.pogodin/react-native-fs
     packageProviders.Append(winrt::ReactNativeFs::ReactPackageProvider());
-    // IReactPackageProviders from react-native-webview
+    // IReactPackageProviders from @dr.pogodin/react-native-webview
     packageProviders.Append(winrt::ReactNativeWebView::ReactPackageProvider());
 }
 

@@ -1,4 +1,4 @@
-const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 const fs = require('fs');
 const path = require('path');
@@ -22,9 +22,9 @@ const rnwPath = fs.realpathSync(
  *
  * @type {import('metro-config').MetroConfig}
  */
+
 const config = {
   watchFolders: [root],
-
   resolver: {
     blockList: exclusionList([
       // We need to make sure that only one version is loaded for peerDependencies
@@ -42,13 +42,11 @@ const config = {
       new RegExp(`${rnwPath}/target/.*`),
       /.*\.ProjectImports\.zip/,
     ]),
-
     extraNodeModules: modules.reduce((acc, name) => {
       acc[name] = path.join(__dirname, 'node_modules', name);
       return acc;
     }, {}),
   },
-
   transformer: {
     getTransformOptions: async () => ({
       transform: {

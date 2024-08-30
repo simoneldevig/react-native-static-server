@@ -1,17 +1,27 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "description": "HTTP static file server for React Native",
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
-  "types": "lib/typescript/src/index.d.ts",
-  "react-native": "src/index",
-  "source": "src/index",
+  "source": "./src/index.tsx",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/typescript/module/src/index.d.ts",
+        "default": "./lib/module/index.js"
+      },
+      "require": {
+        "types": "./lib/typescript/commonjs/src/index.d.ts",
+        "default": "./lib/commonjs/index.js"
+      }
+    }
+  },
   "scripts": {
     "codegen-windows": "react-native codegen-windows",
     "example": "yarn workspace @dr.pogodin/react-native-static-server-example",
     "test": "yarn lint && yarn typecheck",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
@@ -50,23 +60,20 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@dr.pogodin/react-native-fs": "^2.27.1",
-    "@react-native/eslint-config": "^0.74.87",
-    "@react-native/metro-config": "^0.74.87",
+    "@dr.pogodin/react-native-fs": "^2.28.0",
+    "@react-native/eslint-config": "^0.75.2",
+    "@react-native/metro-config": "^0.75.2",
     "@types/jest": "^29.5.12",
     "@types/react": "^18.3.4",
     "@types/uuid": "^10.0.0",
     "del-cli": "^5.1.0",
     "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
     "jest": "^29.7.0",
     "metro-config": "^0.80.10",
-    "prettier": "^3.3.3",
     "react": "18.3.1",
-    "react-native": "0.74.5",
-    "react-native-builder-bob": "^0.26.0",
-    "react-native-windows": "^0.74.18",
+    "react-native": "0.75.2",
+    "react-native-builder-bob": "^0.30.0",
+    "react-native-windows": "^0.75.0",
     "typescript": "^5.5.4"
   },
   "resolutions": {
@@ -92,19 +99,12 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@react-native",
-      "prettier"
+      "@react-native"
     ],
     "rules": {
-      "prettier/prettier": [
+      "curly": [
         "error",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "all",
-          "useTabs": false
-        }
+        "multi-line"
       ],
       "react/react-in-jsx-scope": "off"
     }
@@ -113,23 +113,28 @@
     "node_modules/",
     "lib/"
   ],
-  "prettier": {
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "all",
-    "useTabs": false
-  },
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
     "targets": [
-      "commonjs",
-      "module",
+      "codegen",
+      [
+        "commonjs",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
       [
         "typescript",
         {
-          "project": "tsconfig.build.json"
+          "project": "tsconfig.build.json",
+          "esm": true
         }
       ]
     ]
@@ -141,7 +146,15 @@
     "windows": {
       "namespace": "winrt::ReactNativeStaticServer",
       "outputDirectory": "windows/ReactNativeStaticServer/codegen"
-    }
+    },
+    "outputDir": {
+      "ios": "ios/generated",
+      "android": "android/generated"
+    },
+    "android": {
+      "javaPackageName": "com.drpogodin.reactnativestaticserver"
+    },
+    "includesGeneratedCode": true
   },
   "dependencies": {
     "@dr.pogodin/js-utils": "^0.0.12"
