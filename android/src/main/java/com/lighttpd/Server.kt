@@ -2,7 +2,6 @@ package com.lighttpd
 
 import android.util.Log
 import com.drpogodin.reactnativestaticserver.Errors
-import java.util.function.BiConsumer
 
 /**
  * Java interface for native Lighttpd server running in a dedicated Thread.
@@ -25,7 +24,7 @@ class Server(
         val id: Double,
         var configPath: String,
         var errlogPath: String,
-        private val signalConsumer: BiConsumer<String, String?>
+        private val signalConsumer: (signal: String, message: String?) -> Unit
 ) : Thread() {
     override fun interrupt() {
         Log.i(LOGTAG, "Server.interrupt() triggered")
@@ -42,7 +41,7 @@ class Server(
         if (activeServer != null) {
             val msg = "Another Server instance is active"
             Log.e(LOGTAG, msg)
-            signalConsumer.accept(CRASHED, msg)
+            signalConsumer(CRASHED, msg)
             return
         }
         try {
@@ -56,11 +55,11 @@ class Server(
             // signals.
             activeServer = null
             Log.i(LOGTAG, "Server terminated gracefully")
-            signalConsumer.accept(TERMINATED, null)
+            signalConsumer(TERMINATED, null)
         } catch (error: Exception) {
             activeServer = null
             Log.e(LOGTAG, "Server crashed", error)
-            signalConsumer.accept(CRASHED, error.message)
+            signalConsumer(CRASHED, error.message)
         }
     }
 
@@ -79,7 +78,7 @@ class Server(
         // NOTE: @JvmStatic annotation is needed to make this function
         // visible via JNI in C code.
         @JvmStatic fun onLaunchedCallback() {
-            activeServer!!.signalConsumer.accept(LAUNCHED, null)
+            activeServer!!.signalConsumer(LAUNCHED, null)
         }
     }
 }
