@@ -180,12 +180,6 @@ and [old][Old Architecture] RN architectures.
   from NPM._
 
 - For **Android**:
-  - In the `build.gradle` file set `minSdkVersion` equal `28`
-    ([SDK 28 &mdash; Android 9](https://developer.android.com/studio/releases/platforms#9.0),
-    released in August 2018), or larger. \
-    **Note:** _Support of older SDKs is technically possible, but it is not
-    a priority now._
-
   - Android SDK 28 and above
     [forbids Cleartext / Plaintext HTTP](https://developer.android.com/privacy-and-security/risks/cleartext)
     by default. Thus, to access locally running server over HTTP from within

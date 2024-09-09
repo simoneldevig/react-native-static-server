@@ -100,6 +100,29 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
   )
 endif()
 
+# Builds & places for packing the glob library, for Android-targeted builds.
+if(CMAKE_SYSTEM_NAME MATCHES "Android")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} ${CMAKE_CURRENT_SOURCE_DIR}/glob
+      -B ${CMAKE_BINARY_DIR}/glob
+      -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/sysroot
+      -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+      ${EXTRA_BUILD_ARGS}
+    COMMAND_ECHO STDOUT
+    COMMAND_ERROR_IS_FATAL ANY
+  )
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/glob
+      --config Release ${EXTRA_INSTALL_ARGS}
+  )
+  execute_process(COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}/glob)
+  file(
+    COPY ${CMAKE_BINARY_DIR}/sysroot/lib/libglob.so
+    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/android/src/main/jniLibs/${ANDROID_ABI}
+  )
+endif()
+
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
