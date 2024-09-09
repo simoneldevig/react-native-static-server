@@ -22,7 +22,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - dr-pogodin-react-native-static-server (0.16.0):
+  - dr-pogodin-react-native-static-server (0.17.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1279,7 +1279,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-webview (13.11.1):
+  - react-native-webview (13.12.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1773,7 +1773,7 @@ SPEC CHECKSUMS:
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   dr-pogodin-react-native-fs: d4852b7b2d5f6a9d40627dce4a8a30f865634eef
-  dr-pogodin-react-native-static-server: f4c365cf9e5ba07fd0d10504572f661039562ba3
+  dr-pogodin-react-native-static-server: fbba57f5167d431e10644029cb8efd45a45a06f2
   FBLazyVector: 38bb611218305c3bc61803e287b8a81c6f63b619
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: 69ef571f3de08433d766d614c73a9838a06bf7eb
@@ -1807,7 +1807,7 @@ SPEC CHECKSUMS:
   React-logger: 8db32983d75dc2ad54f278f344ccb9b256e694fc
   React-Mapbuffer: 1c08607305558666fd16678b85ef135e455d5c96
   React-microtasksnativemodule: f13f03163b6a5ec66665dfe80a0df4468bb766a6
-  react-native-webview: 8e4d4384fe7c702804d6b3d3d21b1fa98077cd7e
+  react-native-webview: 987318278133db89939305abefc47ebb28ed4af8
   React-nativeconfig: 57781b79e11d5af7573e6f77cbf1143b71802a6d
   React-NativeModulesApple: 7ff2e2cfb2e5fa5bdedcecf28ce37e696c6ef1e1
   React-perflogger: 8a360ccf603de6ddbe9ff8f54383146d26e6c936
