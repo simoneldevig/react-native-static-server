@@ -44,7 +44,7 @@ and [old][Old Architecture] RN architectures.
 ### Sponsored By:
 <table>
   <tr>
-    <td width="141px">
+    <td width="150px">
       <img
         alt="Luna4 Enterprises Inc."
         width="100%"
@@ -56,6 +56,23 @@ and [old][Old Architecture] RN architectures.
       <strong>Luna4 Enterprises Inc.</strong> &mdash; The support for Windows
       and Mac Catalyst systems would not happen any time soon without their
       interest and financial contribution.
+    </td>
+  </tr>
+  <tr>
+    <td width="150px">
+      <a href="https://github.com/digitalfabrik/integreat-app">
+        <img
+          alt="Integreat App"
+          src="https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/logo-integreat.svg"
+          width="100%"
+          height="auto"
+        >
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/digitalfabrik/integreat-app" target="_blank" rel="noopener">
+        Integreat App
+      </a> &mdash; Kindly sponsored support of older Android SDKs (23&ndash;27).
     </td>
   </tr>
 </table>
