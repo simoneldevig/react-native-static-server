@@ -72,7 +72,7 @@ and [old][Old Architecture] RN architectures.
     <td>
       <a href="https://github.com/digitalfabrik/integreat-app">
         Integreat App
-      </a> &mdash; Kindly sponsored support of older Android SDKs (23&ndash;27).
+      </a> &mdash; Kindly sponsored the support of older Android SDKs (23&ndash;27).
     </td>
   </tr>
 </table>
