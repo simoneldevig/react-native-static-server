@@ -71,7 +71,7 @@ and [old][Old Architecture] RN architectures.
     </td>
     <td>
       <a href="https://github.com/digitalfabrik/integreat-app">
-        Integreat App
+        Integreat
       </a> &mdash; Kindly sponsored the support of older Android SDKs (23&ndash;27).
     </td>
   </tr>
