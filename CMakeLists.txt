@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.22.1 FATAL_ERROR)
 
 if (CMAKE_VERSION MATCHES "3.30.0")
   message(FATAL_ERROR "CMake v3.30.0 is not supported: https://github.com/birdofpreyru/react-native-static-server/issues/111")
+elseif (CMAKE_VERSION MATCHES "3.30.1")
+  message(FATAL_ERROR "CMake v3.30.1 is not supported: https://github.com/birdofpreyru/react-native-static-server/issues/111")
 endif()
 
 # This prevents CMake from complaining that INSTALL(..) directives in
@@ -26,7 +28,7 @@ endif()
 # to obscure errors (e.g. it may successfully complete the build,
 # but effectively doing it for the first of the archs only, and leave us
 # to wonder, why something does not link for some arch later).
-string(REPLACE ";" "\\\;" ESCAPED_ARCHS "${CMAKE_OSX_ARCHITECTURES}")
+string(REPLACE " " "\\\;" ESCAPED_ARCHS "$ENV{ARCHS_STANDARD}")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
   set(
