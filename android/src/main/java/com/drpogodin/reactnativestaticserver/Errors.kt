@@ -32,7 +32,7 @@ class Errors(val name: String, val message: String) {
     }
 
     override fun toString(): String {
-        return LOGTAG + ":" + name
+        return "$LOGTAG:$name"
     }
 
     companion object {

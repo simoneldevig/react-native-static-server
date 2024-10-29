@@ -23,11 +23,11 @@ class ReactNativeStaticServerPackage : TurboReactPackage() {
       moduleInfos[ReactNativeStaticServerModule.NAME] = ReactModuleInfo(
         ReactNativeStaticServerModule.NAME,
         ReactNativeStaticServerModule.NAME,
-        false,  // canOverrideExistingModule
-        false,  // needsEagerInit
-        true,  // hasConstants
-        false,  // isCxxModule
-        isTurboModule // isTurboModule
+        canOverrideExistingModule = false,  // canOverrideExistingModule
+        needsEagerInit = false,  // needsEagerInit
+        hasConstants = true,  // hasConstants
+        isCxxModule = false,  // isCxxModule
+        isTurboModule = isTurboModule // isTurboModule
       )
       moduleInfos
     }
