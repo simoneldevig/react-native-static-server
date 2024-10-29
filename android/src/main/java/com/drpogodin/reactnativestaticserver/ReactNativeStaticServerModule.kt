@@ -83,7 +83,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             return
         }
 
-        val activeServerId = server?.id;
+        val activeServerId = server?.id
         if (activeServerId != null) {
             Errors.ANOTHER_INSTANCE_IS_ACTIVE(activeServerId, id).log().reject(promise)
             sem.release()
@@ -95,7 +95,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             return
         }
         pendingPromise = promise
-        val emitter: DeviceEventManagerModule.RCTDeviceEventEmitter = getReactApplicationContext()
+        val emitter: DeviceEventManagerModule.RCTDeviceEventEmitter = reactApplicationContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
 
         server = Server(id, configPath, errlogPath) { signal, details ->
