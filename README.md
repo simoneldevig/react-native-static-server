@@ -25,8 +25,6 @@
 [mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
 [mod_setenv]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_setenv
 [mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
-[New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
-[Old Architecture]: https://reactnative.dev/docs/native-modules-intro
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [React Native]: https://reactnative.dev
@@ -36,8 +34,7 @@
 <!-- The regular README content starts here -->
 
 Embedded HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
-and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
-and [old][Old Architecture] RN architectures.
+and Windows platforms; powered by [Lighttpd] server.
 
 [![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
 

@@ -7,6 +7,7 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.lighttpd.Server
 import java.net.InetAddress
@@ -14,8 +15,9 @@ import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.util.concurrent.Semaphore
 
-class ReactNativeStaticServerModule internal constructor(context: ReactApplicationContext) :
-    ReactNativeStaticServerSpec(context), LifecycleEventListener {
+@ReactModule(name = ReactNativeStaticServerModule.NAME)
+class ReactNativeStaticServerModule(reactContext: ReactApplicationContext) :
+  NativeReactNativeStaticServerSpec(reactContext), LifecycleEventListener {
     // The currently active server instance. We assume only single server instance
     // can be active at any time, thus a simple field should be enought for now.
     // If we arrive to having possibility of multiple servers running in

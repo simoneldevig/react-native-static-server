@@ -27,6 +27,4 @@ export interface Spec extends TurboModule {
   stop(): Promise<string>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>(
-  'ReactNativeStaticServer',
-) as Spec | null;
+export default TurboModuleRegistry.getEnforcing<Spec>('ReactNativeStaticServer');

@@ -1,7 +1,7 @@
 // Imports internal constants defined within the native layer,
 // and exports user-facing constants for server states.
 
-import ReactNativeStaticServer from './ReactNativeStaticServer';
+import ReactNativeStaticServer from './NativeReactNativeStaticServer';
 
 const CONSTANTS = ReactNativeStaticServer.getConstants();
 

@@ -23,7 +23,7 @@ import {
 } from './config';
 
 import { SIGNALS, STATES } from './constants';
-import ReactNativeStaticServer from './ReactNativeStaticServer';
+import ReactNativeStaticServer from './NativeReactNativeStaticServer';
 import { resolveAssetsPath } from './utils';
 
 export { ERROR_LOG_FILE, UPLOADS_DIR, WORK_DIR } from './config';
