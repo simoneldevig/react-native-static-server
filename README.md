@@ -117,10 +117,12 @@ and Windows platforms; powered by [Lighttpd] server.
       [constructor()].
   - ~~[extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
 (Android-specific).~~
-  - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+  - [getActiveServer()] &mdash; Gets the currently active, starting, or stopping
     server instance, if any, according to the TS layer data.
   - [getActiveServerId()] &mdash; Gets ID of the currently active, starting, or
     stopping server instance, if any, according to the Native layer data.
+  - [getActiveServerSet()] &mdash; Gets a set of currently active, starting,
+    or stopping server instances, if any, according to the TS layer data.
   - [resolveAssetsPath()] &mdash; Resolves relative paths for bundled assets.
   - [ERROR_LOG_FILE] &mdash; Location of the error log file.
   - [STATES] &mdash; Enumerates possible states of [Server] instance.
@@ -928,16 +930,25 @@ import {getActiveServer} from '@dr.pogodin/react-native-static-server';
 
 getActiveServer(): Server | undefined;
 ```
-Returns currently active, starting, or stopping [Server] instance, if any exist
-in the app. It does not return, however, any inactive server instance which has
-been stopped automatically because of `stopInBackground` option, when the app
-entered background, and might be automatically started in future if the app
-enters foreground again prior to an explicit [.stop()] call for that instance.
+Returns the currently active, starting, or stopping [Server] instance, if any
+exist in the app. It does not return, however, any inactive server instance
+which has been stopped automatically because of `stopInBackground` option, when
+the app entered background, and might be automatically started in future if
+the app enters foreground again prior to an explicit [.stop()] call for that
+instance.
 
-**NOTE:** The result of this function is based on the TypeScript layer data
-(that's why it is synchronous), in contrast to the [getActiveServerId()]
-function below, which calls into the Native layer, and returns ID of the active
-server based on that.
+**NOTE:**
+- The result of this function is based on the TypeScript layer data
+  (that's why it is synchronous), in contrast to the [getActiveServerId()]
+  function below, which calls into the Native layer, and returns ID of the active
+  server based on that.
+
+- The feature &laquo;[Connecting to an Active Server in the Native Layer]&raquo;
+  creates a possibility to have several active server instances in TS layer, all
+  connected to the same active server on the native side. For this reason we also
+  provide [getActiveServerSet()] function, which returns a set of all active
+  server instances on TS side. [getActiveServer()] just returns the first server
+  instance from that set.
 
 ### getActiveServerId()
 [getActiveServerId()]: #getactiveserverid
@@ -959,6 +970,31 @@ layer server.
 **NOTE:** It is different from [getActiveServer()] function above, which
 returns the acurrently active, starting, or stopping [Server] instance based on
 TypeScript layer data.
+
+### getActiveServerSet()
+[getActiveServerSet()]: #getactiveserverset
+```ts
+import {getActiveServer} from '@dr.pogodin/react-native-static-server';
+
+getActiveServer(): Set<Server> | undefined;
+```
+Returns a set of currently active, starting, or stopping [Server] instances,
+if any exist in the app.
+
+**NOTE:**
+- On the native side, there cannot be more than one active (or starting,
+  or stopping) server instance at any time, and the native ID of that server
+  instance can be retrieved by the [getActiveServerId()] function. However,
+  on TS side user can create multiple [Server] object instances, connected to
+  the same native instance
+  (see &laquo;[Connecting to an Active Server in the Native Layer]&raquo;) &mdash;
+  that is how it is possible to have more than one active [Server] on TS side.
+  In normal use, however, this set will have only a single active [Server],
+  and you may use [getActiveServer()] function instead, which always returns
+  the first item in this set.
+
+- When there is no active server instance, this function returns `undefined`
+  (rather than an empty set).
 
 ### resolveAssetsPath()
 [resolveAssetsPath()]: #resolveassetspath

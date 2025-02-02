@@ -480,16 +480,26 @@ export async function extractBundledAssets(
 }
 
 /**
- * Returns a server instance currently being in ACTIVE, STARTING,
- * or STOPPING state, if such server instance exists.
- * @return {StaticServer|undefined}
+ * Returns a set of server instance currently being in ACTIVE, STARTING,
+ * or STOPPING state, if such server instances exists.
+ * @return {Set<StaticServer>|undefined}
  */
-export function getActiveServer() {
+export function getActiveServerSet(): Set<StaticServer> | undefined {
   return Object.values(servers).find((group) => {
     const server = group.values().next().value;
     const state = server?.state;
     return state !== STATES.INACTIVE && state !== STATES.CRASHED;
   });
+}
+
+/**
+ * Returns a server instance currently being in ACTIVE, STARTING,
+ * or STOPPING state, if such server instance exists.
+ * @return {StaticServer|undefined}
+ */
+export function getActiveServer(): StaticServer | undefined {
+  const set = getActiveServerSet();
+  return set && set.values().next().value;
 }
 
 export const getActiveServerId = ReactNativeStaticServer.getActiveServerId;
