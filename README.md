@@ -213,18 +213,30 @@ and Windows platforms; powered by [Lighttpd] server.
     $ brew install cmake pkg-config
     ```
 
-    **IMPORTANT:** [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
-    command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
-    it might not work for sessions inside of other apps, such as XCode, therefore you might need to
-    manually create symbolic links:
+    **IMPORTANT:**
+    - [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
+      command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
+      it might not work for sessions inside of other apps, such as XCode, therefore you might need to
+      manually create symbolic links:
 
-    ```shell
-    $ sudo ln -s $(which cmake) /usr/local/bin/cmake
-    $ sudo ln -s $(which pkg-config) /usr/local/bin/pkg-config
-    ```
+      ```shell
+      $ sudo ln -s $(which cmake) /usr/local/bin/cmake
+      $ sudo ln -s $(which pkg-config) /usr/local/bin/pkg-config
+      ```
 
-    For details read: https://earthly.dev/blog/homebrew-on-m1,
-    and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
+      For details read: https://earthly.dev/blog/homebrew-on-m1,
+      and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
+
+    - It looks like with CMake v3.31.5 it is also necessary to
+      sym-link `/usr/local/share/cmake` to point to the `share/cmake` folder of
+      the Homebrew-installed CMake, like so:
+      ```sh
+      $ sudo ln -s /opt/homebrew/Cellar/cmake/3.31.5/share/cmake /usr/local/share/cmake
+      ```
+      otherwise the build will fail with
+      > _CMake Error: Could not find CMAKE_ROOT !!!_
+
+      See [Issue #130](https://github.com/birdofpreyru/react-native-static-server/issues/130) for details.
 
 - Install the package and its peer dependencies:
   ```shell
