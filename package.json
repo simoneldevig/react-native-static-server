@@ -18,14 +18,13 @@
     }
   },
   "scripts": {
-    "codegen-windows": "react-native codegen-windows",
+    "codegen-windows": "./node_modules/.bin/rnc-cli codegen-windows",
     "example": "yarn workspace @dr.pogodin/react-native-static-server-example",
     "test": "yarn lint && yarn typecheck",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
-    "windows": "react-native run-windows"
+    "prepare": "bob build"
   },
   "keywords": [
     "react-native",
@@ -161,5 +160,12 @@
     "type": "turbo-module",
     "languages": "kotlin-objc",
     "version": "0.47.0"
+  },
+  "react-native-windows": {
+    "init-windows": {
+      "name": "ReactNativeStaticServer",
+      "namespace": "ReactNativeStaticServer",
+      "template": "old/uwp-cpp-lib"
+    }
   }
 }

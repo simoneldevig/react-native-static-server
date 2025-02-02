@@ -6,7 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "windows:autolink": "react-native autolink-windows --sln \"windows\\ReactNativeStaticServerExample.sln\" --proj \"windows\\ReactNativeStaticServerExample\\ReactNativeStaticServerExample.vcxproj\"",
+    "windows:autolink": "./node_modules/.bin/rnc-cli autolink-windows --sln \"windows\\ReactNativeStaticServerExample.sln\" --proj \"windows\\ReactNativeStaticServerExample\\ReactNativeStaticServerExample.vcxproj\"",
     "build:android": "react-native build-android --extra-params \"--no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a\"",
     "build:ios": "react-native build-ios --scheme ReactNativeStaticServerExample --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\""
   },
@@ -31,5 +31,12 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "react-native-windows": {
+    "init-windows": {
+      "name": "ReactNativeStaticServerExample",
+      "namespace": "ReactNativeStaticServerExample",
+      "template": "old/uwp-cpp-app"
+    }
   }
 }
