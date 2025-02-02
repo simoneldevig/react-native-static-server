@@ -145,12 +145,19 @@ endif()
 add_subdirectory(lighttpd1.4)
 
 set(PLUGIN_STATIC
+  PLUGIN_INIT(mod_access)\n
   PLUGIN_INIT(mod_alias)\n
   PLUGIN_INIT(mod_dirlisting)\n
+  PLUGIN_INIT(mod_evhost)\n
+  PLUGIN_INIT(mod_expire)\n
+  PLUGIN_INIT(mod_fastcgi)\n
   PLUGIN_INIT(mod_h2)\n
   PLUGIN_INIT(mod_indexfile)\n
+  PLUGIN_INIT(mod_redirect)\n
   PLUGIN_INIT(mod_rewrite)\n
+  PLUGIN_INIT(mod_scgi)\n
   PLUGIN_INIT(mod_setenv)\n
+  PLUGIN_INIT(mod_simple_vhost)\n
   PLUGIN_INIT(mod_staticfile)\n
 )
 
