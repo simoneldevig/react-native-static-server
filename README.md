@@ -507,6 +507,13 @@ Support of these modules within this library varies:
 #### Core and Built-in Modules
 [Core and Built-in Modules]: #core-and-built-in-modules
 
+**BEWARE:** _The following listing of supported modules should be valid for
+Android, iOS, and macOS target platforms; but most probably it is wrong for
+Windows, as only `mod_dirlisting.dll` and `mod_webdav.dll` are currently
+build and explicitly packed with the library. At the moment of writing this,
+I do not remember in details, how exactly the Windows build of the library
+and its modules is set up, and do not have an immediate interest to revisit it._
+
 There are three core modules that [Lighttpd] loads by default, and that can be
 further configured using the `extraConfig` option of [Server]'s [constructor()]:
 
