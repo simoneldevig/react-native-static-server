@@ -7,6 +7,7 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.lighttpd.Server
 import java.net.InetAddress
@@ -14,10 +15,11 @@ import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.util.concurrent.Semaphore
 
-class ReactNativeStaticServerModule internal constructor(context: ReactApplicationContext) :
-    ReactNativeStaticServerSpec(context), LifecycleEventListener {
+@ReactModule(name = ReactNativeStaticServerModule.NAME)
+class ReactNativeStaticServerModule(reactContext: ReactApplicationContext) :
+  NativeReactNativeStaticServerSpec(reactContext), LifecycleEventListener {
     // The currently active server instance. We assume only single server instance
-    // can be active at any time, thus a simple field should be enought for now.
+    // can be active at any time, thus a simple field should be enough for now.
     // If we arrive to having possibility of multiple servers running in
     // parallel, then this will become a hash map [ID <-> Server], and we will
     // use it for communication from JS to this module to the target Server
@@ -44,13 +46,13 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
         try {
             val en = NetworkInterface.getNetworkInterfaces()
             while (en.hasMoreElements()) {
-                val intf = en.nextElement()
-                val enumIpAddr = intf.inetAddresses
-                while (enumIpAddr.hasMoreElements()) {
-                    val inetAddress = enumIpAddr.nextElement()
+                val `interface` = en.nextElement()
+                val enumIpAddress = `interface`.inetAddresses
+                while (enumIpAddress.hasMoreElements()) {
+                    val inetAddress = enumIpAddress.nextElement()
                     if (!inetAddress.isLoopbackAddress) {
                         val ip = inetAddress.hostAddress
-                        if (isIPv4Address(ip)) {
+                        if (ip != null && isIPv4Address(ip)) {
                             promise.resolve(ip)
                             return
                         }
@@ -59,7 +61,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             }
             promise.resolve("127.0.0.1")
         } catch (e: Exception) {
-            Errors.FAIL_GET_LOCAL_IP_ADDRESS().reject(promise)
+            Errors.failGetLocalIpAddress().reject(promise)
         }
     }
 
@@ -74,23 +76,23 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             errlogPath: String,
             promise: Promise
     ) {
-        Log.i(LOGTAG, "Starting...")
+        Log.i(LOG_TAG, "Starting...")
         try {
             sem.acquire()
         } catch (e: Exception) {
-            Errors.INTERNAL_ERROR(id).log(e)
+            Errors.internalError(id).log(e)
                     .reject(promise, "Failed to acquire a semaphore")
             return
         }
 
         val activeServerId = server?.id
         if (activeServerId != null) {
-            Errors.ANOTHER_INSTANCE_IS_ACTIVE(activeServerId, id).log().reject(promise)
+            Errors.anotherInstanceIsActive(activeServerId, id).log().reject(promise)
             sem.release()
             return
         }
         if (pendingPromise != null) {
-            Errors.INTERNAL_ERROR(id).log().reject(promise, "Unexpected pending promise")
+            Errors.internalError(id).log().reject(promise, "Unexpected pending promise")
             sem.release()
             return
         }
@@ -108,7 +110,7 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
                 emitter.emit("RNStaticServer", event)
             } else {
                 if (signal === Server.CRASHED) {
-                    Errors.SERVER_CRASHED(id).reject(pendingPromise, details)
+                    Errors.serverCrashed(id).reject(pendingPromise, details)
                 } else pendingPromise!!.resolve(details)
                 pendingPromise = null
                 sem.release()
@@ -126,22 +128,22 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
             socket.close()
             promise.resolve(port)
         } catch (e: Exception) {
-            Errors.FAIL_GET_OPEN_PORT().log(e).reject(promise)
+            Errors.failGetOpenPort().log(e).reject(promise)
         }
     }
 
     @ReactMethod
     override fun stop(promise: Promise?) {
-        Log.i(LOGTAG, "stop() triggered")
+        Log.i(LOG_TAG, "stop() triggered")
         try {
             sem.acquire()
         } catch (e: Exception) {
-            Errors.INTERNAL_ERROR(server!!.id).log(e)
+            Errors.internalError(server!!.id).log(e)
                     .reject(promise, "Failed to acquire a semaphore")
             return
         }
         if (pendingPromise != null) {
-            Errors.INTERNAL_ERROR(server!!.id)
+            Errors.internalError(server!!.id)
                     .reject(pendingPromise, "Unexpected pending promise")
             sem.release()
             return
@@ -177,6 +179,6 @@ class ReactNativeStaticServerModule internal constructor(context: ReactApplicati
         // are in all cases prior to assigning the pendingPromise value.
         private val sem = Semaphore(1, true)
         const val NAME = "ReactNativeStaticServer"
-        const val LOGTAG = Errors.LOGTAG + " (Module)"
+        const val LOG_TAG = Errors.LOG_TAG + " (Module)"
     }
 }

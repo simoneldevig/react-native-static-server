@@ -14,19 +14,34 @@
 [copyFileAssets()]: https://github.com/birdofpreyru/react-native-fs?tab=readme-ov-file#copyfileassets
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [Example App]: https://github.com/birdofpreyru/react-native-static-server/tree/master/example
-[Expo Example App]: https://github.com/jole141/expo-examples/tree/react-native-static-server
+
+[Expo Example App #1]: https://github.com/jole141/expo-examples/tree/react-native-static-server
+[jole141]: https://github.com/jole141
+[Expo Example App #2]: https://github.com/benjaminkomen/expo-static-server
+[benjaminkomen]: https://github.com/benjaminkomen
+
 [Expo]: https://expo.dev
 [getDeviceType()]: https://www.npmjs.com/package/react-native-device-info#getDeviceType
 [Issue#8]: https://github.com/birdofpreyru/react-native-static-server/issues/8
-[jole141]: https://github.com/jole141
+
 [Lighttpd]: https://www.lighttpd.net
 [MainBundlePath]: https://www.npmjs.com/package/@dr.pogodin/react-native-fs#mainbundlepath
+
+[mod_access]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_access
 [mod_alias]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_alias
+[mod_dirlisting]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_dirlisting
+[mod_evhost]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_evhost
+[mod_expire]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_expire
+[mod_fastcgi]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_fastcgi
+[mod_indexfile]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_indexfile
+[mod_redirect]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_redirect
 [mod_rewrite]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_rewrite
+[mod_scgi]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_scgi
 [mod_setenv]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_setenv
+[mod_simple_vhost]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_simple_vhost
+[mod_staticfile]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_staticfile
 [mod_webdav]: https://redmine.lighttpd.net/projects/lighttpd/wiki/Mod_webdav
-[New Architecture]: https://reactnative.dev/docs/the-new-architecture/landing-page
-[Old Architecture]: https://reactnative.dev/docs/native-modules-intro
+
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [react-native-device-info]: https://www.npmjs.com/package/react-native-device-info
 [React Native]: https://reactnative.dev
@@ -36,8 +51,7 @@
 <!-- The regular README content starts here -->
 
 Embedded HTTP server for [React Native] applications for Android, iOS, Mac (Catalyst),
-and Windows platforms. Powered by [Lighttpd] server, supports both [new][New Architecture]
-and [old][Old Architecture] RN architectures.
+and Windows platforms; powered by [Lighttpd] server.
 
 [![Sponsor](https://raw.githubusercontent.com/birdofpreyru/react-native-static-server/master/.README/sponsor.svg)](https://github.com/sponsors/birdofpreyru)
 
@@ -88,10 +102,36 @@ and [old][Old Architecture] RN architectures.
 
 - [Getting Started](#getting-started)
   - [Bundling-in Server Assets Into an App Statically]
-  - [Enabling Alias module]
-  - [Enabling Rewrite module]
-  - [Enabling SetEnv module]
-  - [Enabling WebDAV module]
+  - [Support of Lighttpd Modules]
+    - [Core and Built-in Modules]
+      - [mod_access](#mod_access) &mdash; it is used to deny access to files.
+      - [mod_alias](#mod_alias) &mdash; it is used to specify a special document
+        root for a given url-subset.
+      - [mod_dirlisting](#mod_dirlisting) &mdash; creates an HTML page listing
+        the contents of the target directory.
+      - [mod_evhost](#mod_evhost) &mdash; builds the document-root based on
+        a pattern which contains wildcards.
+      - [mod_expire](#mod_expire) &mdash; controls the Cache-Control: max-age
+        response header in HTTP/1.1 or later, and Expires response header in
+        HTTP/1.0.
+      - [mod_fastcgi](#mod_fastcgi) &mdash; an interface to external programs
+        that support the FastCGI interface.
+      - [mod_indexfile](#mod_indexfile) &mdash; list of files to try when
+        an HTTP request is for a directory.
+      - [mod_redirect](#mod_redirect) &mdash; it is used to specify redirects
+        for a set of URLs.
+      - [mod_rewrite](#mod_rewrite) &mdash; internal redirects, url rewrite.
+      - [mod_scgi](#mod_scgi) &mdash; provides SCGI interface.
+      - [mod_setenv](#mod_setenv) &mdash; modifies request headers (from
+        clients), response headers (to clients), and the environment (for CGI).
+      - [mod_simple_vhost](#mod_simple_vhost) &mdash; allows to host multiple
+        domain names on a single server.
+      - [mod_staticfile](#mod_staticfile) &mdash; is used to serve files.
+    - [Other Modules]
+      - [mod_webdav](#mod_webdav) &mdash; provides [WebDAV], a set of HTTP
+        extensions that provides a framework allowing to create, change,
+        and move documents on the server. Essentially an easy way to enable
+        `POST`, `PUT`, _etc._ functionality for selected routes.
   - [Connecting to an Active Server in the Native Layer]
 - [API Reference](#api-reference)
   - [Server] &mdash; Represents a server instance.
@@ -115,10 +155,12 @@ and [old][Old Architecture] RN architectures.
       [constructor()].
   - ~~[extractBundledAssets()] &mdash; Extracts bundled assets into a regular folder
 (Android-specific).~~
-  - [getActiveServer()] &mdash; Gets currently active, starting, or stopping
+  - [getActiveServer()] &mdash; Gets the currently active, starting, or stopping
     server instance, if any, according to the TS layer data.
   - [getActiveServerId()] &mdash; Gets ID of the currently active, starting, or
     stopping server instance, if any, according to the Native layer data.
+  - [getActiveServerSet()] &mdash; Gets a set of currently active, starting,
+    or stopping server instances, if any, according to the TS layer data.
   - [resolveAssetsPath()] &mdash; Resolves relative paths for bundled assets.
   - [ERROR_LOG_FILE] &mdash; Location of the error log file.
   - [STATES] &mdash; Enumerates possible states of [Server] instance.
@@ -146,8 +188,10 @@ and [old][Old Architecture] RN architectures.
 
     - [Expo] ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AExpo)).
 
-      Though, presumably the library in its current state already works fine
-      with [Expo] &mdash; see [Issue#8] and [Expo Example App] by [jole141].
+      Though, presumably, the library in its current state already works fine
+      with [Expo] &mdash; see [Issue#8] and the following example apps:
+      - [Expo Example App #1] by [jole141];
+      - [Expo Example App #2] by [benjaminkomen].
 
     - [tvOS](https://developer.apple.com/tvos) ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AtvOS)).
 
@@ -169,18 +213,30 @@ and [old][Old Architecture] RN architectures.
     $ brew install cmake pkg-config
     ```
 
-    **IMPORTANT:** [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
-    command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
-    it might not work for sessions inside of other apps, such as XCode, therefore you might need to
-    manually create symbolic links:
+    **IMPORTANT:**
+    - [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
+      command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
+      it might not work for sessions inside of other apps, such as XCode, therefore you might need to
+      manually create symbolic links:
 
-    ```shell
-    $ sudo ln -s $(which cmake) /usr/local/bin/cmake
-    $ sudo ln -s $(which pkg-config) /usr/local/bin/pkg-config
-    ```
+      ```shell
+      $ sudo ln -s $(which cmake) /usr/local/bin/cmake
+      $ sudo ln -s $(which pkg-config) /usr/local/bin/pkg-config
+      ```
 
-    For details read: https://earthly.dev/blog/homebrew-on-m1,
-    and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
+      For details read: https://earthly.dev/blog/homebrew-on-m1,
+      and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
+
+    - It looks like with CMake v3.31.5 it is also necessary to
+      sym-link `/usr/local/share/cmake` to point to the `share/cmake` folder of
+      the Homebrew-installed CMake, like so:
+      ```sh
+      $ sudo ln -s /opt/homebrew/Cellar/cmake/3.31.5/share/cmake /usr/local/share/cmake
+      ```
+      otherwise the build will fail with
+      > _CMake Error: Could not find CMAKE_ROOT !!!_
+
+      See [Issue #130](https://github.com/birdofpreyru/react-native-static-server/issues/130) for details.
 
 - Install the package and its peer dependencies:
   ```shell
@@ -216,9 +272,10 @@ and [old][Old Architecture] RN architectures.
 
 - For [Expo]:
 
-  Presumably, it works with some additional setup (see [Issue#8] and
-  [Expo Example App] by [jole141]; though it is not officially supported
-  (tested) for new releases.
+  It is not supported officially, but it is said to work with some additional
+  setup &mdash; see [Issue#8] and the following example apps:
+  - [Expo Example App #1] by [jole141];
+  - [Expo Example App #2] by [benjaminkomen].
 
 - For **Mac Catalyst**:
   - Disable Flipper in your app's Podfile.
@@ -439,105 +496,150 @@ outside platform-specific sub-folders.
     </Target>
     ```
 
-### Enabling Alias Module
-[Enabling Alias module]: #enabling-alias-module
+### Support of Lighttpd Modules
+[Support of Lighttpd Modules]: #support-of-lighttpd-modules
 
-[Lighttpd] module [mod_alias] is used to specify a special document
-root for a given url-subset. To enable it just use `extraConfig` option of
-[Server] [constructor()] to load and configure it, for example:
+Much of the [Lighttpd]'s functionality is split into dedicated modules that should
+be explicitly loaded and configured, as per
+[Lighttpd documentation](https://redmine.lighttpd.net/projects/lighttpd/wiki/Docs_ConfigurationOptions).
+Support of these modules within this library varies:
 
-```ts
-extraConfig: `
-  server.modules += ("mod_alias")
-  alias.url = ("/sample/url" => "/special/root/path")
-`,
-```
+#### Core and Built-in Modules
+[Core and Built-in Modules]: #core-and-built-in-modules
 
-### Enabling Rewrite Module
-[Enabling Rewrite module]: #enabling-rewrite-module
+**BEWARE:** _The following listing of supported modules should be valid for
+Android, iOS, and macOS target platforms; but most probably it is wrong for
+Windows, as only `mod_dirlisting.dll` and `mod_webdav.dll` are currently
+build and explicitly packed with the library. At the moment of writing this,
+I do not remember in details, how exactly the Windows build of the library
+and its modules is set up, and do not have an immediate interest to revisit it._
 
-[Lighttpd]'s module [mod_rewrite] can be used for interal redirects,
-URL rewrites by the server. To enable it just use `extraConfig` option of
-[Server] [constructor()] to load and configure it, for example:
+There are three core modules that [Lighttpd] loads by default, and that can be
+further configured using the `extraConfig` option of [Server]'s [constructor()]:
 
-```ts
-extraConfig: `
-  server.modules += ("mod_rewrite")
-  url.rewrite-once = ("/some/path/(.*)" => "/$1")
-`,
+- <span id="mod_dirlisting" />[mod_dirlisting] &mdash; creates an HTML page
+  listing the contents of the target directory.
 
-// With such configuration, for example, a request
-// GET "/some/path/file"
-// will be redirected to
-// GET "/file"
-```
+- <span id="mod_indexfile" />[mod_indexfile] &mdash; list of files to try when
+  an HTTP request is for a directory.
 
-### Enabling SetEnv Module
-[Enabling SetEnv module]: #enabling-setenv-module
+- <span id="mod_staticfile" />[mod_staticfile] &mdash; is used to serve files.
 
-[Lighttpd]'s built-in module [mod_setenv] allows to modify request and response
-headers. To enable it just use `extraConfig` option of [Server] [constructor()]
-to load and configure it, for example:
-```ts
-extraConfig: `
-  server.modules += ("mod_setenv")
-  setenv.add-response-header = (
-    "My-Custom-Header" => "my-custom-value"
-    "Another-Custom-Header" => "another-custom-value"
-  )
-  setenv.add-request-header = ("X-Proxy" => "my.server.name")
-`,
-```
+For the following, built-in modules, the `extraConfig` option should be used
+to both load (by listing them within the `server.modules` array), and configure
+them:
 
-### Enabling WebDAV Module
-[Enabling WebDAV module]: #enabling-webdav-module
+- <span id="mod_access" />[mod_access] &mdash; it is used to deny access
+  to files.
 
-[Lighttpd]'s optional module [mod_webdav] provides [WebDAV] &mdash; a set of
-HTTP extensions that provides a framework allowing to create, change, and move
-documents on a server &mdash; essentially an easy way to enable `POST`, `PUT`,
-_etc._ functionality for selected routes.
+- <span id="mod_alias" />[mod_alias] &mdash; it is used to specify a special
+  document root for a given url-subset; for example:
+  ```ts
+  extraConfig: `
+    server.modules += ("mod_alias")
+    alias.url = ("/sample/url" => "/special/root/path")
+  `,
+  ```
 
-**BEWARE:** _As of now, props and locks are not supported._
+- <span id="mod_evhost" />[mod_evhost] &mdash; builds the document-root based on
+  a pattern which contains wildcards.
 
-**BEWARE:** _If you have set up the server to serve static assets bundled into
-the app, the chances are your server works with a readonly location on most
-platforms (in the case of Android it is anyway necessary to unpack bundled
-assets to the regular filesystem, thus there the server might be serving
-from a writeable location already). The easiest way around it is to use
-[mod_alias][Enabling Alias module] to point URLs configured for [mod_webdav]
-to a writeable filesystem location, different from that of the served static
-assets._
+- <span id="mod_expire" />[mod_expire] &mdash; controls the Cache-Control:
+  max-age response header in HTTP/1.1 or later, and Expires response header in
+  HTTP/1.0.
 
-To enable [mod_webdav] in the library you need (1) configure your host RN app
-to build Lighttpd with [mod_webdav] included; (2) opt-in to use it for selected
-routes when you create [Server] instance, using `extraConfig` option.
+- <span id="mod_fastcgi" />[mod_fastcgi] &mdash; provides an interface
+  to external programs that support the FastCGI interface.
 
-1.  **Android**: Edit `android/gradle.properties` file of your app, adding
-    this flag in there:
-    ```gradle
-    ReactNativeStaticServer_webdav = true
-    ```
+- <span id="mod_redirect" />[mod_redirect] &mdash; it is used to specify
+  redirects for a set of URLs.
 
-    **iOS**: Use environment variable `RN_STATIC_SERVER_WEBDAV=1` when
-    installing or updating the pods (_i.e._ when doing `pod install` or
-    `pod update`).
+- <span id="mod_rewrite" />[mod_rewrite] &mdash; it can be used for interal
+  redirects, URL rewrites by the server, for example:
+  ```ts
+  extraConfig: `
+    server.modules += ("mod_rewrite")
+    url.rewrite-once = ("/some/path/(.*)" => "/$1")
+  `,
 
-    **macOS (Catalyst)**: The same as for iOS.
+  // With such configuration, for example, a request
+  // GET "/some/path/file"
+  // will be redirected to
+  // GET "/file"
+  ```
 
-    **Windows**: Does not require a special setup &mdash; the pre-compiled DLL
-    for [WebDAV] module is always packed with the library, and loaded if opted
-    for by [Server]'s [constructor()].
+- <span id="mod_scgi" />[mod_scgi] &mdash; provides SCGI interface.
 
-2.  Use `extraConfig` option of [Server]'s [constructor()] to load [mod_webdav]
-    and use it for selected routes of the created server instance, for example:
-    ```ts
-    extraConfig: `
-      server.modules += ("mod_webdav")
-      $HTTP["url"] =~ "^/dav/($|/)" {
-        webdav.activate = "enable"
-      }
-    `,
-    ```
+- <span id="mod_setenv" />[mod_setenv] &mdash; modifies request headers (from
+  clients), response headers (to clients), and the environment (for CGI);
+  for example:
+  ```ts
+  extraConfig: `
+    server.modules += ("mod_setenv")
+    setenv.add-response-header = (
+      "My-Custom-Header" => "my-custom-value"
+      "Another-Custom-Header" => "another-custom-value"
+    )
+    setenv.add-request-header = ("X-Proxy" => "my.server.name")
+  `,
+  ```
+
+- <span id="mod_simple_vhost" />[mod_simple_vhost] &mdash; allows to host
+  multiple domain names on a single server.
+
+#### Other Modules
+[Other Modules]: #other-modules
+
+All other modules require additional efforts to wire them into this library's
+build process as optional components, which so far has been done only for
+[mod_webdav](#mod_webdav) module:
+
+- <span id="mod_webdav" />[mod_webdav] &mdash; provides [WebDAV], a set of HTTP
+  extensions that provides a framework allowing to create, change, and move
+  documents on a server. Essentially an easy way to enable `POST`, `PUT`,
+  _etc._ functionality for selected routes.
+
+  **BEWARE:** _As of now, props and locks are not supported._
+
+  **BEWARE:** _If you have set up the server to serve static assets bundled into
+  the app, the chances are your server works with a readonly location on most
+  platforms (in the case of Android it is anyway necessary to unpack bundled
+  assets to the regular filesystem, thus there the server might be serving
+  from a writeable location already). The easiest way around it is to use
+  [mod_alias][Enabling Alias module] to point URLs configured for [mod_webdav]
+  to a writeable filesystem location, different from that of the served static
+  assets._
+
+  To enable [mod_webdav] in the library you need (1) configure your host RN app
+  to build Lighttpd with [mod_webdav] included; (2) opt-in to use it for selected
+  routes when you create [Server] instance, using `extraConfig` option.
+
+  1.  **Android**: Edit `android/gradle.properties` file of your app, adding
+      this flag in there:
+      ```gradle
+      ReactNativeStaticServer_webdav = true
+      ```
+
+      **iOS**: Use environment variable `RN_STATIC_SERVER_WEBDAV=1` when
+      installing or updating the pods (_i.e._ when doing `pod install` or
+      `pod update`).
+
+      **macOS (Catalyst)**: The same as for iOS.
+
+      **Windows**: Does not require a special setup &mdash; the pre-compiled DLL
+      for [WebDAV] module is always packed with the library, and loaded if opted
+      for by [Server]'s [constructor()].
+
+  2.  Use `extraConfig` option of [Server]'s [constructor()] to load [mod_webdav]
+      and use it for selected routes of the created server instance, for example:
+      ```ts
+      extraConfig: `
+        server.modules += ("mod_webdav")
+        $HTTP["url"] =~ "^/dav/($|/)" {
+          webdav.activate = "enable"
+        }
+      `,
+      ```
 
 ### Connecting to an Active Server in the Native Layer
 [Connecting to an Active Server in the Native Layer]: #connecting-to-an-active-server-in-the-native-layer
@@ -923,16 +1025,25 @@ import {getActiveServer} from '@dr.pogodin/react-native-static-server';
 
 getActiveServer(): Server | undefined;
 ```
-Returns currently active, starting, or stopping [Server] instance, if any exist
-in the app. It does not return, however, any inactive server instance which has
-been stopped automatically because of `stopInBackground` option, when the app
-entered background, and might be automatically started in future if the app
-enters foreground again prior to an explicit [.stop()] call for that instance.
+Returns the currently active, starting, or stopping [Server] instance, if any
+exist in the app. It does not return, however, any inactive server instance
+which has been stopped automatically because of `stopInBackground` option, when
+the app entered background, and might be automatically started in future if
+the app enters foreground again prior to an explicit [.stop()] call for that
+instance.
 
-**NOTE:** The result of this function is based on the TypeScript layer data
-(that's why it is synchronous), in contrast to the [getActiveServerId()]
-function below, which calls into the Native layer, and returns ID of the active
-server based on that.
+**NOTE:**
+- The result of this function is based on the TypeScript layer data
+  (that's why it is synchronous), in contrast to the [getActiveServerId()]
+  function below, which calls into the Native layer, and returns ID of the active
+  server based on that.
+
+- The feature &laquo;[Connecting to an Active Server in the Native Layer]&raquo;
+  creates a possibility to have several active server instances in TS layer, all
+  connected to the same active server on the native side. For this reason we also
+  provide [getActiveServerSet()] function, which returns a set of all active
+  server instances on TS side. [getActiveServer()] just returns the first server
+  instance from that set.
 
 ### getActiveServerId()
 [getActiveServerId()]: #getactiveserverid
@@ -954,6 +1065,31 @@ layer server.
 **NOTE:** It is different from [getActiveServer()] function above, which
 returns the acurrently active, starting, or stopping [Server] instance based on
 TypeScript layer data.
+
+### getActiveServerSet()
+[getActiveServerSet()]: #getactiveserverset
+```ts
+import {getActiveServer} from '@dr.pogodin/react-native-static-server';
+
+getActiveServer(): Set<Server> | undefined;
+```
+Returns a set of currently active, starting, or stopping [Server] instances,
+if any exist in the app.
+
+**NOTE:**
+- On the native side, there cannot be more than one active (or starting,
+  or stopping) server instance at any time, and the native ID of that server
+  instance can be retrieved by the [getActiveServerId()] function. However,
+  on TS side user can create multiple [Server] object instances, connected to
+  the same native instance
+  (see &laquo;[Connecting to an Active Server in the Native Layer]&raquo;) &mdash;
+  that is how it is possible to have more than one active [Server] on TS side.
+  In normal use, however, this set will have only a single active [Server],
+  and you may use [getActiveServer()] function instead, which always returns
+  the first item in this set.
+
+- When there is no active server instance, this function returns `undefined`
+  (rather than an empty set).
 
 ### resolveAssetsPath()
 [resolveAssetsPath()]: #resolveassetspath

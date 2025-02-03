@@ -10,12 +10,12 @@ class Errors(val name: String, val message: String) {
         get() = Exception(message)
 
     fun log(): Errors {
-        Log.e(LOGTAG, message)
+        Log.e(LOG_TAG, message)
         return this
     }
 
     fun log(e: Exception): Errors {
-        Log.e(LOGTAG, e.toString())
+        Log.e(LOG_TAG, e.toString())
         return this.log()
     }
 
@@ -32,13 +32,13 @@ class Errors(val name: String, val message: String) {
     }
 
     override fun toString(): String {
-        return "$LOGTAG:$name"
+        return "$LOG_TAG:$name"
     }
 
     companion object {
-        const val LOGTAG = "RN_STATIC_SERVER"
+        const val LOG_TAG = "RN_STATIC_SERVER"
 
-        fun ANOTHER_INSTANCE_IS_ACTIVE(
+        fun anotherInstanceIsActive(
             activeServerId: Double,
             failedToLaunchServerId: Double
         ): Errors {
@@ -47,30 +47,26 @@ class Errors(val name: String, val message: String) {
                 "Failed to launch server #$failedToLaunchServerId, another server instance (#$activeServerId) is active.")
         }
 
-        fun FAIL_GET_LOCAL_IP_ADDRESS(): Errors {
+        fun failGetLocalIpAddress(): Errors {
             return Errors(
                 "FAIL_GET_LOCAL_IP_ADDRESS",
-                "Failed to get local IP adddress"
+                "Failed to get local IP address"
             )
         }
 
-        fun FAIL_GET_OPEN_PORT(): Errors {
+        fun failGetOpenPort(): Errors {
             return Errors(
                 "FAIL_GET_OPEN_PORT",
                 "Failed to get an open port"
             )
         }
 
-        fun INTERNAL_ERROR(serverId: Double): Errors {
+        fun internalError(serverId: Double): Errors {
             return Errors("INTERNAL_ERROR", "Internal error (server #$serverId)")
         }
 
-        fun SERVER_CRASHED(serverId: Double): Errors {
+        fun serverCrashed(serverId: Double): Errors {
             return Errors("SERVER_CRASHED", "Server #$serverId crashed")
-        }
-
-        fun STOP_FAILURE(serverId: Double): Errors {
-            return Errors("STOP_FAILURE", "Failed to gracefully shutdown the server #$serverId")
         }
     }
 }

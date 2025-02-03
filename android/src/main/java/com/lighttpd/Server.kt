@@ -23,11 +23,11 @@ import com.drpogodin.reactnativestaticserver.Errors
 class Server(
         val id: Double,
         var configPath: String,
-        var errlogPath: String,
+        private var errorLogPath: String,
         private val signalConsumer: (signal: String, message: String?) -> Unit
 ) : Thread() {
     override fun interrupt() {
-        Log.i(LOGTAG, "Server.interrupt() triggered")
+        Log.i(LOG_TAG, "Server.interrupt() triggered")
         gracefulShutdown()
         // No need to call super.interrupt() here, the native this.shutdown()
         // method will set within the native layer necessary flags that will
@@ -35,18 +35,18 @@ class Server(
     }
 
     private external fun gracefulShutdown()
-    external fun launch(configPath: String, errlogPath: String): Int
+    external fun launch(configPath: String, errorLogPath: String): Int
     override fun run() {
-        Log.i(LOGTAG, "Server.run() triggered")
+        Log.i(LOG_TAG, "Server.run() triggered")
         if (activeServer != null) {
             val msg = "Another Server instance is active"
-            Log.e(LOGTAG, msg)
+            Log.e(LOG_TAG, msg)
             signalConsumer(CRASHED, msg)
             return
         }
         try {
             activeServer = this
-            val res = launch(configPath, errlogPath)
+            val res = launch(configPath, errorLogPath)
             if (res != 0) {
                 throw Exception("Native server exited with status $res")
             }
@@ -54,11 +54,11 @@ class Server(
             // NOTE: It MUST BE set "null" prior to sending out TERMINATED or CRASHED
             // signals.
             activeServer = null
-            Log.i(LOGTAG, "Server terminated gracefully")
+            Log.i(LOG_TAG, "Server terminated gracefully")
             signalConsumer(TERMINATED, null)
         } catch (error: Exception) {
             activeServer = null
-            Log.e(LOGTAG, "Server crashed", error)
+            Log.e(LOG_TAG, "Server crashed", error)
             signalConsumer(CRASHED, error.message)
         }
     }
@@ -73,7 +73,7 @@ class Server(
         const val LAUNCHED = "LAUNCHED"
         const val TERMINATED = "TERMINATED"
         private var activeServer: Server? = null
-        private const val LOGTAG = Errors.LOGTAG
+        private const val LOG_TAG = Errors.LOG_TAG
 
         // NOTE: @JvmStatic annotation is needed to make this function
         // visible via JNI in C code.
