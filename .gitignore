@@ -83,5 +83,5 @@ lib/
 ios/generated
 android/generated
 
-# Other
-/package.tgz
+# React Native Nitro Modules
+nitrogen/
