@@ -8,7 +8,7 @@
     </ProjectReference>
     <!-- Projects from @dr.pogodin/react-native-fs -->
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\@dr.pogodin\react-native-fs\windows\ReactNativeFs\ReactNativeFs.vcxproj">
-      <Project>{8f26d46b-7043-4fdb-a2fd-8a7b16eca729}</Project>
+      <Project>{53640a4d-6b5f-4963-872b-27e5aa4f96ee}</Project>
     </ProjectReference>
     <!-- Projects from @dr.pogodin/react-native-webview -->
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\@dr.pogodin\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj">

@@ -35,7 +35,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Include", "..\node_modules\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactNativeStaticServer", "..\..\windows\ReactNativeStaticServer\ReactNativeStaticServer.vcxproj", "{16DA6F7D-0D78-4550-BCF3-A340A17C7FD9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactNativeFs", "..\node_modules\@dr.pogodin\react-native-fs\windows\ReactNativeFs\ReactNativeFs.vcxproj", "{8F26D46B-7043-4FDB-A2FD-8A7B16ECA729}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactNativeFs", "..\node_modules\@dr.pogodin\react-native-fs\windows\ReactNativeFs\ReactNativeFs.vcxproj", "{53640A4D-6B5F-4963-872B-27E5AA4F96EE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactNativeWebView", "..\node_modules\@dr.pogodin\react-native-webview\windows\ReactNativeWebView\ReactNativeWebView.vcxproj", "{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}"
 EndProject
@@ -165,6 +165,18 @@ Global
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|x64.Build.0 = Release|x64
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|x86.ActiveCfg = Release|Win32
 		{00AA3765-C6A0-4713-B3F9-BFE47B9C83F5}.Release|x86.Build.0 = Release|Win32
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Debug|ARM64.Build.0 = Debug|ARM64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Debug|x64.ActiveCfg = Debug|x64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Debug|x64.Build.0 = Debug|x64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Debug|x86.ActiveCfg = Debug|Win32
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Debug|x86.Build.0 = Debug|Win32
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Release|ARM64.ActiveCfg = Release|ARM64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Release|ARM64.Build.0 = Release|ARM64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Release|x64.ActiveCfg = Release|x64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Release|x64.Build.0 = Release|x64
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Release|x86.ActiveCfg = Release|Win32
+		{53640A4D-6B5F-4963-872B-27E5AA4F96EE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
