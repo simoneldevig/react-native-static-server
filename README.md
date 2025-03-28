@@ -188,7 +188,7 @@ and Windows platforms; powered by [Lighttpd] server.
 
     - [Expo] ([open issues](https://github.com/birdofpreyru/react-native-static-server/issues?q=is%3Aissue+is%3Aopen+label%3AExpo)).
 
-      Though, presumably, the library in its current state already works fine
+      Though, presumably, the library in its current state works just fine
       with [Expo] &mdash; see [Issue#8] and the following example apps:
       - [Expo Example App #1] by [jole141];
       - [Expo Example App #2] by [benjaminkomen].
@@ -287,10 +287,10 @@ and Windows platforms; powered by [Lighttpd] server.
     iOS: "[MainBundlePath]`/webroot`"; \
     Mac Catalyst: "[MainBundlePath]`/Content/Resources/webroot`".
 
-    Also keep in mind that `Platform.OS` value equals "`iOS`" both for the normal
+    Also keep in mind that `Platform.OS` value equals `"iOS"` both for the normal
     iOS and for the Mac Catalyst builds, and you should use different methods
     to distinguish them; for example relying on [getDeviceType()] method of
-    [react-native-device-info] library, which returns 'Desktop' in case of
+    [react-native-device-info] library, which returns `"Desktop"` in case of
     Catalyst build.
 
 - For **Windows**:
