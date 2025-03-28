@@ -227,11 +227,11 @@ and Windows platforms; powered by [Lighttpd] server.
       For details read: https://earthly.dev/blog/homebrew-on-m1,
       and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
 
-    - It looks like with CMake v3.31.5 it is also necessary to
+    - It looks like with the latest CMake v3.31.6 it is also necessary to
       sym-link `/usr/local/share/cmake` to point to the `share/cmake` folder of
       the Homebrew-installed CMake, like so:
       ```sh
-      $ sudo ln -s /opt/homebrew/Cellar/cmake/3.31.5/share/cmake /usr/local/share/cmake
+      $ sudo ln -s /opt/homebrew/Cellar/cmake/3.31.6/share/cmake /usr/local/share/cmake
       ```
       otherwise the build will fail with
       > _CMake Error: Could not find CMAKE_ROOT !!!_
