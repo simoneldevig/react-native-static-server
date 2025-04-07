@@ -606,7 +606,7 @@ build process as optional components, which so far has been done only for
   platforms (in the case of Android it is anyway necessary to unpack bundled
   assets to the regular filesystem, thus there the server might be serving
   from a writeable location already). The easiest way around it is to use
-  [mod_alias][Enabling Alias module] to point URLs configured for [mod_webdav]
+  [mod_alias] to point URLs configured for [mod_webdav]
   to a writeable filesystem location, different from that of the served static
   assets._
 
