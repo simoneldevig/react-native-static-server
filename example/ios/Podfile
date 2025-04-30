@@ -26,6 +26,7 @@ target 'ReactNativeStaticServerExample' do
   )
 
 
+  # Run Codegen during development for the example app.
   pre_install do |installer|
     system("cd ../../ && npx bob build --target codegen")
   end
