@@ -199,22 +199,15 @@ and Windows platforms; powered by [Lighttpd] server.
 
 - [CMake] is required on the build host.
 
-  - **BEWARE:** [**CMake v3.30.0** breaks the library build for iOS](https://github.com/birdofpreyru/react-native-static-server/issues/111)
-    because of a regression on CMake side, and for this reason it is marked as
-    unsupported on all platforms &mdash; be sure to use a different version
-    (v3.22.1&ndash;3.29.6 at the moment of writing).
-
   - When building for **Android**, [CMake] should be installed as a part of your
     _Android SDK_ (open _SDK Manager_, and look for [CMake] within
     the _SDK Tools_ tab).
 
-  - On **MacOS**, the `pkg-config` dependency is also needed. You can install both via [Homebrew],
-    by executing:
-    ```shell
-    $ brew install cmake pkg-config
-    ```
+  - On **MacOS** you want to install [CMake] _via_ [Homebrew].
+    Beware, many recent [CMake] versions caused different build issues
+    on **MacOS**, and required additional manual actions after install
+    to make it work, in particular:
 
-    **IMPORTANT:**
     - [Homebrew] should have added `eval "$(/opt/homebrew/bin/brew shellenv)"'`
       command to your `.zshrc` or `.bashrc`. Although this works for interactive terminals,
       it might not work for sessions inside of other apps, such as XCode, therefore you might need to
@@ -228,9 +221,13 @@ and Windows platforms; powered by [Lighttpd] server.
       For details read: https://earthly.dev/blog/homebrew-on-m1,
       and [Issue#29](https://github.com/birdofpreyru/react-native-static-server/issues/29).
 
-    - It looks like with the latest CMake v3.31.6 it is also necessary to
+    - [**CMake v3.30.0** broke the library build for iOS](https://github.com/birdofpreyru/react-native-static-server/issues/111)
+      because of a regression on CMake side, and for this reason it was marked as
+      unsupported on all platforms.
+
+    - It looks like with CMake v3.31.6&ndash;v3.31.7 it is also necessary to
       sym-link `/usr/local/share/cmake` to point to the `share/cmake` folder of
-      the Homebrew-installed CMake, like so:
+      the [Homebrew]-installed [CMake], like so:
       ```sh
       $ sudo ln -s /opt/homebrew/Cellar/cmake/3.31.6/share/cmake /usr/local/share/cmake
       ```
@@ -238,6 +235,15 @@ and Windows platforms; powered by [Lighttpd] server.
       > _CMake Error: Could not find CMAKE_ROOT !!!_
 
       See [Issue #130](https://github.com/birdofpreyru/react-native-static-server/issues/130) for details.
+
+    - The latest [CMake] v4.0.1 seems to work fine with the latest Xcode 16.3,
+      without the need of sym-linking mentioned under the previous point.
+
+  - On **MacOS**, the `pkg-config` dependency is also needed. You can install both via [Homebrew],
+    by executing:
+    ```shell
+    $ brew install cmake pkg-config
+    ```
 
 - Install the package and its peer dependencies:
   ```shell
