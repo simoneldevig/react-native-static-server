@@ -90,7 +90,7 @@ and Windows platforms; powered by [Lighttpd] server.
   </tr>
 </table>
 
-[<img width=72 src="https://avatars.githubusercontent.com/u/95426957?v=4&s=72" />](https://github.com/Chipster-org)
+[<img width=72 src="https://avatars.githubusercontent.com/u/95426957?v=4&s=72" />](https://chipster.org)
 [<img width=36 src="https://avatars.githubusercontent.com/u/71085569?s=36" />](https://github.com/Lumentric)
 
 ### [Contributors](https://github.com/birdofpreyru/react-native-static-server/graphs/contributors)
