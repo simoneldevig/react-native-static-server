@@ -7,8 +7,8 @@ android/gradle
 android/gradlew
 android/gradlew.bat
 android/local.properties
-/build
+build/
 dr.pogodin-react-native-static-server-*.tgz
-/example/
-ios/build
+example/
+ios/build/
 node_modules
