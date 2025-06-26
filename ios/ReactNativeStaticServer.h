@@ -1,6 +1,6 @@
 #import <React/RCTEventEmitter.h>
 
-#import "generated/RNReactNativeStaticServerSpec/RNReactNativeStaticServerSpec.h"
+#import "ReactNativeStaticServerSpec/ReactNativeStaticServerSpec.h"
 
 @interface ReactNativeStaticServer : RCTEventEmitter <NativeReactNativeStaticServerSpec>
 
