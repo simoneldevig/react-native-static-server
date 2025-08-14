@@ -115,7 +115,8 @@
     }
   },
   "dependencies": {
-    "@dr.pogodin/js-utils": "^0.0.18"
+    "@dr.pogodin/js-utils": "^0.0.18",
+    "react-native-windows": "0.80.0-preview.2"
   },
   "create-react-native-library": {
     "languages": "kotlin-objc",
