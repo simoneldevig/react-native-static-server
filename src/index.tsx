@@ -4,7 +4,7 @@ import {
   NativeEventEmitter,
   type NativeEventSubscription,
   Platform,
-} from 'react-native';
+} from "react-native";
 
 import {
   copyFileAssets,
@@ -12,21 +12,21 @@ import {
   mkdir,
   readDirAssets,
   unlink,
-} from '@dr.pogodin/react-native-fs';
+} from "@dr.pogodin/react-native-fs";
 
-import { Emitter, Semaphore } from '@dr.pogodin/js-utils';
+import { Emitter, Semaphore } from "@dr.pogodin/js-utils";
 
 import {
   ERROR_LOG_FILE,
   newStandardConfigFile,
   type ErrorLogOptions,
-} from './config';
+} from "./config";
 
-import { SIGNALS, STATES } from './constants';
-import ReactNativeStaticServer from './NativeReactNativeStaticServer';
-import { resolveAssetsPath } from './utils';
+import { SIGNALS, STATES } from "./constants";
+import ReactNativeStaticServer from "./NativeReactNativeStaticServer";
+import { resolveAssetsPath } from "./utils";
 
-export { ERROR_LOG_FILE, UPLOADS_DIR, WORK_DIR } from './config';
+export { ERROR_LOG_FILE, UPLOADS_DIR, WORK_DIR } from "./config";
 
 export { STATES, resolveAssetsPath };
 
@@ -36,7 +36,7 @@ const servers: { [id: string]: Set<StaticServer> } = {};
 
 const nativeEventEmitter = new NativeEventEmitter(ReactNativeStaticServer);
 
-const LOOPBACK_ADDRESS = '127.0.0.1';
+const LOOPBACK_ADDRESS = "127.0.0.1";
 
 export type StateListener = (
   newState: STATES,
@@ -45,7 +45,7 @@ export type StateListener = (
 ) => void;
 
 nativeEventEmitter.addListener(
-  'RNStaticServer',
+  "RNStaticServer",
   ({ serverId, event, details }) => {
     const group = servers[serverId];
     if (group) {
@@ -89,11 +89,11 @@ class StaticServer {
   _errorLog?: ErrorLogOptions;
   _extraConfig: string;
   _fileDir: string;
-  _hostname = '';
+  _hostname = "";
 
   /* DEPRECATED */ _nonLocal: boolean;
 
-  _origin: string = '';
+  _origin: string = "";
   _stopInBackground: boolean;
   _port: number;
 
@@ -150,7 +150,7 @@ class StaticServer {
     return this._state;
   }
 
-  _setState(neu: STATES, details: string = '', error?: Error) {
+  _setState(neu: STATES, details: string = "", error?: Error) {
     this._state = neu;
     this._stateChangeEmitter.emit(neu, details, error);
   }
@@ -160,7 +160,7 @@ class StaticServer {
    */
   constructor({
     errorLog = false,
-    extraConfig = '',
+    extraConfig = "",
     fileDir,
     hostname,
 
@@ -199,7 +199,7 @@ class StaticServer {
     this._id = id;
 
     this._nonLocal = nonLocal;
-    this._hostname = hostname || (nonLocal ? '' : LOOPBACK_ADDRESS);
+    this._hostname = hostname || (nonLocal ? "" : LOOPBACK_ADDRESS);
 
     this._port = port;
     this._stopInBackground = stopInBackground;
@@ -220,7 +220,7 @@ class StaticServer {
       default:
     }
 
-    if (!fileDir) throw Error('`fileDir` MUST BE a non-empty string');
+    if (!fileDir) throw Error("`fileDir` MUST BE a non-empty string");
     this._fileDir = resolveAssetsPath(fileDir);
 
     this._webdav = webdav;
@@ -234,7 +234,7 @@ class StaticServer {
     if (this._stopInBackground) {
       if (!this._appStateSub) {
         this._appStateSub = AppState.addEventListener(
-          'change',
+          "change",
           this._handleAppStateChange.bind(this),
         );
       }
@@ -341,7 +341,7 @@ class StaticServer {
       await ReactNativeStaticServer.start(
         this._id,
         this._configPath,
-        this._errorLog ? ERROR_LOG_FILE : '',
+        this._errorLog ? ERROR_LOG_FILE : "",
       );
 
       this._setState(STATES.ACTIVE);
@@ -410,10 +410,10 @@ class StaticServer {
   }
 
   async _handleAppStateChange(appState: AppStateStatus) {
-    const starting = appState === 'active' || appState === 'inactive';
+    const starting = appState === "active" || appState === "inactive";
     try {
-      if (starting) await this.start('App entered foreground');
-      else await this._stop('App entered background');
+      if (starting) await this.start("App entered foreground");
+      else await this._stop("App entered background");
     } catch (e) {
       // If anything goes wrong within .start() or ._stop() calls, those methods
       // will move the server into the "CRASHED" state, and they'll notify all
@@ -461,13 +461,13 @@ export default StaticServer;
  */
 export async function extractBundledAssets(
   into = DocumentDirectoryPath,
-  from = '',
+  from = "",
 ) {
   console.warn(
-    'extractBundledAssets() is deprecated! See: https://github.com/birdofpreyru/react-native-static-server?tab=readme-ov-file#extractbundledassets',
+    "extractBundledAssets() is deprecated! See: https://github.com/birdofpreyru/react-native-static-server?tab=readme-ov-file#extractbundledassets",
   );
 
-  if (Platform.OS !== 'android') return;
+  if (Platform.OS !== "android") return;
 
   await mkdir(into);
   const assets = await readDirAssets(from);

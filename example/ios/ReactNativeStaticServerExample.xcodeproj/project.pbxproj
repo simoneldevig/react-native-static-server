@@ -412,7 +412,6 @@
 				CODE_SIGN_ENTITLEMENTS = ReactNativeStaticServerExample/ReactNativeStaticServerExample.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 7TTF2KGYQU;
 				INFOPLIST_FILE = ReactNativeStaticServerExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

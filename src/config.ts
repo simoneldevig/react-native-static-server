@@ -4,7 +4,7 @@ import {
   mkdir,
   TemporaryDirectoryPath,
   writeFile,
-} from '@dr.pogodin/react-native-fs';
+} from "@dr.pogodin/react-native-fs";
 
 /**
  * Filesystem location where the library will keep its working files (configs,
@@ -68,21 +68,21 @@ function errorLogConfig(errorLogOptions?: ErrorLogOptions): string {
     const enable = (op: string) => {
       res.push(`debug.log-${op} = "enable"`);
     };
-    if (ops.conditionHandling) enable('condition-handling');
-    if (ops.fileNotFound) enable('file-not-found');
-    if (ops.requestHandling) enable('request-handling');
-    if (ops.requestHeader) enable('request-header');
-    if (ops.requestHeaderOnError) enable('request-header-on-error');
-    if (ops.responseHeader) enable('response-header');
+    if (ops.conditionHandling) enable("condition-handling");
+    if (ops.fileNotFound) enable("file-not-found");
+    if (ops.requestHandling) enable("request-handling");
+    if (ops.requestHeader) enable("request-header");
+    if (ops.requestHeaderOnError) enable("request-header-on-error");
+    if (ops.responseHeader) enable("response-header");
 
     // Not a valid option, without TLS module (see more details in a comment
     // earlier in the file).
     // if (ops.sslNoise) enable('ssl-noise');
 
-    if (ops.timeouts) enable('timeouts');
+    if (ops.timeouts) enable("timeouts");
   } else res.push('server.errorlog-use-syslog = "enable"');
 
-  return res.join('\n');
+  return res.join("\n");
 }
 
 /**
@@ -98,7 +98,7 @@ function standardConfig({
   port,
   webdav, // DEPRECATED
 }: StandardConfigOptions) {
-  let webdavConfig = '';
+  let webdavConfig = "";
   if (webdav) {
     webdavConfig += 'server.modules += ("mod_webdav")';
     for (let i = 0; i < webdav.length; ++i) {
@@ -133,6 +133,6 @@ export async function newStandardConfigFile(
   await mkdir(UPLOADS_DIR);
 
   const configFile = `${WORK_DIR}/config-${Date.now()}.txt`;
-  await writeFile(configFile, standardConfig(options), 'utf8');
+  await writeFile(configFile, standardConfig(options), "utf8");
   return configFile;
 }

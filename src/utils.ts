@@ -1,22 +1,22 @@
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
 import {
   DocumentDirectoryPath,
   MainBundlePath,
-} from '@dr.pogodin/react-native-fs';
+} from "@dr.pogodin/react-native-fs";
 
-import { IS_MAC_CATALYST } from './constants';
+import { IS_MAC_CATALYST } from "./constants";
 
-type PLATFORM = 'ANDROID' | 'IOS' | 'MACOS' | 'WINDOWS';
+type PLATFORM = "ANDROID" | "IOS" | "MACOS" | "WINDOWS";
 
 function getPlatform(): PLATFORM {
   switch (Platform.OS) {
-    case 'android':
-      return 'ANDROID';
-    case 'ios':
-      return IS_MAC_CATALYST ? 'MACOS' : 'IOS';
-    case 'windows':
-      return 'WINDOWS';
+    case "android":
+      return "ANDROID";
+    case "ios":
+      return IS_MAC_CATALYST ? "MACOS" : "IOS";
+    case "windows":
+      return "WINDOWS";
     default:
       throw Error(`Unsupported platform ${Platform.OS}`);
   }
@@ -26,14 +26,14 @@ const PLATFORM: PLATFORM = getPlatform();
 
 const BASE_ASSET_DIRS: { [key in typeof PLATFORM]: string } = {
   ANDROID: DocumentDirectoryPath,
-  IOS: MainBundlePath || '',
+  IOS: MainBundlePath || "",
   MACOS: `${MainBundlePath}/Contents/Resources`,
-  WINDOWS: MainBundlePath || '',
+  WINDOWS: MainBundlePath || "",
 };
 
 const BASE_ASSET_DIR = BASE_ASSET_DIRS[PLATFORM];
 
-const SEP = PLATFORM === 'WINDOWS' ? '\\' : '/';
+const SEP = PLATFORM === "WINDOWS" ? "\\" : "/";
 
 /**
  * Returns `true` if given path is absolute, `false` otherwise.
@@ -43,12 +43,12 @@ const SEP = PLATFORM === 'WINDOWS' ? '\\' : '/';
 function isAbsolutePath(path: string): boolean {
   if (!path) return false;
 
-  if (Platform.OS === 'windows') {
+  if (Platform.OS === "windows") {
     return !!path.match(/^[a-zA-Z]:\\/);
   }
 
   // This should do for Android and iOS.
-  return path.startsWith('/') || path.startsWith('file:///');
+  return path.startsWith("/") || path.startsWith("file:///");
 }
 
 /**

@@ -6,12 +6,12 @@ window.onNativeMessage = function (message) {
   alert(`Got message from React Native layer: ${message}`);
 };
 
-document.getElementById('message-to-rn').addEventListener('click', function () {
+document.getElementById("message-to-rn").addEventListener("click", function () {
   // .ReactNativeWebView is automatically attached to the `window` by the host
   // WebView component, and it has .postMessage() method allowing to send text
   // messages to the React Native layer.
   if (window.ReactNativeWebView) {
-    const message = 'Hello from the WebView content!';
+    const message = "Hello from the WebView content!";
     window.ReactNativeWebView.postMessage(message);
   }
 });
