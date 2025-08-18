@@ -31,11 +31,18 @@ endif()
 string(REPLACE " " "\\\;" ESCAPED_ARCHS "$ENV{ARCHS_STANDARD}")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
+  # These (and similar values set for DCMAKE_SHARED_LINKER_FLAGS below)
+  # are necessary to ensure 16KB Memory Page Size compatibility of compiled
+  # shared libraries; for additional details see:
+  # https://developer.android.com/guide/practices/page-sizes
+  link_libraries("-Wl,-z,max-page-size=16384")
+  link_libraries("-Wl,-z,common-page-size=16384")
   set(
     EXTRA_BUILD_ARGS
     -DANDROID_ABI=${ANDROID_ABI}
     -DANDROID_PLATFORM=${ANDROID_PLATFORM}
     -DANDROID_STL=${ANDROID_STL}
+    -DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
     -GNinja
   )
