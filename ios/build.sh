@@ -24,4 +24,4 @@ BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
 xcodebuild -create-xcframework \
 -framework './build/ReactNativeStaticServer.framework-iphonesimulator.xcarchive/Products/Library/Frameworks/ReactNativeStaticServer.framework' \
 -framework './build/ReactNativeStaticServer.framework-iphoneos.xcarchive/Products/Library/Frameworks/ReactNativeStaticServer.framework' \
--output './build/ReactNativeStaticServers.xcframework'
+-output './build/ReactNativeStaticServer.xcframework'

@@ -1,6 +1,6 @@
 {
   "name": "@dr.pogodin/react-native-static-server",
-  "version": "0.24.2",
+  "version": "0.25.0",
   "description": "Embedded HTTP server for React Native",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -19,7 +19,8 @@
     "typecheck": "tsc",
     "lint": "eslint",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build"
+    "prepare": "bob build",
+    "build-ios-framework": "ios/build.sh"
   },
   "keywords": [
     "react-native",

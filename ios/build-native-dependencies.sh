@@ -19,17 +19,11 @@ else
   EXTRA_CONFIG_ARGS="-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
 fi
 
-# Handle WebDAV module if enabled
-EXTRA_CMAKE_ARGS=""
-if [[ "${RN_STATIC_SERVER_WEBDAV}" == "1" ]]; then
-  EXTRA_CMAKE_ARGS=" -DWITH_MOD_WEBDAV=ON"
-fi
-
 # Get the project root (2 levels up from the Xcode project)
-PROJECT_ROOT="${PROJECT_DIR}/../.."
+PROJECT_ROOT="${PROJECT_DIR}/.."
 
 cmake "${PROJECT_ROOT}" -B ${TARGET_TEMP_DIR} \
-  -DBUILD_STATIC=1 -DBUILD_LIBRARY=1 ${EXTRA_CONFIG_ARGS} ${EXTRA_CMAKE_ARGS}
+  -DBUILD_STATIC=1 -DBUILD_LIBRARY=1 ${EXTRA_CONFIG_ARGS} ${EXTRA_CMAKE_ARGS} -DWITH_MOD_WEBDAV=ON
 
 cmake --build ${TARGET_TEMP_DIR} --config ${LIGHTTPD_CONFIG} --target lighttpd
 
