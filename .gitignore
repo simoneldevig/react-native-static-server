@@ -11,8 +11,8 @@ jsconfig.json
 
 # Xcode
 #
-build/
-!*.xcframework
+example/ios/build/
+ios/build/*.xcarchive
 *.pbxuse
 !default.pbxuser
 *.mode1v3
