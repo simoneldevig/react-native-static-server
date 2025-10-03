@@ -7,7 +7,7 @@ android/gradle
 android/gradlew
 android/gradlew.bat
 android/local.properties
-build/
+ios/build/*.xcarchive
 dr.pogodin-react-native-static-server-*.tgz
 example/
 ios/build/
