@@ -11,9 +11,8 @@ jsconfig.json
 
 # Xcode
 #
-# ignore everything under ios/build, then re-include the xcframework
 build/
-!ios/build/ReactNativeStaticServer.xcframework/**
+!*.xcframework
 *.pbxuse
 !default.pbxuser
 *.mode1v3
