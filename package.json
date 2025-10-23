@@ -75,6 +75,7 @@
     "react": "19.1.1",
     "react-native": "0.82.0",
     "react-native-builder-bob": "^0.40.13",
+    "react-native-monorepo-config": "^0.2.2",
     "react-native-windows": "0.80.0-preview.8",
     "typescript": "^5.9.3"
   },
