@@ -12,6 +12,9 @@ jsconfig.json
 # Xcode
 #
 build/
+!ios/build/
+ios/build/*
+!ios/build/ReactNativeStaticServer.xcframework/
 *.pbxuse
 !default.pbxuser
 *.mode1v3
@@ -85,6 +88,3 @@ android/generated
 
 # React Native Nitro Modules
 nitrogen/
-
-# iOS xcframework
-!ios/build/ReactNativeStaticServer.xcframework
