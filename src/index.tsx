@@ -414,7 +414,7 @@ class StaticServer {
     try {
       if (starting) await this.start("App entered foreground");
       else await this._stop("App entered background");
-    } catch (e) {
+    } catch {
       // If anything goes wrong within .start() or ._stop() calls, those methods
       // will move the server into the "CRASHED" state, and they'll notify all
       // server state listeners (see .addStateListener()) about the error, with
