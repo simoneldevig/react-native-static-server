@@ -86,3 +86,12 @@ fi
 
 echo "=== Final built products ==="
 ls -la "${BUILT_PRODUCTS_DIR}/"*.a 2>/dev/null || echo "No .a files in built products dir"
+
+echo "=== Cleaning up temporary build files ==="
+
+# Clean up temp directory
+if [[ -d "${TARGET_TEMP_DIR}" ]]; then
+  echo "Removing temporary build directory: ${TARGET_TEMP_DIR}"
+  rm -rf "${TARGET_TEMP_DIR}"
+  echo "Cleanup completed - temp directory removed"
+fi
