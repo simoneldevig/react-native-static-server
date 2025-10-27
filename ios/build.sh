@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# Change to the iOS directory to ensure xcodebuild can find the project
+cd "$(dirname "$0")"
+
 rm -rf build
 
 # For iOS Device
