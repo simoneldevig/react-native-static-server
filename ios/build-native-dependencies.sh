@@ -70,18 +70,22 @@ fi
 
 echo "=== Copying files to ${BUILT_PRODUCTS_DIR} ==="
 
-# Copy lighttpd libraries
+# Copy specific lighttpd libraries
 if [[ -f "${LIGHTTPD_BUILD_DIR}/liblighttpd.a" ]]; then
-  cp "${LIGHTTPD_BUILD_DIR}/"*.a "${BUILT_PRODUCTS_DIR}"
+  # Copy specific lighttpd libraries
+  cp "${LIGHTTPD_BUILD_DIR}/liblighttpd.a" "${BUILT_PRODUCTS_DIR}" 2>/dev/null || echo "liblighttpd.a not found in ${LIGHTTPD_BUILD_DIR}"
+  cp "${LIGHTTPD_BUILD_DIR}/libmod_h2.a" "${BUILT_PRODUCTS_DIR}" 2>/dev/null || echo "libmod_h2.a not found in ${LIGHTTPD_BUILD_DIR}"
 else
-  cp "${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}/"*.a "${BUILT_PRODUCTS_DIR}"
+  # Copy specific lighttpd libraries from alternative location
+  cp "${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}/liblighttpd.a" "${BUILT_PRODUCTS_DIR}" 2>/dev/null || echo "liblighttpd.a not found in ${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}"
+  cp "${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}/libmod_h2.a" "${BUILT_PRODUCTS_DIR}" 2>/dev/null || echo "libmod_h2.a not found in ${TARGET_TEMP_DIR}/lighttpd1.4/build${BUILD_OUTPUT_FOLDER_LIGHTTPD}"
 fi
 
-# Copy pcre2 libraries
+# Copy specific pcre2 library
 if [[ -f "${PCRE2_BUILD_DIR}/libpcre2-8.a" ]]; then
-  cp "${PCRE2_BUILD_DIR}/"*.a "${BUILT_PRODUCTS_DIR}"
+  cp "${PCRE2_BUILD_DIR}/libpcre2-8.a" "${BUILT_PRODUCTS_DIR}" 2>/dev/null || echo "libpcre2-8.a not found in ${PCRE2_BUILD_DIR}"
 else
-  cp "${TARGET_TEMP_DIR}/pcre2${BUILD_OUTPUT_FOLDER_PCRE2}/"*.a "${BUILT_PRODUCTS_DIR}"
+  cp "${TARGET_TEMP_DIR}/pcre2${BUILD_OUTPUT_FOLDER_PCRE2}/libpcre2-8.a" "${BUILT_PRODUCTS_DIR}" 2>/dev/null || echo "libpcre2-8.a not found in ${TARGET_TEMP_DIR}/pcre2${BUILD_OUTPUT_FOLDER_PCRE2}"
 fi
 
 echo "=== Final built products ==="

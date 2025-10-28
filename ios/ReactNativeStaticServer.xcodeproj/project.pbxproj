@@ -129,11 +129,8 @@
 			);
 			outputPaths = (
 				"${BUILT_PRODUCTS_DIR}/liblighttpd.a",
-				"${BUILT_PRODUCTS_DIR}/libmod_dirlisting.a",
 				"${BUILT_PRODUCTS_DIR}/libmod_h2.a",
-				"${BUILT_PRODUCTS_DIR}/libmod_webdav.a",
 				"${BUILT_PRODUCTS_DIR}/libpcre2-8.a",
-				"${BUILT_PRODUCTS_DIR}/libpcre2-posix.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -183,7 +180,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				OTHER_LDFLAGS = "-force_load $(BUILT_PRODUCTS_DIR)/liblighttpd.a -force_load $(BUILT_PRODUCTS_DIR)/libpcre2-8.a -force_load $(BUILT_PRODUCTS_DIR)/libpcre2-posix.a -force_load $(BUILT_PRODUCTS_DIR)/libmod_h2.a -lz";
+				OTHER_LDFLAGS = "-force_load $(BUILT_PRODUCTS_DIR)/liblighttpd.a -force_load $(BUILT_PRODUCTS_DIR)/libpcre2-8.a -force_load $(BUILT_PRODUCTS_DIR)/libmod_h2.a -lz";
 PRODUCT_BUNDLE_IDENTIFIER = ReactNativeStaticServer.ReactNativeStaticServer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
@@ -228,7 +225,7 @@ PRODUCT_BUNDLE_IDENTIFIER = ReactNativeStaticServer.ReactNativeStaticServer;
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				OTHER_LDFLAGS = "-force_load $(BUILT_PRODUCTS_DIR)/liblighttpd.a -force_load $(BUILT_PRODUCTS_DIR)/libpcre2-8.a -force_load $(BUILT_PRODUCTS_DIR)/libpcre2-posix.a -force_load $(BUILT_PRODUCTS_DIR)/libmod_h2.a -lz";
+				OTHER_LDFLAGS = "-force_load $(BUILT_PRODUCTS_DIR)/liblighttpd.a -force_load $(BUILT_PRODUCTS_DIR)/libpcre2-8.a -force_load $(BUILT_PRODUCTS_DIR)/libmod_h2.a -lz";
 PRODUCT_BUNDLE_IDENTIFIER = ReactNativeStaticServer.ReactNativeStaticServer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;

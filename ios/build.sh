@@ -3,7 +3,7 @@
 # Change to the iOS directory to ensure xcodebuild can find the project
 cd "$(dirname "$0")"
 
-rm -rf build
+rm -rf build/ReactNativeStaticServer.*
 
 # For iOS Device
 xcodebuild archive \
